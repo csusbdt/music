@@ -155,12 +155,6 @@ window.set_draw = (t, f) => {
     draw_id = setInterval(draw_func, t);
 };
 
-
-
-/*
-
-UNUSED
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 // color palette
@@ -176,7 +170,6 @@ window.colors = {
 	white  : [174, 201, 201]
 };
 
-
 const rgb_red    = `rgb(${colors.red   [0]}, ${colors.red   [1]}, ${colors.red   [2]})`;
 const rgb_green  = `rgb(${colors.green [0]}, ${colors.green [1]}, ${colors.green [2]})`;
 const rgb_blue   = `rgb(${colors.blue  [0]}, ${colors.blue  [1]}, ${colors.blue  [2]})`;
@@ -189,4 +182,53 @@ window.bg_red = _ => {
 	ctx.fillRect(0, 0, design_width, design_height);
 };
 
-*/
+window.bg_green = _ => {
+	ctx.fillStyle = rgb_green;
+	ctx.fillRect(0, 0, design_width, design_height);
+};
+
+window.bg_blue = _ => {
+	ctx.fillStyle = rgb_blue;
+	ctx.fillRect(0, 0, design_width, design_height);
+};
+
+window.bg_yellow = _ => {
+	ctx.fillStyle = rgb_yellow;
+	ctx.fillRect(0, 0, design_width, design_height);
+};
+
+window.bg_black = _ => {
+	ctx.fillStyle = rgb_black;
+	ctx.fillRect(0, 0, design_width, design_height);
+};
+
+window.bg_white = _ => {
+	ctx.fillStyle = rgb_white;
+	ctx.fillRect(0, 0, design_width, design_height);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// animation
+//
+///////////////////////////////////////////////////////////////////////////////
+
+window.once = (...args) => {
+    const q = args.slice();
+    return _ => {
+        const first = q.shift();
+        if (first === undefined || first === null) {
+            return;
+        } else if (Array.isArray(first)) {
+            first.forEach(f => {
+                if (typeof f === "boolean") {
+                    if (f) q.unshift(first);
+                } else {
+                    f();
+                }
+            });
+        } else {
+            first();
+        }
+    };
+}
