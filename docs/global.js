@@ -53,23 +53,27 @@ window.design_coords = e => {
 };
 
 window.adjust_canvas = _ => {
-	let w = window.innerWidth;
-	let h = window.innerHeight;
-
-	// Set canvas size.
-	scale = Math.min(w / design_width, h / design_height);
-	canvas.width  = scale * design_width;
-	canvas.height = scale * design_height;
-
-	// Center canvas in browser window.
-	left = (w  - canvas.width ) / 2;
-	top  = (h - canvas.height) / 2;
+    const sx          = window.innerWidth  / design_width ;
+    const sy          = window.innerHeight / design_height;
+    scale             = Math.min(sx, sy);
+	canvas.width      = scale * design_width ;
+	canvas.height     = scale * design_height;
+	left              = (window.innerWidth  - canvas.width ) / 2;
+	top               = (window.innerHeight - canvas.height) / 2;
 	canvas.style.left = left;
-	canvas.style.top  = top;
-
-	// Set drawing context transform to scale 
-    // design coordinates to display coordinates.
+	canvas.style.top  = top ;
 	ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    
+	// let w             = window.innerWidth;
+	// let h             = window.innerHeight;
+	// scale             = Math.min(w / design_width, h / design_height);
+	// canvas.width      = scale * design_width;
+	// canvas.height     = scale * design_height;
+	// left              = (w - canvas.width ) / 2;
+	// top               = (h - canvas.height) / 2;
+	// canvas.style.left = left;
+	// canvas.style.top  = top;
+	// ctx.setTransform(scale, 0, 0, scale, 0, 0);
 }
 
 window.addEventListener('resize', adjust_canvas);
@@ -99,7 +103,7 @@ canvas.addEventListener('click', e => {
 
 window.circle = function(x, y, r) {
 	return _ => { 
-        return (x - click_x) * (x - click_x) + (click_y - y) * (y - click_y) < r * r; 
+        return (x - click_x) * (x - click_x) + (y - click_y) * (y - click_y) < r * r; 
     };
 };
 
@@ -108,7 +112,6 @@ window.rect = function(left, top, right, bottom) {
         return left <= click_x && top <= click_y && click_x < right && click_y < bottom; 
     };
 };
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //
