@@ -82,15 +82,19 @@ adjust_canvas();
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-let click_x  = null;
-let click_y  = null;
-window.click = null;
+let click_x    = null;
+let click_y    = null;
+let click_func = null;
+
+window.set_click = f => {
+    click_func = f;
+}
 
 canvas.addEventListener('click', e => {
-    if (click === null) return;
+    if (click_func === null) return;
     click_x = (e.pageX - left) / scale;
 	click_y = (e.pageY - top ) / scale;
-    click(click_x, click_y);
+    click_func(click_x, click_y);
 });
 
 window.circle = function(x, y, r) {
@@ -132,10 +136,6 @@ c_image.prototype.draw = function(x, y, s) {
 	ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
 };
 
-// window.image = (src, x = 0, y = 0, s = 1) => {
-//     return new c_image(src, x, y, s);
-// };
-
 window.image = (src, x = 0, y = 0, s = 1) => {
     const image = new c_image(src, x, y, s);
     return (x = 0, y = 0, s = 1) => {
@@ -146,10 +146,9 @@ window.image = (src, x = 0, y = 0, s = 1) => {
 let draw_id   = null;
 let draw_func = null;
 
-window.loop = (t, f) => {
+window.set_draw = (t, f) => {
     if (draw_id !== null) clearInterval(draw_id);
     draw_func = f;
-//    f();
     draw_id = setInterval(draw_func, t);
 };
 

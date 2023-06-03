@@ -1,7 +1,7 @@
 const bg         = image("./home/images/bg.png");
 const big_button = circle(490, 500, 200);
 
-click = _ => {
+const click = _ => {
     if (big_button()) {
         console.log("big button");
     }
@@ -12,7 +12,8 @@ const draw = _ => {
 };
 
 const start = _ => {
-    window.loop(350, draw);
+    set_click(click);
+    set_draw(350, draw);
 };
 
 export default start;
