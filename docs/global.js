@@ -102,6 +102,13 @@ window.rect = function(left, top, right, bottom) {
     };
 };
 
+window.shapes = function(..._shapes) {
+	for (let i = 0; i < _shapes.length; ++i) {
+		if (_shapes[i]()) return true;
+	}
+	return false;
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // drawing
@@ -121,15 +128,19 @@ c_image.prototype.clone = function(x, y, s) {
 };
 
 c_image.prototype.draw = function(x, y, s) {
-    const sx      = 0                    ;
-    const sy      = 0                    ;
-    const sWidth  = this.image.width     ;
-    const sHeight = this.image.height    ;
-    const dx      = this.x + x           ;
-    const dy      = this.y + y           ;
-    const dWidth  = sWidth * this.s * s  ;
-    const dHeight = sHeight * this.s * s ;
-	ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+	if (this.image.complete) {
+		const dx      = this.x + x           ;
+		const dy      = this.y + y           ;
+		const sx      = 0                    ;
+		const sy      = 0                    ;
+	    const sWidth  = this.image.width     ;
+	    const sHeight = this.image.height    ;
+	    const dWidth  = sWidth * this.s * s  ;
+	    const dHeight = sHeight * this.s * s ;
+		ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
+	} else {
+		this.image.onload = this.draw.bind(this, x, y, s);
+	}
 };
 
 window.image = (src, x = 0, y = 0, s = 1) => {
@@ -146,8 +157,12 @@ let draw_func = null;
 window.set_draw = (t, f) => {
     if (draw_id !== null) clearInterval(draw_id);
     draw_func = f;
-    draw_id = setInterval(draw_func, t);
-	draw_func();
+	if (t === undefined) {
+		draw_func = null;
+	} else {
+	    draw_id = setInterval(draw_func, t);
+		draw_func();
+	}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -207,6 +222,21 @@ window.draw_white_bg = _ => {
 // animation
 //
 ///////////////////////////////////////////////////////////////////////////////
+
+window.schedule = (...args) => {
+	let wait = 0;
+	args.forEach(a => {
+		for (let i = a.length - 1; i >= 0; --i) {
+			if (Number.isInteger(a[i])) {
+				wait += a[i];
+				a.splice(i, 1);
+			}
+		}
+		setTimeout(_ => {
+			a.forEach(o => { o(); });
+		}, wait);
+	});
+}
 
 window.once = (...args) => {
     const q = args.slice();
