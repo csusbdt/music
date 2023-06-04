@@ -53,14 +53,25 @@ c_button.prototype.draw = function() {
     this.border();
 };
 
+const song_2 = [
+    [160, .25, 1.10 - 0   ],
+	[ 47, .52, 2.10 - 1.10],
+	[ 65, .42, 3.14 - 2.10],
+	[ 81, .69, 4.20 - 3.14],
+	[239, .48, 5.22 - 4.20],
+	[ 96, .18, 6.20 - 5.22],
+	[ 51, .42, 7.19 - 6.20],
+	[ 69, .66, 8.26 - 7.19]
+];
+
 const buttons = [
-    new c_button("big"     , circle(460, 550, 170), song()),
-    new c_button("medium_1", circle(770, 330, 100), song()),
-    new c_button("medium_2", circle(760, 808, 115), song()),
-    new c_button("small_1" , circle(230, 393,  56), song()),
-    new c_button("small_2" , circle(166, 754,  40), song()),
-    new c_button("small_3" , circle(420, 812,  45), song()),
-    new c_button("small_4" , circle(780, 570,  45), song())
+    new c_button("big"     , circle(460, 550, 170), song(song_2)),
+    new c_button("medium_1", circle(770, 330, 100), song(song_2)),
+    new c_button("medium_2", circle(760, 808, 115), song(song_2)),
+    new c_button("small_1" , circle(230, 393,  56), song(song_2)),
+    new c_button("small_2" , circle(166, 754,  40), song(song_2)),
+    new c_button("small_3" , circle(420, 812,  45), song(song_2)),
+    new c_button("small_4" , circle(780, 570,  45), song(song_2))
 ];
 
 const click = _ => {
