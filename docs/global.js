@@ -127,6 +127,10 @@ function c_image(src, x, y, s) {
     this.s         = s;
 }
 
+c_image.prototype.clone = function(x, y, s) {
+    return new c_image(this.image.src, x, y, s);
+};
+
 c_image.prototype.draw = function(x, y, s) {
     const sx      = 0                    ;
     const sy      = 0                    ;
@@ -141,10 +145,30 @@ c_image.prototype.draw = function(x, y, s) {
 
 window.image = (src, x = 0, y = 0, s = 1) => {
     const image = new c_image(src, x, y, s);
-    return (x = 0, y = 0, s = 1) => {
+    const f = (x = 0, y = 0, s = 1) => {
         image.draw(x, y, s);
-    }
+    };
+    return f;
 };
+
+
+// function image(src, x = 0, y = 0, s = 1) {
+//     const f = (x = 0, y = 0, s = 1) => {
+//         this.draw(x, y, s);
+//     };
+    
+//     const i = new c_image(src, x, y, s);
+//     const f = (x = 0, y = 0, s = 1) => {
+//         i.draw(x, y, s);
+//     };
+//     f.clone = (cx = 0, cy = 0, cs = 1) => {
+//         return (x = 0, y = 0, s = 1) => {
+//             image.draw(x, y, s);
+//         };
+//     }
+//     return f;
+// };
+
 
 let draw_id   = null;
 let draw_func = null;
