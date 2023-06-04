@@ -1,7 +1,6 @@
 import start_away from "../index.js";
 
 const big_button_1       = image("./home/images/big_button_1.png");
-//const big_button_2       = image("./home/images/big_button_2.png");
 const big_button_clicked = circle(490, 500, 200);
 let big_button           = null;
 

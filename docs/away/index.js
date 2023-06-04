@@ -5,18 +5,15 @@ const big_button_0          = image("./home/images/big_button_0.png");
 const big_button_1          = image("./home/images/big_button_1.png");
 const big_button_2          = image("./home/images/big_button_2.png");
 
-const medium_button_0 = big_button_0;
-const medium_button_1 = big_button_1;
-const medium_button_2 = big_button_2;
-// const medium_button_0 = big_button_0.bind(clone(-200, -200, .6);
-// const medium_button_1 = big_button_1.clone(-200, -200, .6);
-// const medium_button_2 = big_button_2.clone(-200, -200, .6);
+//const medium_button_adj     = [-200, 200, .6];
+const medium_button_0       = big_button_0.bind(null, -200, 200, .6);
+const medium_button_1       = big_button_1.bind(null, -200, 200, .6);
+const medium_button_2       = big_button_2.bind(null, -200, 200, .6);
 
 let big_button              = null;
 let medium_button           = null;
 
-const big_button_clicked    = circle(490, 500, 200);
-//const medium_button_clicked = circle(490 - 200, 500 - 200, 200 * .6);
+const big_button_clicked    = circle(490, 500, 200).bind(null, -200, 200, .6);
 const medium_button_clicked = rect(0, 0, 100, 100);
 
 const click = _ => {
@@ -25,14 +22,13 @@ const click = _ => {
     } else
     if (medium_button_clicked()) {
         start_far_away();
-//        medium_button = once(medium_button_1, [medium_button_0, start_far_away]);
     }
 };
 
 const draw = _ => {
     bg_blue();
     big_button();
-    medium_button(-200, -200, .6);
+    medium_button();
 };
 
 const start = _ => {

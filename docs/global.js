@@ -63,17 +63,6 @@ window.adjust_canvas = _ => {
 	canvas.style.left = left;
 	canvas.style.top  = top ;
 	ctx.setTransform(scale, 0, 0, scale, 0, 0);
-    
-	// let w             = window.innerWidth;
-	// let h             = window.innerHeight;
-	// scale             = Math.min(w / design_width, h / design_height);
-	// canvas.width      = scale * design_width;
-	// canvas.height     = scale * design_height;
-	// left              = (w - canvas.width ) / 2;
-	// top               = (h - canvas.height) / 2;
-	// canvas.style.left = left;
-	// canvas.style.top  = top;
-	// ctx.setTransform(scale, 0, 0, scale, 0, 0);
 }
 
 window.addEventListener('resize', adjust_canvas);
@@ -102,8 +91,8 @@ canvas.addEventListener('click', e => {
 });
 
 window.circle = function(x, y, r) {
-	return _ => { 
-        return (x - click_x) * (x - click_x) + (y - click_y) * (y - click_y) < r * r; 
+	return (dx = 0, dy = 0, dr = 0) => { 
+        return (x + dx - click_x) * (x + dx - click_x) + (y + dy - click_y) * (y + dy - click_y) < (r + dr) * (r + dr); 
     };
 };
 
@@ -150,25 +139,6 @@ window.image = (src, x = 0, y = 0, s = 1) => {
     };
     return f;
 };
-
-
-// function image(src, x = 0, y = 0, s = 1) {
-//     const f = (x = 0, y = 0, s = 1) => {
-//         this.draw(x, y, s);
-//     };
-    
-//     const i = new c_image(src, x, y, s);
-//     const f = (x = 0, y = 0, s = 1) => {
-//         i.draw(x, y, s);
-//     };
-//     f.clone = (cx = 0, cy = 0, cs = 1) => {
-//         return (x = 0, y = 0, s = 1) => {
-//             image.draw(x, y, s);
-//         };
-//     }
-//     return f;
-// };
-
 
 let draw_id   = null;
 let draw_func = null;
