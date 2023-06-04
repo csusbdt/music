@@ -238,38 +238,56 @@ window.schedule = (...args) => {
 	});
 }
 
-window.once = (...args) => {
-    const q = args.slice();
-    return _ => {
-        const first = q.shift();
-        if (first === undefined || first === null) {
-            return;
-        } else if (Array.isArray(first)) {
-            first.forEach(f => {
-                if (typeof f === "boolean") {
-                    if (f) q.unshift(first);
-                } else {
-                    f();
-                }
-            });
-        } else {
-            first();
-        }
-    };
-}
+// window.once = (...args) => {
+//     const q = args.slice();
+//     return _ => {
+//         const first = q.shift();
+//         if (first === undefined || first === null) {
+//             return;
+//         } else if (Array.isArray(first)) {
+//             first.forEach(f => {
+//                 if (typeof f === "boolean") {
+//                     if (f) q.unshift(first);
+//                 } else {
+//                     f();
+//                 }
+//             });
+//         } else {
+//             first();
+//         }
+//     };
+// }
 
-window.loop = (...args) => {
-    const list = args.slice();
-	let i = 0;
-    return _ => {
-		const o = list[i];
-		if (o === null) {
-			// noop
-        } else if (Array.isArray(o)) {
-            o.forEach(oo => { oo(); });
-        } else {
-			o();
-		}
-		if (++i === list.length) i = 0;
-    };
-}
+// window.loop = (...args) => {
+//     const list = args.slice();
+// 	let i = 0;
+//     return _ => {
+// 		const o = list[i];
+// 		if (o === null) {
+// 			// noop
+//         } else if (Array.isArray(o)) {
+//             o.forEach(oo => { oo(); });
+//         } else {
+// 			o();
+// 		}
+// 		if (++i === list.length) i = 0;
+//     };
+// }
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+// audio
+//
+///////////////////////////////////////////////////////////////////////////////////////////
+
+window.audio = null;
+
+window.init_audio = _ => {
+	// this function must run in click handler to work on apple hardware
+	if (audio === null) {
+		audio = new (window.AudioContext || window.webkitAudioContext)();
+	}
+	if (audio.state === "suspended") {
+		audio.resume();
+	}
+};

@@ -1,25 +1,12 @@
 import start_home     from "../home/index.js"   ;
 import start_far_away from "./far_away/index.js";
+import song           from "./song.js";
 
 const draw_back_border      = image("./away/images/back_border.png");
 const draw_back_red         = image("./away/images/back_red.png");
 //const draw_back_green       = image("./away/images/back_green.png");
 
 const back_click = circle(125, 130,  65);
-//let draw_back = null;
-
-function c_song() {
-}
-
-c_song.prototype.stop = function() {
-    console.log("stop song");
-};
-
-c_song.prototype.start = function() {
-    console.log("start song");
-};
-
-const song = () => { return new c_song(); }
     
 function c_button(name, shape, song) {
     this.border = image("./away/images/play_" + name + "_border.png");
@@ -79,27 +66,17 @@ const buttons = [
 const click = _ => {
     if (back_click()) {
         start_home();
-//        draw_back = loop([draw_back_green, draw_back_border], start_home);
     } else {
         buttons.forEach(button => button.click());
     }
 };
-
-// const draw = _ => {
-//     draw_blue_bg();
-//     buttons.forEach(button => button.draw());
-//     draw_back();
-// };
 
 const start = _ => {
     draw_blue_bg();
     buttons.forEach(button => button.draw());
     draw_back_red();
     draw_back_border();
-
-//    draw_back = loop([draw_back_red, draw_back_border]);
     set_click(click);
-//    set_draw(350, draw);
 };
 
 export default start;
