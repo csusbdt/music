@@ -13,7 +13,7 @@ const click = _ => {
 };
 
 const draw = _ => {
-    bg_blue();
+    draw_blue_bg();
     big_button();
 };
 

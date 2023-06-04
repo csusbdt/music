@@ -1,39 +1,70 @@
 import start_home     from "../home/index.js"   ;
 import start_far_away from "./far_away/index.js";
 
-const big_button_0          = image("./home/images/big_button_0.png");
-const big_button_1          = image("./home/images/big_button_1.png");
-const big_button_2          = image("./home/images/big_button_2.png");
+const draw_back_border      = image("./away/images/back_border.png");
+const draw_back_red         = image("./away/images/back_red.png");
+const draw_back_green       = image("./away/images/back_green.png");
 
-//const medium_button_adj     = [-200, 200, .6];
-const medium_button_0       = big_button_0.bind(null, -200, 200, .6);
-const medium_button_1       = big_button_1.bind(null, -200, 200, .6);
-const medium_button_2       = big_button_2.bind(null, -200, 200, .6);
+const back_click = circle(125, 130,  65);
+let draw_back = null;
 
-let big_button              = null;
-let medium_button           = null;
+function c_button(name, shape, song) {
+    this.border = image("./away/images/play_" + name + "_border.png");
+    this.red    = image("./away/images/play_" + name + "_red.png"   );
+    this.green  = image("./away/images/play_" + name + "_green.png" );
+    this.shape  = shape;
+    this.song   = song;
+}
 
-const big_button_clicked    = circle(490, 500, 200).bind(null, -200, 200, .6);
-const medium_button_clicked = rect(0, 0, 100, 100);
+c_button.prototype.playing = null;
+
+c_button.prototype.click = function() {
+    const proto = Object.getPrototypeOf(this);
+    if (this.shape()) {
+        if (proto.playing === this) {
+            proto.playing = null;
+        } else {
+            proto.playing = this;            
+        }
+    }
+};
+
+c_button.prototype.draw = function() {
+    const proto = Object.getPrototypeOf(this);
+    if (proto.playing === this) {
+        this.green();
+    } else {
+        this.red();            
+    }
+    this.border();
+};
+
+const buttons = [
+    new c_button("big"     , circle(460, 550, 170), {}),
+    new c_button("medium_1", circle(770, 330, 100), {}),
+    new c_button("medium_2", circle(760, 808, 115), {}),
+    new c_button("small_1" , circle(230, 393,  56), {}),
+    new c_button("small_2" , circle(166, 754,  40), {}),
+    new c_button("small_3" , circle(420, 812,  45), {}),
+    new c_button("small_4" , circle(780, 570,  45), {})
+];
 
 const click = _ => {
-    if (big_button_clicked()) {
-        big_button = once(big_button_1, [big_button_0, start_home]);
-    } else
-    if (medium_button_clicked()) {
-        start_far_away();
+    if (back_click()) {
+        draw_back = loop([draw_back_green, draw_back_border], start_home);
+    } else {
+        buttons.forEach(button => button.click());
     }
 };
 
 const draw = _ => {
-    bg_blue();
-    big_button();
-    medium_button();
+    draw_blue_bg();
+    buttons.forEach(button => button.draw());
+    draw_back();
 };
 
 const start = _ => {
-    big_button = big_button_2; 
-    medium_button = medium_button_2;
+    draw_back = loop([draw_back_red, draw_back_border]);
     set_click(click);
     set_draw(350, draw);
 };

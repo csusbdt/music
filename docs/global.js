@@ -147,6 +147,7 @@ window.set_draw = (t, f) => {
     if (draw_id !== null) clearInterval(draw_id);
     draw_func = f;
     draw_id = setInterval(draw_func, t);
+	draw_func();
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -171,32 +172,32 @@ const rgb_yellow = `rgb(${colors.yellow[0]}, ${colors.yellow[1]}, ${colors.yello
 const rgb_black  = `rgb(${colors.black [0]}, ${colors.black [1]}, ${colors.black [2]})`;
 const rgb_white  = `rgb(${colors.white [0]}, ${colors.white [1]}, ${colors.white [2]})`;
 
-window.bg_red = _ => {
+window.draw_red_bg = _ => {
 	ctx.fillStyle = rgb_red;
 	ctx.fillRect(0, 0, design_width, design_height);
 };
 
-window.bg_green = _ => {
+window.draw_green_bg = _ => {
 	ctx.fillStyle = rgb_green;
 	ctx.fillRect(0, 0, design_width, design_height);
 };
 
-window.bg_blue = _ => {
+window.draw_blue_bg = _ => {
 	ctx.fillStyle = rgb_blue;
 	ctx.fillRect(0, 0, design_width, design_height);
 };
 
-window.bg_yellow = _ => {
+window.draw_yellow_bg = _ => {
 	ctx.fillStyle = rgb_yellow;
 	ctx.fillRect(0, 0, design_width, design_height);
 };
 
-window.bg_black = _ => {
+window.draw_black_bg = _ => {
 	ctx.fillStyle = rgb_black;
 	ctx.fillRect(0, 0, design_width, design_height);
 };
 
-window.bg_white = _ => {
+window.draw_white_bg = _ => {
 	ctx.fillStyle = rgb_white;
 	ctx.fillRect(0, 0, design_width, design_height);
 };
@@ -224,5 +225,21 @@ window.once = (...args) => {
         } else {
             first();
         }
+    };
+}
+
+window.loop = (...args) => {
+    const list = args.slice();
+	let i = 0;
+    return _ => {
+		const o = list[i];
+		if (o === null) {
+			// noop
+        } else if (Array.isArray(o)) {
+            o.forEach(oo => { oo(); });
+        } else {
+			o();
+		}
+		if (++i === list.length) i = 0;
     };
 }
