@@ -31,7 +31,7 @@ const big_button_0 = img("./home/images/big_button_0.png");
 const big_button_1 = img("./home/images/big_button_1.png");
 const big_button_2 = img("./home/images/big_button_2.png");
 
-let big_button           = null;
+//let big_button           = null;
 
 const draw_stuff = _ => {
     draw_blue_bg();
@@ -48,10 +48,16 @@ const click = _ => {
     inner_ring.click();
     outer_ring.click();
     if (big_button_0.click()) {
+        let start_func = null;
+        if (inner_ring.color === inner_ring.green || outer_ring.color === outer_ring.green) {
+            start_func = start_away;
+        } else {
+            start_func = start_songs;
+        }
         schedule(
-            [  0, draw_stuff , big_button_1          ],
-            [100, draw_stuff , big_button_2          ],
-            [100, start_songs, removeEventListener.bind(null, 'resize', draw)]
+            [  0, draw_stuff , big_button_1 ],
+            [100, draw_stuff , big_button_2 ],
+            [100, p.page_exit(start_func)   ]
         );
     }
 };

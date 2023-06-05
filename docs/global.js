@@ -384,6 +384,10 @@ c_page.prototype.exit = function(destination_page_start = null) {
     }
 };
 
+c_page.prototype.page_exit = function(destination_page_start = null) {
+    return this.exit.bind(this, destination_page_start);
+};
+
 window.page = (draw_func, click_func, start_func = null, exit_func = null) => {
     return new c_page(draw_func, click_func, start_func, exit_func);
 };

@@ -1,4 +1,4 @@
-import start_home     from "../home/index.js"   ;
+import start_home     from "../home/index.js";
 import song           from "./song.js";
 
 const draw_back_border      = image("./songs/images/back_border.png");
@@ -74,8 +74,8 @@ const buttons = [
 
 const click = _ => {
     if (back_click()) {
-        window.removeEventListener('resize', draw);
-        start_home();
+		p.exit(start_home);
+//        start_home();
     } else {
         buttons.forEach(button => button.click());
     }
@@ -88,11 +88,6 @@ const draw = _ => {
     draw_back_border();
 };
 
-window.addEventListener('resize', draw);
+const p = page(draw, click);
 
-const start = _ => {
-    draw();
-    set_click(click);
-};
-
-export default start;
+export default p.page_start();
