@@ -277,7 +277,14 @@ window.schedule = (...args) => {
 			}
 		}
 		setTimeout(_ => {
-			a.forEach(o => { o(); });
+			a.forEach(o => {
+				if (typeof o === "function") {
+					o(); 
+				} else {
+					assert(o.draw !== undefined);
+					o.draw();
+				}
+			});
 		}, wait);
 	});
 }
