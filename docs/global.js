@@ -79,6 +79,9 @@ let click_x    = null;
 let click_y    = null;
 let click_func = null;
 
+window._x = _ => { return click_x; };
+window._y = _ => { return click_y; };
+
 window.set_click = f => {
     click_func = f;
 }
