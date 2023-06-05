@@ -342,3 +342,48 @@ window.init_audio = _ => {
 		audio.resume();
 	}
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+// page
+//
+///////////////////////////////////////////////////////////////////////////////////////////
+
+function c_page(draw_func, click_func, start_func = null, exit_func = null) {
+    this.draw_func  = draw_func;
+    this.click_func = click_func;
+    this.start_func = start_func;
+    this.exit_func = exit_func;
+    this.back_func = null;
+}
+
+c_page.prototype.start = function(back_func = null) {
+    this.back_func = back_func;
+    addEventListener('resize', this.draw_func);
+    if (this.start_func !== null) {
+        this.start_func();
+    }
+    this.draw_func();
+    set_click(this.click_func);
+};
+
+c_page.prototype.page_start = function() {
+    return this.start.bind(this);
+};
+
+c_page.prototype.exit = function(destination_page_start = null) {
+    removeEventListener('resize', this.draw_func);
+    set_click(null);
+    if (this.exit_func !== null) {
+        this.exit_func();
+    }
+    if (destination_page_start === null) {
+        this.back_func();
+    } else {
+        destination_page_start(this.page_start());
+    }
+};
+
+window.page = (draw_func, click_func, start_func = null, exit_func = null) => {
+    return new c_page(draw_func, click_func, start_func, exit_func);
+};

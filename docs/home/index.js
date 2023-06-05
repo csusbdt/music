@@ -31,13 +31,17 @@ const big_button_0 = img("./home/images/big_button_0.png");
 const big_button_1 = img("./home/images/big_button_1.png");
 const big_button_2 = img("./home/images/big_button_2.png");
 
-//const big_button_clicked = circle(490, 500, 200);
 let big_button           = null;
 
 const draw_stuff = _ => {
     draw_blue_bg();
     inner_ring.draw();
     outer_ring.draw();
+};
+
+const draw = _ => {
+    draw_stuff();
+    big_button_0.draw();
 };
 
 const click = _ => {
@@ -52,15 +56,6 @@ const click = _ => {
     }
 };
 
-const draw = _ => {
-    draw_stuff();
-    big_button_0.draw();
-};
+const p = page(draw, click);
 
-const start = _ => {
-    addEventListener('resize', draw);
-    draw();
-    set_click(click);
-};
-
-export default start;
+export default p.page_start();
