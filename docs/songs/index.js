@@ -1,5 +1,4 @@
 import start_home     from "../home/index.js"   ;
-import start_far_away from "./far_away/index.js";
 import song           from "./song.js";
 
 const draw_back_border      = image("./songs/images/back_border.png");

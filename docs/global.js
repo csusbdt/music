@@ -79,8 +79,9 @@ let click_x    = null;
 let click_y    = null;
 let click_func = null;
 
-window._x = _ => { return click_x; };
-window._y = _ => { return click_y; };
+// may need these later
+//window._x = _ => { return click_x; };
+//window._y = _ => { return click_y; };
 
 window.set_click = f => {
     click_func = f;
@@ -105,6 +106,12 @@ window.rect = function(left, top, right, bottom) {
     };
 };
 
+// window.pixels = function(src) {
+// 	return _ => { 
+//         return left <= click_x && top <= click_y && click_x < right && click_y < bottom; 
+//     };
+// };
+
 window.shapes = function(..._shapes) {
 	for (let i = 0; i < _shapes.length; ++i) {
 		if (_shapes[i]()) return true;
@@ -118,7 +125,7 @@ window.shapes = function(..._shapes) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-function c_image(src, x, y, s) {
+function c_image(src, x = 0, y = 0, s = 1) {
     this.image     = new Image();
     this.image.src = src;
     this.x         = x;
@@ -126,11 +133,11 @@ function c_image(src, x, y, s) {
     this.s         = s;
 }
 
-c_image.prototype.clone = function(x, y, s) {
+c_image.prototype.clone = function(x = 0, y = 0, s = 1) {
     return new c_image(this.image.src, x, y, s);
 };
 
-c_image.prototype.draw = function(x, y, s) {
+c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
 	if (this.image.complete) {
 		const dx      = this.x + x           ;
 		const dy      = this.y + y           ;
@@ -146,6 +153,40 @@ c_image.prototype.draw = function(x, y, s) {
 	}
 };
 
+const c_image_canvas  = document.createElement('canvas');
+const c_image_ctx     = c_image_canvas.getContext("2d");
+
+c_image.prototype.click = function() {
+    if (!this.image.complete) return false;
+	c_image_canvas.width  = design_width; 
+	c_image_canvas.height = design_height;
+    c_image_ctx.setTransform(1, 0, 0, 1, 0, 0);
+    c_image_ctx.clearRect(0, 0, c_image_canvas.width, c_image_canvas.height);
+    const dx      = this.x            ;
+    const dy      = this.y            ;
+    const sx      = 0                 ;
+    const sy      = 0                 ;
+    const sWidth  = this.image.width  ;
+    const sHeight = this.image.height ;
+    const dWidth  = sWidth * this.s   ;
+    const dHeight = sHeight * this.s  ;
+	c_image_ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+    const image_data = c_image_ctx.getImageData(0, 0, c_image_canvas.width, c_image_canvas.height);
+    let x = Math.floor(click_x);
+    let y = Math.floor(click_y);
+    const i = Math.floor((image_data.width * y + x) * 4);
+    return image_data.data[i] !== 0;
+};
+
+window.img = (src, x = 0, y = 0, s = 1) => {
+    return new c_image(src, x, y, s);
+};
+
+// window.click_image = (src, x = 0, y = 0, s = 1) => {
+//     const image = new c_image(src, x, y, s);
+//     return image.click;
+// };
+
 window.image = (src, x = 0, y = 0, s = 1) => {
     const image = new c_image(src, x, y, s);
     const f = (x = 0, y = 0, s = 1) => {
@@ -154,19 +195,19 @@ window.image = (src, x = 0, y = 0, s = 1) => {
     return f;
 };
 
-let draw_id   = null;
-let draw_func = null;
+// let draw_id   = null;
+// let draw_func = null;
 
-window.set_draw = (t, f) => {
-    if (draw_id !== null) clearInterval(draw_id);
-    draw_func = f;
-	if (t === undefined) {
-		draw_func = null;
-	} else {
-	    draw_id = setInterval(draw_func, t);
-		draw_func();
-	}
-};
+// window.set_draw = (t, f) => {
+//     if (draw_id !== null) clearInterval(draw_id);
+//     draw_func = f;
+// 	if (t === undefined) {
+// 		draw_func = null;
+// 	} else {
+// 	    draw_id = setInterval(draw_func, t);
+// 		draw_func();
+// 	}
+// };
 
 ///////////////////////////////////////////////////////////////////////////////
 //
