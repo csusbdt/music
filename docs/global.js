@@ -178,9 +178,9 @@ c_image.prototype.click = function() {
     return image_data.data[i] !== 0;
 };
 
-window.img = (src, x = 0, y = 0, s = 1) => {
-    return new c_image(src, x, y, s);
-};
+// window.img = (src, x = 0, y = 0, s = 1) => {
+//     return new c_image(src, x, y, s);
+// };
 
 // window.click_image = (src, x = 0, y = 0, s = 1) => {
 //     const image = new c_image(src, x, y, s);
@@ -188,11 +188,7 @@ window.img = (src, x = 0, y = 0, s = 1) => {
 // };
 
 window.image = (src, x = 0, y = 0, s = 1) => {
-    const image = new c_image(src, x, y, s);
-    const f = (x = 0, y = 0, s = 1) => {
-        image.draw(x, y, s);
-    };
-    return f;
+    return new c_image(src, x, y, s);
 };
 
 // let draw_id   = null;

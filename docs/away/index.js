@@ -1,21 +1,19 @@
 import start_home     from "../home/index.js"   ;
 import start_far_away from "./far_away/index.js";
 
-const draw_back_border      = image("./songs/images/back_border.png");
-const draw_back_red         = image("./songs/images/back_red.png");
-
-const back_click = circle(125, 130,  65);
+const back_border      = image("./songs/images/back_border.png");
+const back_red         = image("./songs/images/back_red.png");
 
 const click = _ => {
-    if (back_click()) {
+    if (back_red.click()) {
 		p.back();
     }
 };
 
 const draw = _ => {
     draw_blue_bg();
-    draw_back_red();
-    draw_back_border();
+    back_red.draw();
+    back_border.draw();
 };
 
 const p = page(draw, click);

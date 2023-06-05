@@ -2,9 +2,9 @@ import start_away  from "../away/index.js";
 import start_songs from "../songs/index.js";
 
 function c_ring(name) {
-    this.border = img("./home/images/" + name + "_ring_border.png");
-    this.red    = img("./home/images/" + name + "_ring_red.png"   );
-    this.green  = img("./home/images/" + name + "_ring_green.png" );
+    this.border = image("./home/images/" + name + "_ring_border.png");
+    this.red    = image("./home/images/" + name + "_ring_red.png"   );
+    this.green  = image("./home/images/" + name + "_ring_green.png" );
     this.color  = this.red;
 }
 
@@ -27,9 +27,9 @@ c_ring.prototype.click = function() {
 const inner_ring = new c_ring("inner");
 const outer_ring = new c_ring("outer");
 
-const big_button_0 = img("./home/images/big_button_0.png");
-const big_button_1 = img("./home/images/big_button_1.png");
-const big_button_2 = img("./home/images/big_button_2.png");
+const big_button_0 = image("./home/images/big_button_0.png");
+const big_button_1 = image("./home/images/big_button_1.png");
+const big_button_2 = image("./home/images/big_button_2.png");
 
 //let big_button           = null;
 
