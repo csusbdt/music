@@ -5,12 +5,10 @@ const draw_back_border      = image("./songs/images/back_border.png");
 const draw_back_red         = image("./songs/images/back_red.png");
 
 const back_click = circle(125, 130,  65);
-    
+
 const click = _ => {
     if (back_click()) {
-        window.removeEventListener('resize', draw);
-        start_home();
-    } else {
+		p.back();
     }
 };
 
@@ -20,10 +18,6 @@ const draw = _ => {
     draw_back_border();
 };
 
-const start = _ => {
-	window.addEventListener('resize', draw);
-    draw();
-    set_click(click);
-};
+const p = page(draw, click);
 
-export default start;
+export default p.page_start();

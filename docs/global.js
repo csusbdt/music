@@ -376,12 +376,27 @@ c_page.prototype.exit = function(destination_page_start = null) {
     set_click(null);
     if (this.exit_func !== null) {
         this.exit_func();
-    }
-    if (destination_page_start === null) {
-        this.back_func();
+    // }
+    // if (destination_page_start === null) {
+    //     this.back_func();
     } else {
         destination_page_start(this.page_start());
     }
+};
+
+c_page.prototype.back = function() {
+	assert(this.back_func !== null);
+	this.exit(this.back_func);
+    // removeEventListener('resize', this.draw_func);
+    // set_click(null);
+    // if (this.exit_func !== null) {
+    //     this.exit_func();
+    // // }
+    // // if (destination_page_start === null) {
+    // //     this.back_func();
+    // } else {
+    //     destination_page_start(this.page_start());
+    // }
 };
 
 c_page.prototype.page_exit = function(destination_page_start = null) {
