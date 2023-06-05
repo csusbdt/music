@@ -1,13 +1,12 @@
-let gain      = null;
-let o_left    = null;
-let o_right   = null;
-let beat_freq = 3;
-let ramp_up   = 0;
-let ramp_down = 0;
-let loop_id   = null;
+let gain        = null;
+let o_left      = null;
+let o_right     = null;
+let beat_freq   = 3;
+let ramp_up     = 0;
+let ramp_down   = 0;
+let loop_id     = null;
 
 const setup_graph = _ => {
-    assert(gain === null);
     gain = audio.createGain();
 	gain.gain.value = 0;
 	gain.connect(audio.destination);
@@ -24,26 +23,13 @@ const setup_graph = _ => {
 };
 
 const teardown_graph = _ => {
-    // not sure if these are needed if no delay used to change gain to 0
-    o_left.frequency.cancelScheduledValues(audio.currentTime);
-	o_right.frequency.cancelScheduledValues(audio.currentTime);
-	gain.gain.cancelScheduledValues(audio.currentTime);
-	gain.gain.setTargetAtTime(0, audio.currentTime, .01);
-//	gain.gain.setTargetAtTime(0, audio.currentTime + .02, .1); // ramp-down if delay used
-
-// delay could result in race condition
-// avoid for now, listen for artifacts
-//
-//    setTimeout(_ => {
         gain.disconnect();
-        gain    = null;
-        o_left  = null;
-        o_right = null;
-//    }, 26);
+        gain        = null;
+        o_left      = null;
+        o_right     = null;
 };
 
 const play_notes = (notes) => {
-    setup_graph();
     let duration = 0;
 	notes.forEach(note => {
 		duration += note[2];
@@ -57,15 +43,21 @@ const play_notes = (notes) => {
 		const d    = note[2]  ; // duration in seconds
 		o_left .frequency.setValueAtTime(f            , audio.currentTime + t);
 		o_right.frequency.setValueAtTime(f + beat_freq, audio.currentTime + t);
-		gain.gain.setTargetAtTime(v, audio.currentTime + t + ramp_up, .1);
-		gain.gain.setTargetAtTime(0, audio.currentTime + t + d - ramp_down, .1);
+        if (ramp_up > 0 || ramp_down > 0) {
+    		gain.gain.setTargetAtTime(v, audio.currentTime + t + ramp_up, .1);
+    		gain.gain.setTargetAtTime(0, audio.currentTime + t + d - ramp_down, .1);
+        } else {
+    		gain.gain.setTargetAtTime(v, audio.currentTime + t, .1);
+        }
 		t += d;
 	}
 	return t;
 };
 
-const stop_play = () => {
-    teardown_graph();
+const cancel_notes = () => {
+    o_left.frequency.cancelScheduledValues(audio.currentTime);
+	o_right.frequency.cancelScheduledValues(audio.currentTime);
+	gain.gain.cancelScheduledValues(audio.currentTime);
 };
 
 function c_song(notes) {
@@ -73,15 +65,20 @@ function c_song(notes) {
 }
 
 c_song.prototype.start = function() {
-    if (loop_id !== null) this.stop();
+    if (loop_id !== null) {
+        clearInterval(loop_id);
+        cancel_notes();
+    } else {
+        setup_graph();
+    }
 	let duration = play_notes(this.notes);
-	loop_id = setInterval(play_notes.bind(null, this.notes), duration * 1000);
+	loop_id = setInterval(play_notes.bind(null, this.notes), duration * 1000 + 10);
 };
 
 c_song.prototype.stop = function() {
     clearInterval(loop_id);
     loop_id = null;
-    stop_play();
+    teardown_graph();
 };
 
 const song = (notes) => { return new c_song(notes); }

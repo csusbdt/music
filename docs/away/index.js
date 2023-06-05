@@ -4,7 +4,6 @@ import song           from "./song.js";
 
 const draw_back_border      = image("./away/images/back_border.png");
 const draw_back_red         = image("./away/images/back_red.png");
-//const draw_back_green       = image("./away/images/back_green.png");
 
 const back_click = circle(125, 130,  65);
     
@@ -54,14 +53,14 @@ c_button.prototype.draw = function() {
 };
 
 const song_2 = [
-    [160, .25, 1.10 - 0   ],
-	[ 47, .52, 2.10 - 1.10],
-	[ 65, .42, 3.14 - 2.10],
-	[ 81, .69, 4.20 - 3.14],
-	[239, .48, 5.22 - 4.20],
-	[ 96, .18, 6.20 - 5.22],
-	[ 51, .42, 7.19 - 6.20],
-	[ 69, .66, 8.26 - 7.19]
+    [170, .39, 1.00],
+	[ 47, .52, 1.00],
+	[ 65, .42, 1.00],
+	[ 81, .69, 1.00],
+	[239, .48, 1.00],
+	[ 96, .18, 1.00],
+	[ 51, .42, 1.00],
+	[ 69, .66, 1.00]
 ];
 
 const buttons = [
@@ -76,17 +75,24 @@ const buttons = [
 
 const click = _ => {
     if (back_click()) {
+        window.removeEventListener('resize', draw);
         start_home();
     } else {
         buttons.forEach(button => button.click());
     }
 };
 
-const start = _ => {
+const draw = _ => {
     draw_blue_bg();
     buttons.forEach(button => button.draw());
     draw_back_red();
     draw_back_border();
+};
+
+window.addEventListener('resize', draw);
+
+const start = _ => {
+    draw();
     set_click(click);
 };
 
