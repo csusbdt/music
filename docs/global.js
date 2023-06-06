@@ -106,12 +106,6 @@ window.rect = function(left, top, right, bottom) {
     };
 };
 
-// window.pixels = function(src) {
-// 	return _ => { 
-//         return left <= click_x && top <= click_y && click_x < right && click_y < bottom; 
-//     };
-// };
-
 window.shapes = function(..._shapes) {
 	for (let i = 0; i < _shapes.length; ++i) {
 		if (_shapes[i]()) return true;
@@ -178,32 +172,9 @@ c_image.prototype.click = function() {
     return image_data.data[i] !== 0;
 };
 
-// window.img = (src, x = 0, y = 0, s = 1) => {
-//     return new c_image(src, x, y, s);
-// };
-
-// window.click_image = (src, x = 0, y = 0, s = 1) => {
-//     const image = new c_image(src, x, y, s);
-//     return image.click;
-// };
-
 window.image = (src, x = 0, y = 0, s = 1) => {
     return new c_image(src, x, y, s);
 };
-
-// let draw_id   = null;
-// let draw_func = null;
-
-// window.set_draw = (t, f) => {
-//     if (draw_id !== null) clearInterval(draw_id);
-//     draw_func = f;
-// 	if (t === undefined) {
-// 		draw_func = null;
-// 	} else {
-// 	    draw_id = setInterval(draw_func, t);
-// 		draw_func();
-// 	}
-// };
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -263,27 +234,27 @@ window.draw_white_bg = _ => {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-window.schedule = (...args) => {
-	let wait = 0;
-	args.forEach(a => {
-		for (let i = a.length - 1; i >= 0; --i) {
-			if (Number.isInteger(a[i])) {
-				wait += a[i];
-				a.splice(i, 1);
-			}
-		}
-		setTimeout(_ => {
-			a.forEach(o => {
-				if (typeof o === "function") {
-					o(); 
-				} else {
-					assert(o.draw !== undefined);
-					o.draw();
-				}
-			});
-		}, wait);
-	});
-}
+// window.schedule = (...args) => {
+// 	let wait = 0;
+// 	args.forEach(a => {
+// 		for (let i = a.length - 1; i >= 0; --i) {
+// 			if (Number.isInteger(a[i])) {
+// 				wait += a[i];
+// 				a.splice(i, 1);
+// 			}
+// 		}
+// 		setTimeout(_ => {
+// 			a.forEach(o => {
+// 				if (typeof o === "function") {
+// 					o(); 
+// 				} else {
+// 					assert(o.draw !== undefined);
+// 					o.draw();
+// 				}
+// 			});
+// 		}, wait);
+// 	});
+// }
 
 // window.once = (...args) => {
 //     const q = args.slice();
