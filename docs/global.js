@@ -413,40 +413,39 @@ window.page = (draw_func, click_func, start_func = null, exit_func = null) => {
 //
 ////////////////////////////////////////////////////////////////////////////////////
 
-function c_button(t, action, ...src) {
+function c_button(t, action, images) {
     this.action = action;
     this.t      = t;
-    this.images = src.map(s => { return image(s); });
+    this.images = images;
     this.i      = 0;
     this.id     = null;
 }
 
-c_button.prototype.draw = _ => {
+c_button.prototype.draw = function() {
     this.images[this.i].draw();
 };
 
-c_button.prototype.click = _ => {
-    if (this.i !== 0) {
-        return;
-    } else if (this.images.length === 1) {
+c_button.prototype.next = function() {
+	++this.i;
+	if (this.i === this.images.length) {
+		this.i  = 0;
+		this.id = null;
         this.action();
     } else {
-        this.i = 1;
-        draw();
-        this.id = setTimeout(_ => {
-            ++this.i;
-            if (this.i === this.images.length) {
-                this.i = 0;
-                this.id = null;
-                this.action();
-            } else {
-                draw();
-            } 
-        }.bind(this), this.t);
+        current_page.draw_func();
+        this.id = setTimeout(this.next.bind(this), this.t);
+    }
+};
+
+c_button.prototype.click = function() {
+    if (this.i !== 0) {
+        return;
+    } else if (this.images[0].click()) {
+		this.next();
     }
 }
 
-window.button = (t, action, ...src) => {
-    return new c_button(action, t, src);
+window.button = (t, action, src) => {
+    return new c_button(t, action, src);
 };
 

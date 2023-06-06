@@ -26,9 +26,9 @@ c_ring.prototype.click = function() {
 
 const big_button_action = b => {
     if (inner_ring.color === inner_ring.green || outer_ring.color === outer_ring.green) {
-        b.exit(start_away);
+        p.exit(start_away);
     } else {
-        b.exit(start_songs);
+        p.exit(start_songs);
     }
 };
 
