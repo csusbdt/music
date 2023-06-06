@@ -154,7 +154,7 @@ c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
 };
 
 const c_image_canvas  = document.createElement('canvas');
-const c_image_ctx     = c_image_canvas.getContext("2d");
+const c_image_ctx     = c_image_canvas.getContext("2d", { willReadFrequently: true });
 
 c_image.prototype.click = function() {
     if (!this.image.complete) return false;
@@ -353,7 +353,11 @@ function c_page(draw_func, click_func, start_func = null, exit_func = null) {
     this.back_func = null;
 }
 
+let current_page  = null;
+let previous_page = null;
+
 c_page.prototype.start = function(back_func = null) {
+	current_page = this;
     this.back_func = back_func;
     addEventListener('resize', this.draw_func);
     if (this.start_func !== null) {
@@ -368,13 +372,13 @@ c_page.prototype.page_start = function() {
 };
 
 c_page.prototype.exit = function(destination_page_start = null) {
+	previous_page = this;
     removeEventListener('resize', this.draw_func);
-    set_click(null);
+    set_click(null); // probably not needed, but just in case
     if (this.exit_func !== null) {
         this.exit_func();
-    // }
-    // if (destination_page_start === null) {
-    //     this.back_func();
+    } else if (destination_page_start === null) {
+        this.back_func();
     } else {
         destination_page_start(this.page_start());
     }
@@ -402,3 +406,47 @@ c_page.prototype.page_exit = function(destination_page_start = null) {
 window.page = (draw_func, click_func, start_func = null, exit_func = null) => {
     return new c_page(draw_func, click_func, start_func, exit_func);
 };
+
+////////////////////////////////////////////////////////////////////////////////////
+//
+// button
+//
+////////////////////////////////////////////////////////////////////////////////////
+
+function c_button(t, action, ...src) {
+    this.action = action;
+    this.t      = t;
+    this.images = src.map(s => { return image(s); });
+    this.i      = 0;
+    this.id     = null;
+}
+
+c_button.prototype.draw = _ => {
+    this.images[this.i].draw();
+};
+
+c_button.prototype.click = _ => {
+    if (this.i !== 0) {
+        return;
+    } else if (this.images.length === 1) {
+        this.action();
+    } else {
+        this.i = 1;
+        draw();
+        this.id = setTimeout(_ => {
+            ++this.i;
+            if (this.i === this.images.length) {
+                this.i = 0;
+                this.id = null;
+                this.action();
+            } else {
+                draw();
+            } 
+        }.bind(this), this.t);
+    }
+}
+
+window.button = (t, action, ...src) => {
+    return new c_button(action, t, src);
+};
+

@@ -24,42 +24,36 @@ c_ring.prototype.click = function() {
     }
 };
 
+const big_button_action = b => {
+    if (inner_ring.color === inner_ring.green || outer_ring.color === outer_ring.green) {
+        b.exit(start_away);
+    } else {
+        b.exit(start_songs);
+    }
+};
+
+const big_button_images = [
+    image("./home/images/big_button_0.png"),
+    image("./home/images/big_button_1.png"),
+    image("./home/images/big_button_2.png")
+];
+
+const big_button = button(100, big_button_action, big_button_images);
+
 const inner_ring = new c_ring("inner");
 const outer_ring = new c_ring("outer");
 
-const big_button_0 = image("./home/images/big_button_0.png");
-const big_button_1 = image("./home/images/big_button_1.png");
-const big_button_2 = image("./home/images/big_button_2.png");
-
-//let big_button           = null;
-
-const draw_stuff = _ => {
+const draw = _ => {
     draw_blue_bg();
     inner_ring.draw();
     outer_ring.draw();
-};
-
-const draw = _ => {
-    draw_stuff();
-    big_button_0.draw();
+    big_button.draw();
 };
 
 const click = _ => {
     inner_ring.click();
     outer_ring.click();
-    if (big_button_0.click()) {
-        let start_func = null;
-        if (inner_ring.color === inner_ring.green || outer_ring.color === outer_ring.green) {
-            start_func = start_away;
-        } else {
-            start_func = start_songs;
-        }
-        schedule(
-            [  0, draw_stuff , big_button_1 ],
-            [100, draw_stuff , big_button_2 ],
-            [100, p.page_exit(start_func)   ]
-        );
-    }
+    big_button.click();
 };
 
 const p = page(draw, click);
