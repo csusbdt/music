@@ -93,24 +93,105 @@ window.init_audio = _ => {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-let click_x    = null;
-let click_y    = null;
-let click_func = null;
+// let click_x    = null;
+// let click_y    = null;
+// let click_func = null;
 
 // may need these later for space shooter etc
 //window._x = _ => { return click_x; };
 //window._y = _ => { return click_y; };
 
-window.set_click = f => {
-    click_func = f;
-}
+// window.set_click = f => {
+//     click_func = f;
+// }
+
+// canvas.addEventListener('click', e => {
+//     if (click_func === null) return;
+//     click_x = (e.pageX - left) / scale;
+// 	click_y = (e.pageY - top ) / scale;
+//     click_func(click_x, click_y);
+// });
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+// page
+//
+///////////////////////////////////////////////////////////////////////////////////////////
+
+window.current_page  = null;
+window.previous_page = null;
+window.click_x       = null;
+window.click_y       = null;
 
 canvas.addEventListener('click', e => {
-    if (click_func === null) return;
     click_x = (e.pageX - left) / scale;
 	click_y = (e.pageY - top ) / scale;
-    click_func(click_x, click_y);
+	if (current_page !== null) {
+		current_page.click();
+	}
 });
+
+function c_page(draw_func, click_func, start_func = null, exit_func = null) {
+    this.draw_func       = draw_func;
+    this.click_func      = click_func;
+    this.start_func      = start_func;
+    this.exit_func       = exit_func;
+    this.back_func       = null;
+	this.page_start_func = this.start.bind(this);
+	this.page_draw_func  = this.draw.bind(this);
+}
+
+c_page.prototype.click = function() {
+	if (this.click_func !== null) {
+		this.click_func();
+	}
+};
+
+c_page.prototype.draw = function() {
+    this.draw_func();
+};
+
+c_page.prototype.start = function(back_func = null) {
+	current_page   = this;
+    this.back_func = back_func;
+    addEventListener('resize', this.page_draw_func);
+    if (this.start_func !== null) {
+        this.start_func();
+    }
+    this.draw();
+};
+
+// c_page.prototype.page_start = function() {
+//     return this.start.bind(this);
+// };
+
+c_page.prototype.exit = function(destination_page_start) {
+	assert(destination_page_start !== undefined && destination_page_start !== null);
+	previous_page = this;
+    removeEventListener('resize', this.page_draw_func);
+    if (this.exit_func !== null) {
+        this.exit_func();
+    } 
+    destination_page_start(this.page_start_func);
+};
+
+c_page.prototype.back = function() {
+	assert(this.back_func !== null);
+	this.exit(this.back_func);
+};
+
+c_page.prototype.page_exit_func = function(destination_page_start) {
+	assert(destination_page_start !== undefined);
+    return this.exit.bind(this, destination_page_start);
+};
+
+c_page.prototype.page_back_func = function() {
+    return this.back.bind(this);
+};
+
+window.page = (draw_func, click_func, start_func = null, exit_func = null) => {
+    return new c_page(draw_func, click_func, start_func, exit_func);
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -162,70 +243,6 @@ window.draw_black_bg = _ => {
 window.draw_white_bg = _ => {
 	ctx.fillStyle = rgb_white;
 	ctx.fillRect(0, 0, design_width, design_height);
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////
-//
-// page
-//
-///////////////////////////////////////////////////////////////////////////////////////////
-
-function c_page(draw_func, click_func, start_func = null, exit_func = null) {
-    this.draw_func  = draw_func;
-    this.click_func = click_func;
-    this.start_func = start_func;
-    this.exit_func = exit_func;
-    this.back_func = null;
-}
-
-let current_page  = null;
-let previous_page = null;
-
-c_page.prototype.start = function(back_func = null) {
-	current_page = this;
-    this.back_func = back_func;
-    addEventListener('resize', this.draw_func);
-    if (this.start_func !== null) {
-        this.start_func();
-    }
-    this.draw_func();
-    set_click(this.click_func);
-};
-
-c_page.prototype.page_start = function() {
-    return this.start.bind(this);
-};
-
-// calling draw on page object is not yet needed
-// but in future, this could be a way of drawing overlays, global buttons, etc.
-// c_page.prototype.draw = function() {
-//     this.draw_func();
-// };
-
-c_page.prototype.exit = function(destination_page_start = null) {
-	previous_page = this;
-    removeEventListener('resize', this.draw_func);
-    set_click(null); // probably not needed, but just in case
-    if (this.exit_func !== null) {
-        this.exit_func();
-    } else if (destination_page_start === null) {
-        this.back_func();
-    } else {
-        destination_page_start(this.page_start());
-    }
-};
-
-c_page.prototype.back = function() {
-	assert(this.back_func !== null);
-	this.exit(this.back_func);
-};
-
-c_page.prototype.page_exit = function(destination_page_start = null) {
-    return this.exit.bind(this, destination_page_start);
-};
-
-window.page = (draw_func, click_func, start_func = null, exit_func = null) => {
-    return new c_page(draw_func, click_func, start_func, exit_func);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

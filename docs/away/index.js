@@ -18,4 +18,4 @@ const draw = _ => {
 
 const p = page(draw, click);
 
-export default p.page_start();
+export default p.page_start_func;

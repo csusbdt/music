@@ -5,7 +5,7 @@ import { song_2 }  from "./songs.js"      ;
 import { song_3 }  from "./songs.js"      ;
 
 const back_border      = image("./songs/images/back_border.png");
-const back_red         = image("./songs/images/back_red.png");
+const back_red         = image("./songs/images/back_red.png"   );
 
 const song_0_button = radio_button(
 	image("./songs/images/play_big_border.png", 0, 0, 1                     ),
@@ -53,6 +53,10 @@ const draw = _ => {
     back_border.draw();
 };
 
+const start = _ => {
+	back_button = once(back_border, back_red);
+};
+
 const p = page(draw, click);
 
-export default p.page_start();
+export default p.page_start_func;
