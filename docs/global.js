@@ -371,7 +371,7 @@ c_radio_button.prototype.set_on = function() {
 	}
 };
 
-window.radio_button = (border_image, off_image, on_image, off_func, on_func) => {
+window.radio_button = (border_image, off_image, on_image, off_func = null, on_func = null) => {
 	return new c_radio_button(border_image, off_image, on_image, off_func, on_func);
 };
 
@@ -405,6 +405,53 @@ c_radio_buttons.prototype.click = function() {
 
 window.radio_buttons = (...radio_buttons) => {
 	return new c_radio_buttons(radio_buttons);
+};
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// checkbox
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+function c_check_box(border_image, off_image, on_image, off_func, on_func) {
+	this.border_image = border_image;
+	this.off_image    = off_image   ;
+	this.on_image     = on_image    ;
+	this.off_func     = off_func    ;
+	this.on_func      = on_func     ;
+	this.on           = false       ;
+}
+
+c_check_box.prototype.draw = function() {
+	if (this.on) {
+		this.on_image.draw();
+	} else {
+		this.off_image.draw();
+	}
+	this.border_image.draw();
+};
+
+c_check_box.prototype.click = function() {
+	if (this.off_image.click()) {
+		if (this.on) {
+			if (this.off_func !== null) {
+				this.off_func();
+			}
+			this.on = false;
+		} else {
+			if (this.on_func !== null) {
+				this.on_func();
+			}
+			this.on = true;
+		}
+		return true;
+	} else {
+		return false;
+	}
+};
+
+window.check_box = (border_image, off_image, on_image, off_func = null, on_func = null) => {
+	return new c_check_box(border_image, off_image, on_image, off_func, on_func);
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
