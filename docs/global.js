@@ -87,31 +87,6 @@ window.init_audio = _ => {
 	}
 };
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// click handling
-//
-///////////////////////////////////////////////////////////////////////////////
-
-// let click_x    = null;
-// let click_y    = null;
-// let click_func = null;
-
-// may need these later for space shooter etc
-//window._x = _ => { return click_x; };
-//window._y = _ => { return click_y; };
-
-// window.set_click = f => {
-//     click_func = f;
-// }
-
-// canvas.addEventListener('click', e => {
-//     if (click_func === null) return;
-//     click_x = (e.pageX - left) / scale;
-// 	click_y = (e.pageY - top ) / scale;
-//     click_func(click_x, click_y);
-// });
-
 ///////////////////////////////////////////////////////////////////////////////////////////
 //
 // page
@@ -160,10 +135,6 @@ c_page.prototype.start = function(back_func = null) {
     }
     this.draw();
 };
-
-// c_page.prototype.page_start = function() {
-//     return this.start.bind(this);
-// };
 
 c_page.prototype.exit = function(destination_page_start) {
 	assert(destination_page_start !== undefined && destination_page_start !== null);
