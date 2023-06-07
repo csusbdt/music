@@ -222,17 +222,16 @@ window.draw_white_bg = _ => {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-function c_image(src, x = 0, y = 0, s = 1, f = null) {
+function c_image(src, x = 0, y = 0, s = 1) {
     this.image     = new Image();
     this.image.src = src;
     this.x         = x;
     this.y         = y;
     this.s         = s;
-	this.f         = f;
 }
 
-c_image.prototype.clone = function(x = 0, y = 0, s = 1, f = null) {
-    return new c_image(this.image.src, x, y, s, f);
+c_image.prototype.clone = function(x = 0, y = 0, s = 1) {
+    return new c_image(this.image.src, x, y, s);
 };
 
 c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
@@ -254,8 +253,10 @@ c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
 const c_image_canvas  = document.createElement('canvas');
 const c_image_ctx     = c_image_canvas.getContext("2d", { willReadFrequently: true });
 
-c_image.prototype.will_click = function() {
-    if (!this.image.complete) return false;
+c_image.prototype.click = function() {
+    if (!this.image.complete) {
+		return false;
+	}
 	c_image_canvas.width  = design_width; 
 	c_image_canvas.height = design_height;
     c_image_ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -276,17 +277,8 @@ c_image.prototype.will_click = function() {
 	return image_data.data[i] !== 0;
 };
 
-c_image.prototype.click = function() {
-	if (this.will_click()) {
-		if (this.f !== null) this.f();
-		return true;
-	} else {
-		return false;
-	}
-};
-
-window.image = (src, x = 0, y = 0, s = 1, f = null) => {
-    return new c_image(src, x, y, s, f);
+window.image = (src, x = 0, y = 0, s = 1) => {
+    return new c_image(src, x, y, s);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -339,10 +331,12 @@ window.once = (t, action, images) => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_radio_button(border_image, off_image, on_image) {
+function c_radio_button(border_image, off_image, on_image, off_func, on_func) {
 	this.border_image = border_image;
 	this.off_image    = off_image   ;
 	this.on_image     = on_image    ;
+	this.off_func     = off_func    ;
+	this.on_func      = on_func     ;
 	this.on           = false       ;
 }
 
@@ -355,15 +349,15 @@ c_radio_button.prototype.draw = function() {
 	this.border_image.draw();
 };
 
-c_radio_button.prototype.will_click = function() {
-	return this.off_image.will_click();
+c_radio_button.prototype.click = function() {
+	return this.off_image.click();
 };
 
 c_radio_button.prototype.set_off = function() {
 	assert(this.on);
 	if (this.on) {
-		if (this.on_image.f !== null) {
-			this.on_image.f();
+		if (this.off_func !== null) {
+			this.off_func();
 		}
 		this.on = false;
 	}
@@ -372,15 +366,15 @@ c_radio_button.prototype.set_off = function() {
 c_radio_button.prototype.set_on = function() {
 	assert(!this.on);
 	if (!this.on) {
-		if (this.off_image.f !== null) {
-			this.off_image.f();
+		if (this.on_func !== null) {
+			this.on_func();
 		}
 		this.on = true;
 	}
 };
 
-window.radio_button = (border_image, off_image, on_image) => {
-	return new c_radio_button(border_image, off_image, on_image);
+window.radio_button = (border_image, off_image, on_image, off_func, on_func) => {
+	return new c_radio_button(border_image, off_image, on_image, off_func, on_func);
 };
 
 function c_radio_buttons(radio_buttons) {
@@ -394,7 +388,7 @@ c_radio_buttons.prototype.draw = function() {
 
 c_radio_buttons.prototype.click = function() {
 	for (let i = 0; i < this.radio_buttons.length; ++i) {
-		if (this.radio_buttons[i].will_click()) {
+		if (this.radio_buttons[i].click()) {
 			if (this.radio_buttons[i] === this.on_button) {
 				this.radio_buttons[i].set_off();
 				this.on_button = null;
