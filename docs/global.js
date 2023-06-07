@@ -288,6 +288,12 @@ c_page.prototype.page_start = function() {
     return this.start.bind(this);
 };
 
+// calling draw on page object is not yet needed
+// but in future, this could be a way of drawing overlays, global buttons, etc.
+// c_page.prototype.draw = function() {
+//     this.draw_func();
+// };
+
 c_page.prototype.exit = function(destination_page_start = null) {
 	previous_page = this;
     removeEventListener('resize', this.draw_func);
@@ -304,16 +310,6 @@ c_page.prototype.exit = function(destination_page_start = null) {
 c_page.prototype.back = function() {
 	assert(this.back_func !== null);
 	this.exit(this.back_func);
-    // removeEventListener('resize', this.draw_func);
-    // set_click(null);
-    // if (this.exit_func !== null) {
-    //     this.exit_func();
-    // // }
-    // // if (destination_page_start === null) {
-    // //     this.back_func();
-    // } else {
-    //     destination_page_start(this.page_start());
-    // }
 };
 
 c_page.prototype.page_exit = function(destination_page_start = null) {
@@ -441,6 +437,7 @@ c_radio_button.prototype.draw = function() {
 	} else {
 		this.off_image.draw();
 	}
+	this.border_image.draw();
 };
 
 c_radio_button.prototype.will_click = function() {
@@ -450,8 +447,8 @@ c_radio_button.prototype.will_click = function() {
 c_radio_button.prototype.set_off = function() {
 	assert(this.on);
 	if (this.on) {
-		if (this.off_image.f !== null) {
-			this.off_image.f();
+		if (this.on_image.f !== null) {
+			this.on_image.f();
 		}
 		this.on = false;
 	}
@@ -460,8 +457,8 @@ c_radio_button.prototype.set_off = function() {
 c_radio_button.prototype.set_on = function() {
 	assert(!this.on);
 	if (!this.on) {
-		if (this.on_image.f !== null) {
-			this.on_image.f();
+		if (this.off_image.f !== null) {
+			this.off_image.f();
 		}
 		this.on = true;
 	}
@@ -485,11 +482,13 @@ c_radio_buttons.prototype.click = function() {
 		if (this.radio_buttons[i].will_click()) {
 			if (this.radio_buttons[i] === this.on_button) {
 				this.radio_buttons[i].set_off();
+				this.on_button = null;
 			} else {
 				if (this.on_button !== null) {
 					this.on_button.set_off();
 				}
 				this.radio_buttons[i].set_on();				
+				this.on_button = this.radio_buttons[i];
 			}
 			return true;
 		}

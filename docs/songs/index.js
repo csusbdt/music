@@ -77,8 +77,8 @@ const song_0_button = radio_button(
 
 const song_1_button = radio_button(
 	image("./songs/images/play_medium_1_border.png", 0, 0, 1                     ),
-	image("./songs/images/play_medium_1_red.png"   , 0, 0, 1, song_0.start_func()),
-	image("./songs/images/play_medium_1_green.png" , 0, 0, 1, song_0.stop_func ())
+	image("./songs/images/play_medium_1_red.png"   , 0, 0, 1, song_1.start_func()),
+	image("./songs/images/play_medium_1_green.png" , 0, 0, 1, song_1.stop_func ())
 );
 
 const play_buttons = radio_buttons(
@@ -90,7 +90,7 @@ const click = _ => {
     if (back_red.click()) {
 		p.exit(start_home);
     } else {
-        if (play_buttons.click()) p.draw();
+        if (play_buttons.click()) draw();
     }
 };
 
