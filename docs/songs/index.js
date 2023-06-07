@@ -1,54 +1,7 @@
 import start_home     from "../home/index.js";
 import song           from "./song.js";
 
-const back_border      = image("./songs/images/back_border.png");
-const back_red         = image("./songs/images/back_red.png");
-
-function c_button(name, song) {
-    this.border = image("./songs/images/play_" + name + "_border.png");
-    this.red    = image("./songs/images/play_" + name + "_red.png"   );
-    this.green  = image("./songs/images/play_" + name + "_green.png" );
-    this.song   = song;
-}
-
-c_button.prototype.playing = null;
-
-c_button.prototype.click = function() {
-    const proto = Object.getPrototypeOf(this);
-    if (this.red.click()) {
-        if (proto.playing === this) {
-            proto.playing = null;
-            this.red.draw();
-            this.border.draw();
-            this.song.stop();
-        } else if (proto.playing === null) {
-            this.song.start();
-            proto.playing = this;            
-            this.green.draw();
-            this.border.draw();
-        } else {
-            proto.playing.song.stop(); // maybe not needed
-            proto.playing.red.draw();
-            proto.playing.border.draw();
-            proto.playing = this;            
-            this.green.draw();
-            this.border.draw();
-            this.song.start();
-        }
-    }
-};
-
-c_button.prototype.draw = function() {
-    const proto = Object.getPrototypeOf(this);
-    if (proto.playing === this) {
-        this.green.draw();
-    } else {
-        this.red.draw();        
-    }
-    this.border.draw();
-};
-
-const song_0 = [	
+const song_0 = song([	
 	[ 77, 0.50, 0.86],
 	[ 52, 0.34, 0.60],
 	[ 49, 0.62, 0.22],
@@ -67,9 +20,9 @@ const song_0 = [
 	[153, 0.46, 0.23],
 	[134, 0.34, 0.27],
 	[ 97, 0.30, 0.70]
-];
+]);
 
-const song_1 = [
+const song_1 = song([
 	[ 77, 0.50, 0.86],
 	[ 52, 0.34, 0.86],
 	[ 77, 0.62, 0.86],
@@ -84,50 +37,66 @@ const song_1 = [
 	[135, 0.45, 0.43],
 	[152, 0.32, 0.21],
 	[248, 0.26, 0.22]
-];
+]);
 
-const song_2 = [
-    [170, .39, 1.00],
-	[ 47, .52, 1.00],
-	[ 65, .42, 1.00],
-	[ 81, .69, 1.00],
-	[239, .48, 1.00],
-	[ 96, .18, 1.00],
-	[ 51, .42, 1.00],
-	[ 69, .66, 1.00]
-];
+// const song_2 = [
+//     [170, .39, 1.00],
+// 	[ 47, .52, 1.00],
+// 	[ 65, .42, 1.00],
+// 	[ 81, .69, 1.00],
+// 	[239, .48, 1.00],
+// 	[ 96, .18, 1.00],
+// 	[ 51, .42, 1.00],
+// 	[ 69, .66, 1.00]
+// ];
 
-const song_3 = [
-    [127, 0.25, .59],
-    [249, 0.52, .40],
-    [335, 0.34, .40],
-    [108, 0.41, .51],
-    [142, 0.62, .22],
-    [201, 0.59, .26],
-    [172, 0.38, .40]
-];
+// const song_3 = [
+//     [127, 0.25, .59],
+//     [249, 0.52, .40],
+//     [335, 0.34, .40],
+//     [108, 0.41, .51],
+//     [142, 0.62, .22],
+//     [201, 0.59, .26],
+//     [172, 0.38, .40]
+// ];
 
-const buttons = [
-    new c_button("big"     , song(song_2)),
-    new c_button("medium_1", song(song_0)),
-    new c_button("medium_2", song(song_1)),
-    new c_button("small_1" , song(song_3)) //,
-    // new c_button("small_2" , song(song_2)),
-    // new c_button("small_3" , song(song_2)),
-    // new c_button("small_4" , song(song_2))
-];
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+const back_border      = image("./songs/images/back_border.png");
+const back_red         = image("./songs/images/back_red.png");
+
+
+const song_0_button = radio_button(
+	image("./songs/images/play_big_border.png", 0, 0, 1                     ),
+	image("./songs/images/play_big_red.png"   , 0, 0, 1, song_0.start_func()),
+	image("./songs/images/play_big_green.png" , 0, 0, 1, song_0.stop_func ())
+);
+
+const song_1_button = radio_button(
+	image("./songs/images/play_medium_1_border.png", 0, 0, 1                     ),
+	image("./songs/images/play_medium_1_red.png"   , 0, 0, 1, song_0.start_func()),
+	image("./songs/images/play_medium_1_green.png" , 0, 0, 1, song_0.stop_func ())
+);
+
+const play_buttons = radio_buttons(
+	song_0_button,
+	song_1_button
+);
 
 const click = _ => {
     if (back_red.click()) {
 		p.exit(start_home);
     } else {
-        buttons.forEach(button => button.click());
+        if (play_buttons.click()) p.draw();
     }
 };
 
 const draw = _ => {
     draw_blue_bg();
-    buttons.forEach(button => button.draw());
+	play_buttons.draw();
     back_red.draw();
     back_border.draw();
 };

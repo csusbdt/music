@@ -38,7 +38,7 @@ const big_button_images = [
     image("./home/images/big_button_2.png")
 ];
 
-const big_button = button(100, big_button_action, big_button_images);
+const big_button = once(100, big_button_action, big_button_images);
 
 const inner_ring = new c_ring("inner");
 const outer_ring = new c_ring("outer");

@@ -69,6 +69,24 @@ window.addEventListener('resize', adjust_canvas);
 
 adjust_canvas();
 
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+// audio
+//
+///////////////////////////////////////////////////////////////////////////////////////////
+
+window.audio = null;
+
+window.init_audio = _ => {
+	// this function must run in click handler to work on apple hardware
+	if (audio === null) {
+		audio = new (window.AudioContext || window.webkitAudioContext)();
+	}
+	if (audio.state === "suspended") {
+		audio.resume();
+	}
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // click handling
@@ -94,87 +112,24 @@ canvas.addEventListener('click', e => {
     click_func(click_x, click_y);
 });
 
-window.circle = function(x, y, r) {
-	return (dx = 0, dy = 0, dr = 0) => { 
-        return (x + dx - click_x) * (x + dx - click_x) + (y + dy - click_y) * (y + dy - click_y) < (r + dr) * (r + dr); 
-    };
-};
+// window.circle = function(x, y, r) {
+// 	return (dx = 0, dy = 0, dr = 0) => { 
+//         return (x + dx - click_x) * (x + dx - click_x) + (y + dy - click_y) * (y + dy - click_y) < (r + dr) * (r + dr); 
+//     };
+// };
 
-window.rect = function(left, top, right, bottom) {
-	return _ => { 
-        return left <= click_x && top <= click_y && click_x < right && click_y < bottom; 
-    };
-};
+// window.rect = function(left, top, right, bottom) {
+// 	return _ => { 
+//         return left <= click_x && top <= click_y && click_x < right && click_y < bottom; 
+//     };
+// };
 
-window.shapes = function(..._shapes) {
-	for (let i = 0; i < _shapes.length; ++i) {
-		if (_shapes[i]()) return true;
-	}
-	return false;
-};
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// drawing
-//
-///////////////////////////////////////////////////////////////////////////////
-
-function c_image(src, x = 0, y = 0, s = 1) {
-    this.image     = new Image();
-    this.image.src = src;
-    this.x         = x;
-    this.y         = y;
-    this.s         = s;
-}
-
-c_image.prototype.clone = function(x = 0, y = 0, s = 1) {
-    return new c_image(this.image.src, x, y, s);
-};
-
-c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
-	if (this.image.complete) {
-		const dx      = this.x + x           ;
-		const dy      = this.y + y           ;
-		const sx      = 0                    ;
-		const sy      = 0                    ;
-	    const sWidth  = this.image.width     ;
-	    const sHeight = this.image.height    ;
-	    const dWidth  = sWidth * this.s * s  ;
-	    const dHeight = sHeight * this.s * s ;
-		ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
-	} else {
-		this.image.onload = this.draw.bind(this, x, y, s);
-	}
-};
-
-const c_image_canvas  = document.createElement('canvas');
-const c_image_ctx     = c_image_canvas.getContext("2d", { willReadFrequently: true });
-
-c_image.prototype.click = function() {
-    if (!this.image.complete) return false;
-	c_image_canvas.width  = design_width; 
-	c_image_canvas.height = design_height;
-    c_image_ctx.setTransform(1, 0, 0, 1, 0, 0);
-    c_image_ctx.clearRect(0, 0, c_image_canvas.width, c_image_canvas.height);
-    const dx      = this.x            ;
-    const dy      = this.y            ;
-    const sx      = 0                 ;
-    const sy      = 0                 ;
-    const sWidth  = this.image.width  ;
-    const sHeight = this.image.height ;
-    const dWidth  = sWidth * this.s   ;
-    const dHeight = sHeight * this.s  ;
-	c_image_ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
-    const image_data = c_image_ctx.getImageData(0, 0, c_image_canvas.width, c_image_canvas.height);
-    let x = Math.floor(click_x);
-    let y = Math.floor(click_y);
-    const i = Math.floor((image_data.width * y + x) * 4);
-    return image_data.data[i] !== 0;
-};
-
-window.image = (src, x = 0, y = 0, s = 1) => {
-    return new c_image(src, x, y, s);
-};
+// window.shapes = function(..._shapes) {
+// 	for (let i = 0; i < _shapes.length; ++i) {
+// 		if (_shapes[i]()) return true;
+// 	}
+// 	return false;
+// };
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -230,84 +185,75 @@ window.draw_white_bg = _ => {
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// animation
+// image
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-// window.schedule = (...args) => {
-// 	let wait = 0;
-// 	args.forEach(a => {
-// 		for (let i = a.length - 1; i >= 0; --i) {
-// 			if (Number.isInteger(a[i])) {
-// 				wait += a[i];
-// 				a.splice(i, 1);
-// 			}
-// 		}
-// 		setTimeout(_ => {
-// 			a.forEach(o => {
-// 				if (typeof o === "function") {
-// 					o(); 
-// 				} else {
-// 					assert(o.draw !== undefined);
-// 					o.draw();
-// 				}
-// 			});
-// 		}, wait);
-// 	});
-// }
+function c_image(src, x = 0, y = 0, s = 1, f = null) {
+    this.image     = new Image();
+    this.image.src = src;
+    this.x         = x;
+    this.y         = y;
+    this.s         = s;
+	this.f         = f;
+}
 
-// window.once = (...args) => {
-//     const q = args.slice();
-//     return _ => {
-//         const first = q.shift();
-//         if (first === undefined || first === null) {
-//             return;
-//         } else if (Array.isArray(first)) {
-//             first.forEach(f => {
-//                 if (typeof f === "boolean") {
-//                     if (f) q.unshift(first);
-//                 } else {
-//                     f();
-//                 }
-//             });
-//         } else {
-//             first();
-//         }
-//     };
-// }
+c_image.prototype.clone = function(x = 0, y = 0, s = 1, f = null) {
+    return new c_image(this.image.src, x, y, s, f);
+};
 
-// window.loop = (...args) => {
-//     const list = args.slice();
-// 	let i = 0;
-//     return _ => {
-// 		const o = list[i];
-// 		if (o === null) {
-// 			// noop
-//         } else if (Array.isArray(o)) {
-//             o.forEach(oo => { oo(); });
-//         } else {
-// 			o();
-// 		}
-// 		if (++i === list.length) i = 0;
-//     };
-// }
-
-///////////////////////////////////////////////////////////////////////////////////////////
-//
-// audio
-//
-///////////////////////////////////////////////////////////////////////////////////////////
-
-window.audio = null;
-
-window.init_audio = _ => {
-	// this function must run in click handler to work on apple hardware
-	if (audio === null) {
-		audio = new (window.AudioContext || window.webkitAudioContext)();
+c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
+	if (this.image.complete) {
+		const dx      = this.x + x           ;
+		const dy      = this.y + y           ;
+		const sx      = 0                    ;
+		const sy      = 0                    ;
+	    const sWidth  = this.image.width     ;
+	    const sHeight = this.image.height    ;
+	    const dWidth  = sWidth * this.s * s  ;
+	    const dHeight = sHeight * this.s * s ;
+		ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
+	} else {
+		this.image.onload = this.draw.bind(this, x, y, s);
 	}
-	if (audio.state === "suspended") {
-		audio.resume();
+};
+
+const c_image_canvas  = document.createElement('canvas');
+const c_image_ctx     = c_image_canvas.getContext("2d", { willReadFrequently: true });
+
+c_image.prototype.will_click = function() {
+    if (!this.image.complete) return false;
+	c_image_canvas.width  = design_width; 
+	c_image_canvas.height = design_height;
+    c_image_ctx.setTransform(1, 0, 0, 1, 0, 0);
+    c_image_ctx.clearRect(0, 0, c_image_canvas.width, c_image_canvas.height);
+    const dx      = this.x            ;
+    const dy      = this.y            ;
+    const sx      = 0                 ;
+    const sy      = 0                 ;
+    const sWidth  = this.image.width  ;
+    const sHeight = this.image.height ;
+    const dWidth  = sWidth * this.s   ;
+    const dHeight = sHeight * this.s  ;
+	c_image_ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+    const image_data = c_image_ctx.getImageData(0, 0, c_image_canvas.width, c_image_canvas.height);
+    let x = Math.floor(click_x);
+    let y = Math.floor(click_y);
+    const i = Math.floor((image_data.width * y + x) * 4);
+	return image_data.data[i] !== 0;
+};
+
+c_image.prototype.click = function() {
+	if (this.will_click()) {
+		if (this.f !== null) this.f();
+		return true;
+	} else {
+		return false;
 	}
+};
+
+window.image = (src, x = 0, y = 0, s = 1, f = null) => {
+    return new c_image(src, x, y, s, f);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -380,35 +326,33 @@ window.page = (draw_func, click_func, start_func = null, exit_func = null) => {
 
 ////////////////////////////////////////////////////////////////////////////////////
 //
-// button
+// once
 //
 ////////////////////////////////////////////////////////////////////////////////////
 
-function c_button(t, action, images) {
+function c_once(t, action, images) {
     this.action = action;
     this.t      = t;
     this.images = images;
     this.i      = 0;
-    this.id     = null;
 }
 
-c_button.prototype.draw = function() {
+c_once.prototype.draw = function() {
     this.images[this.i].draw();
 };
 
-c_button.prototype.next = function() {
+c_once.prototype.next = function() {
 	++this.i;
 	if (this.i === this.images.length) {
 		this.i  = 0;
-		this.id = null;
         this.action();
     } else {
         current_page.draw_func();
-        this.id = setTimeout(this.next.bind(this), this.t);
+        setTimeout(this.next.bind(this), this.t);
     }
 };
 
-c_button.prototype.click = function() {
+c_once.prototype.click = function() {
     if (this.i !== 0) {
         return;
     } else if (this.images[0].click()) {
@@ -416,7 +360,208 @@ c_button.prototype.click = function() {
     }
 }
 
-window.button = (t, action, src) => {
-    return new c_button(t, action, src);
+window.once = (t, action, images) => {
+    return new c_once(t, action, images);
 };
 
+// window.once = (t, action, src) => {
+//     return new c_once(t, action, src);
+// };
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// button
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+function c_button(border, colors) {
+	if (!Array.isArray(colors)) {
+		colors = [colors];
+	}
+	if (typeof border === 'string') {
+		this.border = image(border);
+	} else {
+		this.border = border;
+	}
+	this.colors = [];
+	colors.forEach(o => {
+		if (typeof o === 'string') {
+			this.colors.push(image(o));
+		} else {
+			this.colors.push(o);
+		}
+	});
+	this.i = 0;
+	assert(this.colors.length > 0);
+}
+
+c_button.prototype.clone = function() {
+	const border = this.border.clone();
+	const colors = [];
+	this.colors.forEach(i => {
+		colors.push(i.clone());
+	});
+	return new c_button(border, colors);
+};
+
+c_button.prototype.draw = function() {
+	this.border.draw();
+	this.colors[this.i].draw();
+};
+
+c_button.prototype.click = function() {
+	if (this.colors[this.i].click()) {
+		if (++this.i === this.colors.length) this.i = 0;
+		current_page.draw_func();
+		return true;
+	}
+	return false;
+};
+
+window.button = (border, ...colors) => {
+	return new c_button(border, colors);
+};
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// radio buttons
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+function c_radio_button(border_image, off_image, on_image) {
+	this.border_image = border_image;
+	this.off_image    = off_image   ;
+	this.on_image     = on_image    ;
+	this.on           = false       ;
+}
+
+c_radio_button.prototype.draw = function() {
+	if (this.on) {
+		this.on_image.draw();
+	} else {
+		this.off_image.draw();
+	}
+};
+
+c_radio_button.prototype.will_click = function() {
+	return this.off_image.will_click();
+};
+
+c_radio_button.prototype.set_off = function() {
+	assert(this.on);
+	if (this.on) {
+		if (this.off_image.f !== null) {
+			this.off_image.f();
+		}
+		this.on = false;
+	}
+};
+
+c_radio_button.prototype.set_on = function() {
+	assert(!this.on);
+	if (!this.on) {
+		if (this.on_image.f !== null) {
+			this.on_image.f();
+		}
+		this.on = true;
+	}
+};
+
+window.radio_button = (border_image, off_image, on_image) => {
+	return new c_radio_button(border_image, off_image, on_image);
+};
+
+function c_radio_buttons(radio_buttons) {
+	this.radio_buttons = radio_buttons;
+	this.on_button = null;
+}
+
+c_radio_buttons.prototype.draw = function() {
+	this.radio_buttons.forEach(b => { b.draw(); });
+}
+
+c_radio_buttons.prototype.click = function() {
+	for (let i = 0; i < this.radio_buttons.length; ++i) {
+		if (this.radio_buttons[i].will_click()) {
+			if (this.radio_buttons[i] === this.on_button) {
+				this.radio_buttons[i].set_off();
+			} else {
+				if (this.on_button !== null) {
+					this.on_button.set_off();
+				}
+				this.radio_buttons[i].set_on();				
+			}
+			return true;
+		}
+	}
+	return false;
+};
+
+window.radio_buttons = (...buttons) => {
+	return new c_radio_buttons(buttons);
+};
+
+	
+///////////////////////////////////////////////////////////////////////////////
+//
+// animation
+//
+///////////////////////////////////////////////////////////////////////////////
+
+// window.schedule = (...args) => {
+// 	let wait = 0;
+// 	args.forEach(a => {
+// 		for (let i = a.length - 1; i >= 0; --i) {
+// 			if (Number.isInteger(a[i])) {
+// 				wait += a[i];
+// 				a.splice(i, 1);
+// 			}
+// 		}
+// 		setTimeout(_ => {
+// 			a.forEach(o => {
+// 				if (typeof o === "function") {
+// 					o(); 
+// 				} else {
+// 					assert(o.draw !== undefined);
+// 					o.draw();
+// 				}
+// 			});
+// 		}, wait);
+// 	});
+// }
+
+// window.once = (...args) => {
+//     const q = args.slice();
+//     return _ => {
+//         const first = q.shift();
+//         if (first === undefined || first === null) {
+//             return;
+//         } else if (Array.isArray(first)) {
+//             first.forEach(f => {
+//                 if (typeof f === "boolean") {
+//                     if (f) q.unshift(first);
+//                 } else {
+//                     f();
+//                 }
+//             });
+//         } else {
+//             first();
+//         }
+//     };
+// }
+
+// window.loop = (...args) => {
+//     const list = args.slice();
+// 	let i = 0;
+//     return _ => {
+// 		const o = list[i];
+// 		if (o === null) {
+// 			// noop
+//         } else if (Array.isArray(o)) {
+//             o.forEach(oo => { oo(); });
+//         } else {
+// 			o();
+// 		}
+// 		if (++i === list.length) i = 0;
+//     };
+// }

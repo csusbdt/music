@@ -81,6 +81,14 @@ c_song.prototype.stop = function() {
     teardown_graph();
 };
 
+c_song.prototype.start_func = function() {
+	return this.start.bind(this);
+};
+
+c_song.prototype.stop_func = function() {
+	return this.stop.bind(this);
+};
+
 const song = (notes) => { return new c_song(notes); }
 
 export default song;
