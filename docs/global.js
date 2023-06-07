@@ -97,7 +97,7 @@ let click_x    = null;
 let click_y    = null;
 let click_func = null;
 
-// may need these later
+// may need these later for space shooter etc
 //window._x = _ => { return click_x; };
 //window._y = _ => { return click_y; };
 
@@ -111,25 +111,6 @@ canvas.addEventListener('click', e => {
 	click_y = (e.pageY - top ) / scale;
     click_func(click_x, click_y);
 });
-
-// window.circle = function(x, y, r) {
-// 	return (dx = 0, dy = 0, dr = 0) => { 
-//         return (x + dx - click_x) * (x + dx - click_x) + (y + dy - click_y) * (y + dy - click_y) < (r + dr) * (r + dr); 
-//     };
-// };
-
-// window.rect = function(left, top, right, bottom) {
-// 	return _ => { 
-//         return left <= click_x && top <= click_y && click_x < right && click_y < bottom; 
-//     };
-// };
-
-// window.shapes = function(..._shapes) {
-// 	for (let i = 0; i < _shapes.length; ++i) {
-// 		if (_shapes[i]()) return true;
-// 	}
-// 	return false;
-// };
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -181,6 +162,70 @@ window.draw_black_bg = _ => {
 window.draw_white_bg = _ => {
 	ctx.fillStyle = rgb_white;
 	ctx.fillRect(0, 0, design_width, design_height);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+// page
+//
+///////////////////////////////////////////////////////////////////////////////////////////
+
+function c_page(draw_func, click_func, start_func = null, exit_func = null) {
+    this.draw_func  = draw_func;
+    this.click_func = click_func;
+    this.start_func = start_func;
+    this.exit_func = exit_func;
+    this.back_func = null;
+}
+
+let current_page  = null;
+let previous_page = null;
+
+c_page.prototype.start = function(back_func = null) {
+	current_page = this;
+    this.back_func = back_func;
+    addEventListener('resize', this.draw_func);
+    if (this.start_func !== null) {
+        this.start_func();
+    }
+    this.draw_func();
+    set_click(this.click_func);
+};
+
+c_page.prototype.page_start = function() {
+    return this.start.bind(this);
+};
+
+// calling draw on page object is not yet needed
+// but in future, this could be a way of drawing overlays, global buttons, etc.
+// c_page.prototype.draw = function() {
+//     this.draw_func();
+// };
+
+c_page.prototype.exit = function(destination_page_start = null) {
+	previous_page = this;
+    removeEventListener('resize', this.draw_func);
+    set_click(null); // probably not needed, but just in case
+    if (this.exit_func !== null) {
+        this.exit_func();
+    } else if (destination_page_start === null) {
+        this.back_func();
+    } else {
+        destination_page_start(this.page_start());
+    }
+};
+
+c_page.prototype.back = function() {
+	assert(this.back_func !== null);
+	this.exit(this.back_func);
+};
+
+c_page.prototype.page_exit = function(destination_page_start = null) {
+    return this.exit.bind(this, destination_page_start);
+};
+
+window.page = (draw_func, click_func, start_func = null, exit_func = null) => {
+    return new c_page(draw_func, click_func, start_func, exit_func);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -256,70 +301,6 @@ window.image = (src, x = 0, y = 0, s = 1, f = null) => {
     return new c_image(src, x, y, s, f);
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////
-//
-// page
-//
-///////////////////////////////////////////////////////////////////////////////////////////
-
-function c_page(draw_func, click_func, start_func = null, exit_func = null) {
-    this.draw_func  = draw_func;
-    this.click_func = click_func;
-    this.start_func = start_func;
-    this.exit_func = exit_func;
-    this.back_func = null;
-}
-
-let current_page  = null;
-let previous_page = null;
-
-c_page.prototype.start = function(back_func = null) {
-	current_page = this;
-    this.back_func = back_func;
-    addEventListener('resize', this.draw_func);
-    if (this.start_func !== null) {
-        this.start_func();
-    }
-    this.draw_func();
-    set_click(this.click_func);
-};
-
-c_page.prototype.page_start = function() {
-    return this.start.bind(this);
-};
-
-// calling draw on page object is not yet needed
-// but in future, this could be a way of drawing overlays, global buttons, etc.
-// c_page.prototype.draw = function() {
-//     this.draw_func();
-// };
-
-c_page.prototype.exit = function(destination_page_start = null) {
-	previous_page = this;
-    removeEventListener('resize', this.draw_func);
-    set_click(null); // probably not needed, but just in case
-    if (this.exit_func !== null) {
-        this.exit_func();
-    } else if (destination_page_start === null) {
-        this.back_func();
-    } else {
-        destination_page_start(this.page_start());
-    }
-};
-
-c_page.prototype.back = function() {
-	assert(this.back_func !== null);
-	this.exit(this.back_func);
-};
-
-c_page.prototype.page_exit = function(destination_page_start = null) {
-    return this.exit.bind(this, destination_page_start);
-};
-
-window.page = (draw_func, click_func, start_func = null, exit_func = null) => {
-    return new c_page(draw_func, click_func, start_func, exit_func);
-};
-
 ////////////////////////////////////////////////////////////////////////////////////
 //
 // once
@@ -363,60 +344,6 @@ window.once = (t, action, images) => {
 // window.once = (t, action, src) => {
 //     return new c_once(t, action, src);
 // };
-
-//////////////////////////////////////////////////////////////////////////////////////
-//
-// button
-//
-//////////////////////////////////////////////////////////////////////////////////////
-
-function c_button(border, colors) {
-	if (!Array.isArray(colors)) {
-		colors = [colors];
-	}
-	if (typeof border === 'string') {
-		this.border = image(border);
-	} else {
-		this.border = border;
-	}
-	this.colors = [];
-	colors.forEach(o => {
-		if (typeof o === 'string') {
-			this.colors.push(image(o));
-		} else {
-			this.colors.push(o);
-		}
-	});
-	this.i = 0;
-	assert(this.colors.length > 0);
-}
-
-c_button.prototype.clone = function() {
-	const border = this.border.clone();
-	const colors = [];
-	this.colors.forEach(i => {
-		colors.push(i.clone());
-	});
-	return new c_button(border, colors);
-};
-
-c_button.prototype.draw = function() {
-	this.border.draw();
-	this.colors[this.i].draw();
-};
-
-c_button.prototype.click = function() {
-	if (this.colors[this.i].click()) {
-		if (++this.i === this.colors.length) this.i = 0;
-		current_page.draw_func();
-		return true;
-	}
-	return false;
-};
-
-window.button = (border, ...colors) => {
-	return new c_button(border, colors);
-};
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -496,8 +423,62 @@ c_radio_buttons.prototype.click = function() {
 	return false;
 };
 
-window.radio_buttons = (...buttons) => {
-	return new c_radio_buttons(buttons);
+window.radio_buttons = (...radio_buttons) => {
+	return new c_radio_buttons(radio_buttons);
+};
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// button
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+function c_button(border, colors) {
+	if (!Array.isArray(colors)) {
+		colors = [colors];
+	}
+	if (typeof border === 'string') {
+		this.border = image(border);
+	} else {
+		this.border = border;
+	}
+	this.colors = [];
+	colors.forEach(o => {
+		if (typeof o === 'string') {
+			this.colors.push(image(o));
+		} else {
+			this.colors.push(o);
+		}
+	});
+	this.i = 0;
+	assert(this.colors.length > 0);
+}
+
+c_button.prototype.clone = function() {
+	const border = this.border.clone();
+	const colors = [];
+	this.colors.forEach(i => {
+		colors.push(i.clone());
+	});
+	return new c_button(border, colors);
+};
+
+c_button.prototype.draw = function() {
+	this.border.draw();
+	this.colors[this.i].draw();
+};
+
+c_button.prototype.click = function() {
+	if (this.colors[this.i].click()) {
+		if (++this.i === this.colors.length) this.i = 0;
+		current_page.draw_func();
+		return true;
+	}
+	return false;
+};
+
+window.button = (border, ...colors) => {
+	return new c_button(border, colors);
 };
 
 	
