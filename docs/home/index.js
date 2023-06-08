@@ -13,9 +13,9 @@ const inner_ring = check_box(inner_border, inner_red, inner_green);
 const outer_ring = check_box(outer_border, outer_red, outer_green);
 
 const big_button_images = [
-    image("./home/images/big_button_0.png"),
-    image("./home/images/big_button_1.png"),
-    image("./home/images/big_button_2.png")
+    button(image("./home/images/big_button_border.png"  ), image("./home/images/big_button_fill.png"  )),
+    button(image("./home/images/big_button_border_1.png"), image("./home/images/big_button_fill_1.png")),
+    button(image("./home/images/big_button_border_2.png"), image("./home/images/big_button_fill_2.png"))
 ];
 
 const big_button_action = _ => {

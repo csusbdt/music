@@ -287,20 +287,20 @@ window.image = (src, x = 0, y = 0, s = 1) => {
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-function c_once(t, action, images) {
+function c_once(t, action, buttons) {
     this.action = action;
-    this.t      = t;
-    this.images = images;
-    this.i      = 0;
+    this.t       = t;
+    this.buttons = buttons;
+    this.i       = 0;
 }
 
 c_once.prototype.draw = function() {
-    this.images[this.i].draw();
+    this.buttons[this.i].draw();
 };
 
 c_once.prototype.next = function() {
 	++this.i;
-	if (this.i === this.images.length) {
+	if (this.i === this.buttons.length) {
 		this.i  = 0;
         this.action();
     } else {
@@ -312,10 +312,10 @@ c_once.prototype.next = function() {
 c_once.prototype.click = function() {
     if (this.i !== 0) {
         return;
-    } else if (this.images[0].click()) {
+	} else if (this.buttons[0].click()) {
 		this.next();
-    }
-}
+	}
+};
 
 window.once = (t, action, images) => {
     return new c_once(t, action, images);
