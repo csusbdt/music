@@ -24,6 +24,7 @@ window.addEventListener("error", e => {
 });
 
 window.addEventListener('unhandledrejection', e => {
+    if (error_caught) return;
 	if (typeof(e.reason.stack) !== 'undefined') {
 	    document.body.innerHTML = `<h1>${e.reason}<br>${e.reason.message}<br>${e.reason.stack}</h1>`;
 	} else {
@@ -86,8 +87,9 @@ adjust_canvas();
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-window.audio = null;
-window.main_gain  = null;
+window.audio     = null;
+window.main_gain = null;
+window.gain      = null; // used by pages
 
 window.init_audio = _ => {
 	// this function must run in click handler to work on apple hardware
@@ -114,9 +116,7 @@ window.silence_off = _ => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
-// book
-//
-// books are groups of pages loaded by seperate html files to limit resource consumption
+// local storage
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -413,7 +413,7 @@ window.radio_buttons = (...radio_buttons) => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_check_box(border_image, off_image, on_image, off_func, on_func) {
+function c_checkbox(border_image, off_image, on_image, off_func, on_func) {
 	this.border_image = border_image;
 	this.off_image    = off_image   ;
 	this.on_image     = on_image    ;
@@ -422,7 +422,7 @@ function c_check_box(border_image, off_image, on_image, off_func, on_func) {
 	this.on           = false       ;
 }
 
-c_check_box.prototype.draw = function() {
+c_checkbox.prototype.draw = function() {
 	if (this.on) {
 		this.on_image.draw();
 	} else {
@@ -431,7 +431,7 @@ c_check_box.prototype.draw = function() {
 	this.border_image.draw();
 };
 
-c_check_box.prototype.click = function() {
+c_checkbox.prototype.click = function() {
 	if (this.off_image.click()) {
 		if (this.on) {
 			if (this.off_func !== null) {
@@ -450,8 +450,8 @@ c_check_box.prototype.click = function() {
 	}
 };
 
-window.check_box = (border_image, off_image, on_image, off_func = null, on_func = null) => {
-	return new c_check_box(border_image, off_image, on_image, off_func, on_func);
+window.checkbox = (border_image, off_image, on_image, off_func = null, on_func = null) => {
+	return new c_checkbox(border_image, off_image, on_image, off_func, on_func);
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -496,16 +496,13 @@ window.back_button = button(
     image("./global/images/upper_left_yellow.png")
 );
 
-window.silence_button = check_box(
+window.silence_button = checkbox(
     image("./global/images/upper_right_border.png"),
     image("./global/images/upper_right_yellow.png"),
     image("./global/images/upper_right_white.png"),
     silence_off,
     silence_on
 );
-
-// window.current_page  = null; // current page module
-// window.previous_page = null;
 
 window.on_click  = null; // set in page start func
 window.click_x   = null;

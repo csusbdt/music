@@ -91,4 +91,7 @@ c_song.prototype.stop_func = function() {
 
 const song = (notes) => { return new c_song(notes); }
 
-export default song;
+const play = _ => { console.log("play"); };
+const stop = _ => { console.log("stop"); };
+
+export { play, stop };
