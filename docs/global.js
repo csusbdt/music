@@ -76,6 +76,7 @@ adjust_canvas();
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 window.audio = null;
+window.main_gain  = null;
 
 window.init_audio = _ => {
 	// this function must run in click handler to work on apple hardware
@@ -85,6 +86,19 @@ window.init_audio = _ => {
 	if (audio.state === "suspended") {
 		audio.resume();
 	}
+	if (main_gain === null) {
+		main_gain = audio.createGain();
+		main_gain.gain.value = 1;
+		main_gain.connect(audio.destination);
+	}
+};
+
+window.silence_on = _ => {
+	main_gain.gain.setTargetAtTime(0, audio.currentTime, .1);
+};
+
+window.silence_off = _ => {
+	main_gain.gain.setTargetAtTime(1, audio.currentTime, .1);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////

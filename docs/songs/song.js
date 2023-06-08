@@ -9,7 +9,7 @@ let loop_id     = null;
 const setup_graph = _ => {
     gain = audio.createGain();
 	gain.gain.value = 0;
-	gain.connect(audio.destination);
+	gain.connect(main_gain);
 	const merger = new ChannelMergerNode(audio);
 	merger.connect(gain);
 	o_left  = audio.createOscillator();

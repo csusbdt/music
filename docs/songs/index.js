@@ -19,24 +19,24 @@ const song_1_button = radio_button(
 	image("./songs/images/play_medium_1_border.png"),
 	image("./songs/images/play_medium_1_red.png"   ),
 	image("./songs/images/play_medium_1_green.png" ),
-	song_0.stop_func()                              ,
-	song_0.start_func()
+	song_1.stop_func()                              ,
+	song_1.start_func()
 );
 
 const song_2_button = radio_button(
 	image("./songs/images/play_medium_2_border.png"),
 	image("./songs/images/play_medium_2_red.png"   ),
 	image("./songs/images/play_medium_2_green.png" ),
-	song_0.stop_func()                              ,
-	song_0.start_func()
+	song_2.stop_func()                              ,
+	song_2.start_func()
 );
 
 const song_3_button = radio_button(
 	image("./songs/images/play_small_1_border.png" ),
 	image("./songs/images/play_small_1_red.png"    ),
 	image("./songs/images/play_small_1_green.png"  ),
-	song_0.stop_func()                              ,
-	song_0.start_func()
+	song_3.stop_func()                              ,
+	song_3.start_func()
 );
 
 const play_buttons = radio_buttons(
