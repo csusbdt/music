@@ -1,24 +1,24 @@
 import start_away from "../index.js";
 
-const big_button_1 = null;
-
-const click = _ => {
-    big_button_1.click();
-};
+const a = [ bg_blue, silence_button ];
 
 const draw = _ => {
-    bg_blue();
-    big_button_1.draw();
+    a.forEach(o => { o.draw(); });
+	back_button.draw();
+};
+
+const click = _ => {
+	if (back_button.click()) {
+		start_away();
+	} else if (a.some(o => { return o.click(); })) {
+		draw();
+	}
 };
 
 const start = _ => {
-    big_button_1 = image("./home/images/big_button_1.png", start_away);
-}
-
-const exit = _ => {
-    big_button_1 = null; // garbage collected to reduce memory?
+    on_click  = click;
+    on_resize = draw;
+    draw();
 };
 
-const p = page(draw, click, start, exit);
-
-export default p.page_start_func;
+export default start;

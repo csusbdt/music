@@ -23,6 +23,14 @@ window.addEventListener("error", e => {
     document.body.innerHTML = `<h1>${e.error}<br>${filename}<br>Line ${e.lineno}</h1>`;
 });
 
+window.addEventListener('unhandledrejection', e => {
+	if (typeof(e.reason.stack) !== 'undefined') {
+	    document.body.innerHTML = `<h1>${e.reason}<br>${e.reason.message}<br>${e.reason.stack}</h1>`;
+	} else {
+	    document.body.innerHTML = `<h1>${e.reason}<br>${e.reason.message}</h1>`;
+	}
+});
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // canvas
@@ -69,11 +77,14 @@ window.addEventListener('resize', adjust_canvas);
 
 adjust_canvas();
 
-///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 //
 // audio
 //
-///////////////////////////////////////////////////////////////////////////////////////////
+// init_audio is called with every click on the canvas with <canvas onclick="init_audio();"
+// This will run before all other click handlers. 
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 window.audio = null;
 window.main_gain  = null;
@@ -101,13 +112,13 @@ window.silence_off = _ => {
 	main_gain.gain.setTargetAtTime(1, audio.currentTime, .1);
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 //
 // book
 //
-// books are groups of pages loaded by seperate html files to limit resource consuption
+// books are groups of pages loaded by seperate html files to limit resource consumption
 //
-///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 const version = "music_0_";
 
@@ -125,88 +136,11 @@ window.get_item = (key, _default) => {
 	}
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////
-//
-// page
-//
-///////////////////////////////////////////////////////////////////////////////////////////
-
-window.current_page  = null;
-window.previous_page = null;
-window.click_x       = null;
-window.click_y       = null;
-
-canvas.addEventListener('click', e => {
-    click_x = (e.pageX - left) / scale;
-	click_y = (e.pageY - top ) / scale;
-	if (current_page !== null) {
-		current_page.click();
-	}
-});
-
-function c_page(draw_func, click_func, start_func = null, exit_func = null) {
-    this.draw_func       = draw_func;
-    this.click_func      = click_func;
-    this.start_func      = start_func;
-    this.exit_func       = exit_func;
-    this.back_func       = null;
-	this.page_start_func = this.start.bind(this);
-	this.page_draw_func  = this.draw.bind(this);
-}
-
-c_page.prototype.click = function() {
-	if (this.click_func !== null) {
-		this.click_func();
-	}
-};
-
-c_page.prototype.draw = function() {
-    this.draw_func();
-};
-
-c_page.prototype.start = function(back_func = null) {
-	current_page   = this;
-    this.back_func = back_func;
-    addEventListener('resize', this.page_draw_func);
-    if (this.start_func !== null) {
-        this.start_func();
-    }
-    this.draw();
-};
-
-c_page.prototype.exit = function(destination_page_start) {
-	assert(destination_page_start !== undefined && destination_page_start !== null);
-	previous_page = this;
-    removeEventListener('resize', this.page_draw_func);
-    if (this.exit_func !== null) {
-        this.exit_func();
-    } 
-    destination_page_start(this.page_start_func);
-};
-
-c_page.prototype.back = function() {
-	assert(this.back_func !== null);
-	this.exit(this.back_func);
-};
-
-c_page.prototype.page_exit_func = function(destination_page_start) {
-	assert(destination_page_start !== undefined);
-    return this.exit.bind(this, destination_page_start);
-};
-
-c_page.prototype.page_back_func = function() {
-    return this.back.bind(this);
-};
-
-window.page = (draw_func, click_func, start_func = null, exit_func = null) => {
-    return new c_page(draw_func, click_func, start_func, exit_func);
-};
-
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
 //
 // color palette
 //
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
 
 window.colors = {
 	red    : [243, 140, 105],
@@ -254,11 +188,37 @@ window.draw_white_bg = _ => {
 	ctx.fillRect(0, 0, design_width, design_height);
 };
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+//
+// bg
+//
+////////////////////////////////////////////////////////////////////////////////////
+
+function c_bg(rgb) {
+	this.rgb = rgb;
+}
+
+c_bg.prototype.draw = function() {
+	ctx.fillStyle = this.rgb;
+	ctx.fillRect(0, 0, design_width, design_height);
+};
+
+c_bg.prototype.click = function() {
+	return false;
+};
+	
+window.bg_red    = new c_bg(rgb_red   );
+window.bg_green  = new c_bg(rgb_green );
+window.bg_blue   = new c_bg(rgb_blue  );
+window.bg_yellow = new c_bg(rgb_yellow);
+window.bg_black  = new c_bg(rgb_black );
+window.bg_white  = new c_bg(rgb_white );
+
+////////////////////////////////////////////////////////////////////////////////////
 //
 // image
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
 
 function c_image(src, x = 0, y = 0, s = 1) {
     this.image     = new Image();
@@ -284,21 +244,23 @@ c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
 	    const dHeight = sHeight * this.s * s ;
 		ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
 	} else {
-		this.image.onload = this.draw.bind(this, x, y, s);
+		if (this.image.onload === null) {
+			this.image.onload = this.draw.bind(this, x, y, s);
+		}
 	}
 };
 
-const c_image_canvas  = document.createElement('canvas');
-const c_image_ctx     = c_image_canvas.getContext("2d", { willReadFrequently: true });
+const click_test_canvas = document.createElement('canvas');
+const click_test_ctx    = click_test_canvas.getContext("2d", { willReadFrequently: true });
 
 c_image.prototype.click = function() {
     if (!this.image.complete) {
 		return false;
 	}
-	c_image_canvas.width  = design_width; 
-	c_image_canvas.height = design_height;
-    c_image_ctx.setTransform(1, 0, 0, 1, 0, 0);
-    c_image_ctx.clearRect(0, 0, c_image_canvas.width, c_image_canvas.height);
+	click_test_canvas.width  = design_width; 
+	click_test_canvas.height = design_height;
+    click_test_ctx.setTransform(1, 0, 0, 1, 0, 0);
+    click_test_ctx.clearRect(0, 0, click_test_canvas.width, click_test_canvas.height);
     const dx      = this.x            ;
     const dy      = this.y            ;
     const sx      = 0                 ;
@@ -307,8 +269,8 @@ c_image.prototype.click = function() {
     const sHeight = this.image.height ;
     const dWidth  = sWidth * this.s   ;
     const dHeight = sHeight * this.s  ;
-	c_image_ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
-    const image_data = c_image_ctx.getImageData(0, 0, c_image_canvas.width, c_image_canvas.height);
+	click_test_ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+    const image_data = click_test_ctx.getImageData(0, 0, click_test_canvas.width, click_test_canvas.height);
     let x = Math.floor(click_x);
     let y = Math.floor(click_y);
     const i = Math.floor((image_data.width * y + x) * 4);
@@ -319,11 +281,11 @@ window.image = (src, x = 0, y = 0, s = 1) => {
     return new c_image(src, x, y, s);
 };
 
-////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
 //
 // once
 //
-////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
 
 function c_once(t, action, images) {
     this.action = action;
@@ -342,7 +304,7 @@ c_once.prototype.next = function() {
 		this.i  = 0;
         this.action();
     } else {
-        current_page.draw_func();
+        on_resize();
         setTimeout(this.next.bind(this), this.t);
     }
 };
@@ -498,55 +460,69 @@ window.check_box = (border_image, off_image, on_image, off_func = null, on_func 
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_button(border, colors) {
-	if (!Array.isArray(colors)) {
-		colors = [colors];
-	}
-	if (typeof border === 'string') {
-		this.border = image(border);
-	} else {
-		this.border = border;
-	}
-	this.colors = [];
-	colors.forEach(o => {
-		if (typeof o === 'string') {
-			this.colors.push(image(o));
-		} else {
-			this.colors.push(o);
-		}
-	});
-	this.i = 0;
-	assert(this.colors.length > 0);
+function c_button(border_image, color_image, func = null) {
+	this.border_image = border_image;
+	this.color_image  = color_image;
+	this.func         = func;
 }
 
-c_button.prototype.clone = function() {
-	const border = this.border.clone();
-	const colors = [];
-	this.colors.forEach(i => {
-		colors.push(i.clone());
-	});
-	return new c_button(border, colors);
-};
-
 c_button.prototype.draw = function() {
-	this.border.draw();
-	this.colors[this.i].draw();
+	this.border_image.draw();
+	this.color_image.draw();
 };
 
 c_button.prototype.click = function() {
-	if (this.colors[this.i].click()) {
-		if (++this.i === this.colors.length) this.i = 0;
-		current_page.draw_func();
+	if (this.color_image.click()) {
+		if (this.func !== null) this.func();
 		return true;
+	} else {
+		return false;
 	}
-	return false;
 };
 
-window.button = (border, ...colors) => {
-	return new c_button(border, colors);
+window.button = (border_image, color_image, func) => {
+	return new c_button(border_image, color_image);
 };
 
-	
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+// page
+//
+///////////////////////////////////////////////////////////////////////////////////////////
+
+window.back_button = button(
+    image("./global/images/upper_left_border.png"),
+    image("./global/images/upper_left_yellow.png")
+);
+
+window.silence_button = check_box(
+    image("./global/images/upper_right_border.png"),
+    image("./global/images/upper_right_yellow.png"),
+    image("./global/images/upper_right_white.png"),
+    silence_off,
+    silence_on
+);
+
+// window.current_page  = null; // current page module
+// window.previous_page = null;
+
+window.on_click  = null; // set in page start func
+window.click_x   = null;
+window.click_y   = null;
+
+window.on_resize = null; // set in page start func
+
+canvas.addEventListener('click', e => {
+    click_x = (e.pageX - left) / scale;
+	click_y = (e.pageY - top ) / scale;
+	if (on_click !== null) on_click();
+});
+
+addEventListener('resize', _ => {
+	if (on_resize !== null) on_resize();
+});
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // animation

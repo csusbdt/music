@@ -4,9 +4,6 @@ import { song_1 }  from "./songs.js"      ;
 import { song_2 }  from "./songs.js"      ;
 import { song_3 }  from "./songs.js"      ;
 
-const back_border = image("./songs/images/back_border.png");
-const back_red    = image("./songs/images/back_red.png"   );
-
 const song_0_button = radio_button(
 	image("./songs/images/play_big_border.png"     ),
 	image("./songs/images/play_big_red.png"        ),
@@ -46,25 +43,26 @@ const play_buttons = radio_buttons(
 	song_3_button
 );
 
-const click = _ => {
-    if (back_red.click()) {
-		p.exit(start_home);
-    } else {
-        if (play_buttons.click()) draw();
-    }
-};
+const a = [ bg_blue, silence_button, play_buttons ];
 
 const draw = _ => {
-    draw_blue_bg()     ;
-	play_buttons.draw();
-    back_red.draw()    ;
-    back_border.draw() ;
+    a.forEach(o => { o.draw(); });
+	back_button.draw();
+};
+
+const click = _ => {
+	if (back_button.click()) {
+		start_home();
+	} else if (a.some(o => { return o.click(); })) {
+		draw();
+	}
 };
 
 const start = _ => {
-	back_button = once(back_border, back_red);
+    on_click  = click;
+    on_resize = draw;
+    draw();
 };
 
-const p = page(draw, click);
+export default start;
 
-export default p.page_start_func;

@@ -1,13 +1,5 @@
-import start_away  from "../away/index.js";
+import start_away from "../away/index.js";
 import start_songs from "../songs/index.js";
-
-const silence_button = check_box(
-    image("./global/images/upper_right_border.png"),
-    image("./global/images/upper_right_yellow.png"),
-    image("./global/images/upper_right_white.png"),
-    silence_off,
-    silence_on
-);
 
 const inner_border = image("./home/images/inner_ring_border.png");
 const inner_red    = image("./home/images/inner_ring_red.png"   );
@@ -26,30 +18,30 @@ const big_button_images = [
     image("./home/images/big_button_2.png")
 ];
 
-const big_button_action = b => {
+const big_button_action = _ => {
     if (inner_ring.on || outer_ring.on) {
-        p.exit(start_away);
+        start_away();
     } else {
-        p.exit(start_songs);
+        start_songs();
     }
 };
 
 const big_button = once(100, big_button_action, big_button_images);
 
+const a = [ bg_blue, silence_button, inner_ring, outer_ring, big_button ];
+
 const draw = _ => {
-    draw_blue_bg();
-    inner_ring.draw();
-    outer_ring.draw();
-    big_button.draw();
-    silence_button.draw();
+    a.forEach(o => { o.draw(); });
 };
 
 const click = _ => {
-    if (inner_ring.click() || outer_ring.click()) draw();
-    big_button.click();
-    if (silence_button.click()) draw();
+    if (a.some(o => { return o.click(); })) draw();
 };
 
-const p = page(draw, click);
+const start = _ => {
+    on_click  = click;
+    on_resize = draw;
+    draw();
+};
 
-export default p.page_start_func;
+export default start;

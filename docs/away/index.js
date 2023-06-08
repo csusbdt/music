@@ -1,21 +1,32 @@
 import start_home     from "../home/index.js"   ;
 import start_far_away from "./far_away/index.js";
 
-const back_border      = image("./songs/images/back_border.png");
-const back_red         = image("./songs/images/back_red.png");
+const far_away_button = button(
+	image("./songs/images/play_big_border.png"),
+	image("./songs/images/play_big_red.png"   )
+);
 
-const click = _ => {
-    if (back_red.click()) {
-		p.back();
-    }
-};
+const a = [ bg_blue, silence_button, far_away_button ];
 
 const draw = _ => {
-    draw_blue_bg();
-    back_red.draw();
-    back_border.draw();
+    a.forEach(o => { o.draw(); });
+	back_button.draw();
 };
 
-const p = page(draw, click);
+const click = _ => {
+	if (back_button.click()) {
+		start_home();
+	} else if (far_away_button.click()) {
+		start_far_away();
+	} else if (a.some(o => { return o.click(); })) {
+		draw();
+	}
+};
 
-export default p.page_start_func;
+const start = _ => {
+    on_click  = click;
+    on_resize = draw;
+    draw();
+};
+
+export default start;
