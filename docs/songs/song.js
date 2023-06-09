@@ -29,7 +29,9 @@ const teardown_graph = _ => {
         o_right     = null;
 };
 
-const play_notes = (notes) => {
+const play_notes = (notes, ramp_up = 0, ramp_down = 0) => {
+	ramp_up = ramp_up;
+	ramp_down = ramp_down;
     let duration = 0;
 	notes.forEach(note => {
 		duration += note[2];
@@ -64,14 +66,14 @@ function c_song(notes) {
     this.notes = notes;
 }
 
-c_song.prototype.start = function() {
+c_song.prototype.start = function(ramp_up = 0, ramp_down = 0) {
     if (loop_id !== null) {
         clearInterval(loop_id);
         cancel_notes();
     } else {
         setup_graph();
     }
-	let duration = play_notes(this.notes);
+	let duration = play_notes(this.notes, ramp_up, ramp_down);
 	loop_id = setInterval(play_notes.bind(null, this.notes), duration * 1000 + 10);
 };
 

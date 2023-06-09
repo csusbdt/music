@@ -3,6 +3,7 @@ import { song_0 }  from "./songs.js"      ;
 import { song_1 }  from "./songs.js"      ;
 import { song_2 }  from "./songs.js"      ;
 import { song_3 }  from "./songs.js"      ;
+//import { happy_birthday } from "./songs.js"      ;
 
 const song_0_button = radio_button(
 	image("./songs/images/play_big_border.png"     ),
@@ -36,11 +37,20 @@ const song_3_button = radio_button(
 	song_3.start_func()
 );
 
+// const happy_birthday_button = radio_button(
+// 	image("./songs/images/play_small_2_border.png" ),
+// 	image("./songs/images/play_small_2_red.png"    ),
+// 	image("./songs/images/play_small_2_green.png"  ),
+// 	happy_birthday.stop_func()                      ,
+// 	happy_birthday.start_func(0, .15)
+// );
+
 const play_buttons = radio_buttons(
 	song_0_button,
 	song_1_button,
 	song_2_button,
 	song_3_button
+//	happy_birthday_button
 );
 
 const a = [ bg_blue, silence_button, play_buttons ];
