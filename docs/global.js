@@ -493,12 +493,12 @@ window.button = (border_image, color_image, func) => {
 
 window.back_button = button(
     image("./global/images/upper_left_border.png"),
-    image("./global/images/upper_left_yellow.png")
+    image("./global/images/upper_left_red.png")
 );
 
 window.silence_button = checkbox(
     image("./global/images/upper_right_border.png"),
-    image("./global/images/upper_right_yellow.png"),
+    image("./global/images/upper_right_green.png"),
     image("./global/images/upper_right_white.png"),
     silence_off,
     silence_on
