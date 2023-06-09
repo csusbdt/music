@@ -1,5 +1,6 @@
 import start_away           from "../away/index.js"          ;
 import start_songs          from "../songs/index.js"         ;
+import start_space_shooter  from "../space_shooter/index.js" ;
 
 const inner_border = image("./home/images/inner_ring_border.png");
 const inner_red    = image("./home/images/inner_ring_red.png"   );
@@ -20,7 +21,7 @@ const big_button_images = [
 
 const big_button_action = _ => {
     if (inner_ring.on && outer_ring.on) {
-        location = "./happy_birthday.html"
+        start_space_shooter();
     } else if (inner_ring.on || outer_ring.on) {
         start_away();
     } else {
