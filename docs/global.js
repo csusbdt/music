@@ -89,21 +89,28 @@ adjust_canvas();
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// click test canvas
+// click test 
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-const click_test = (image, x = 0, y = 0, s = 1) => {
+const click_test = (images, x = 0, y = 0, s = 1) => {
+	if (!Array.isArray(images)) images = [images];
+	for (let i = 0; i < images.length; ++i) {
+		if (!images[i].complete) return false;		
+	}
     click_test_ctx.clearRect(0, 0, click_test_canvas.width, click_test_canvas.height);
     const dx      = x            ;
     const dy      = y            ;
     const sx      = 0            ;
     const sy      = 0            ;
-    const sWidth  = image.width  ;
-    const sHeight = image.height ;
-    const dWidth  = sWidth * s   ;
-    const dHeight = sHeight * s  ;
-	click_test_ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+	for (let i = 0; i < images.length; ++i) {
+		const image   = images[i]      ;
+	    const sWidth  = image.width  ;
+	    const sHeight = image.height ;
+	    const dWidth  = sWidth * s   ;
+	    const dHeight = sHeight * s  ;
+		click_test_ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
+	}
     const image_data = click_test_ctx.getImageData(0, 0, click_test_canvas.width, click_test_canvas.height);
     let int_x = Math.floor(click_x);
     let int_y = Math.floor(click_y);
@@ -257,15 +264,42 @@ c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
 };
 
 c_image.prototype.click = function() {
-    if (!this.image.complete) {
-		return false;
-	} else {
-		return click_test(this.image, this.x, this.y, this.s);
-	}
+	return click_test(this.image, this.x, this.y, this.s);
 };
 
 window.image = (src, x = 0, y = 0, s = 1) => {
     return new c_image(src, x, y, s);
+};
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// pair
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+function c_pair(first_image, second_image, f = null) {
+	this.first_image  = first_image;
+	this.second_image = second_image;
+	this.f            = f;
+}
+
+c_pair.prototype.draw = function() {
+	this.first_image.draw();
+	this.second_image.draw();
+};
+
+c_pair.prototype.click = function() {
+	const images = [this.first_image, this.second_image];
+	if (click_test(images, this.x, this.y, this.s)) {
+		if (this.f !== null) this.f();
+		return true;
+	} else {
+		return false;
+	}
+};
+
+window.pair = (first_image, second_image, f = null) => {
+	return new c_pair(first_image, second_image, f);
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
