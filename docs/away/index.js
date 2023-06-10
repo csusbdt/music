@@ -1,7 +1,7 @@
 import start_home     from "../home/index.js"   ;
 import start_far_away from "./far_away/index.js";
 
-const far_away_button = button(
+const far_away_button = pair(
 	image("./songs/images/play_big_border.png"),
 	image("./songs/images/play_big_red.png"   )
 );

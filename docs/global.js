@@ -96,7 +96,7 @@ adjust_canvas();
 const click_test = (images, x = 0, y = 0, s = 1) => {
 	if (!Array.isArray(images)) images = [images];
 	for (let i = 0; i < images.length; ++i) {
-		if (!images[i].complete) return false;		
+		if (!images[i].complete) return false;
 	}
     click_test_ctx.clearRect(0, 0, click_test_canvas.width, click_test_canvas.height);
     const dx      = x            ;
@@ -288,8 +288,12 @@ c_pair.prototype.draw = function() {
 	this.second_image.draw();
 };
 
+//////////
+//// maybe should call all f on images
+////////
+
 c_pair.prototype.click = function() {
-	const images = [this.first_image, this.second_image];
+	const images = [this.first_image.image, this.second_image.image];
 	if (click_test(images, this.x, this.y, this.s)) {
 		if (this.f !== null) this.f();
 		return true;
@@ -302,25 +306,24 @@ window.pair = (first_image, second_image, f = null) => {
 	return new c_pair(first_image, second_image, f);
 };
 
+
 //////////////////////////////////////////////////////////////////////////////////////
 //
-// button
+// array
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_button(border_image, color_image, f = null) {
-	this.border_image = border_image;
-	this.color_image  = color_image;
-	this.f            = f;
+function c_array(images, f = null) {
+	this.images = images;
+	this.f      = f;
 }
 
-c_button.prototype.draw = function() {
-	this.border_image.draw();
-	this.color_image.draw();
+c_array.prototype.draw = function() {
+	this.images.forEach(image => image.draw());
 };
 
-c_button.prototype.click = function() {
-	if (this.color_image.click()) {
+c_array.prototype.click = function() {
+	if (click_test(this.images, this.x, this.y, this.s)) {
 		if (this.f !== null) this.f();
 		return true;
 	} else {
@@ -328,9 +331,39 @@ c_button.prototype.click = function() {
 	}
 };
 
-window.button = (border_image, color_image, f = null) => {
-	return new c_button(border_image, color_image, f);
+window.array = (images, f = null) => {
+	return new c_pair(images, f);
 };
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// button
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+// function c_button(border_image, color_image, f = null) {
+// 	this.border_image = border_image;
+// 	this.color_image  = color_image;
+// 	this.f            = f;
+// }
+
+// c_button.prototype.draw = function() {
+// 	this.border_image.draw();
+// 	this.color_image.draw();
+// };
+
+// c_button.prototype.click = function() {
+// 	if (this.color_image.click()) {
+// 		if (this.f !== null) this.f();
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// };
+
+// window.button = (border_image, color_image, f = null) => {
+// 	return new c_button(border_image, color_image, f);
+// };
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -624,18 +657,18 @@ window.radio_buttons = (...radio_buttons) => {
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-window.back_button = button(
-    image("./global/images/upper_left_border.png"),
-    image("./global/images/upper_left_red.png")
+window.back_button = pair(
+    image("./global/images/upper_left_red.png"),
+    image("./global/images/upper_left_border.png")
 );
 
 window.silence_button = checkbox2(
-    button(
+    pair(
 		image("./global/images/upper_right_border.png"), 
 		image("./global/images/upper_right_green.png"), 
 		silence_off
 	),
-    button(
+    pair(
 		image("./global/images/upper_right_border.png"), 
 		image("./global/images/upper_right_white.png"), 
 		silence_on

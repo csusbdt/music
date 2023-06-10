@@ -10,8 +10,8 @@ const outer_border = image("./home/images/outer_ring_border.png");
 const outer_red    = image("./home/images/outer_ring_red.png"   );
 const outer_green  = image("./home/images/outer_ring_green.png" );
 
-const inner_ring = checkbox2(button(inner_border, inner_red), button(inner_border, inner_green));
-const outer_ring = checkbox2(button(outer_border, outer_red), button(outer_border, outer_green));
+const inner_ring = checkbox2(pair(inner_border, inner_red), pair(inner_border, inner_green));
+const outer_ring = checkbox2(pair(outer_border, outer_red), pair(outer_border, outer_green));
 
 const big_button_border   = image("./home/images/big_button_border.png"  );
 const big_button_border_1 = image("./home/images/big_button_border_1.png");
@@ -21,9 +21,9 @@ const big_button_red_1    = image("./home/images/big_button_red_1.png"   );
 const big_button_red_2    = image("./home/images/big_button_red_2.png"   );
 
 const big_buttons = [
-    button(big_button_border  , big_button_red  ),
-    button(big_button_border_1, big_button_red_1),
-    button(big_button_border_2, big_button_red_2)
+    pair(big_button_border  , big_button_red  ),
+    pair(big_button_border_1, big_button_red_1),
+    pair(big_button_border_2, big_button_red_2)
 ];
 
 const big_action = _ => {

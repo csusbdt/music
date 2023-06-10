@@ -44,9 +44,9 @@ const gun_right_white       = image("./space_shooter/images/gun_right_white.png"
 
 // ship 
 
-const ship_left   = button(ship_left_border  , ship_left_yellow  );
-const ship_middle = button(ship_middle_border, ship_middle_yellow);
-const ship_right  = button(ship_right_border , ship_right_yellow );
+const ship_left   = pair(ship_left_yellow, ship_left_border    );
+const ship_middle = pair(ship_middle_yellow, ship_middle_border);
+const ship_right  = pair(ship_right_yellow, ship_right_border  );
 
 const ship = once(300, _ => { ship.start(); }, [ ship_left, ship_middle, ship_right, ship_middle ]);
 
@@ -55,16 +55,16 @@ const ship = once(300, _ => { ship.start(); }, [ ship_left, ship_middle, ship_ri
 
 const gun_speed = 100;
 
-const bullet_left_0 = button(bullet_left_border_0, bullet_left_red_0);
-const bullet_left_1 = button(bullet_left_border_1, bullet_left_red_1);
-const bullet_left_2 = button(bullet_left_border_2, bullet_left_red_2);
-const bullet_left_3 = button(bullet_left_border_3, bullet_left_red_3);
+const bullet_left_0 = pair(bullet_left_red_0, bullet_left_border_0);
+const bullet_left_1 = pair(bullet_left_red_1, bullet_left_border_1);
+const bullet_left_2 = pair(bullet_left_red_2, bullet_left_border_2);
+const bullet_left_3 = pair(bullet_left_red_3, bullet_left_border_3);
 
 const bullet_left = once(gun_speed, null, [ bullet_left_0, bullet_left_1, bullet_left_2, bullet_left_3 ]);
 
-const gun_left_button_ready = button(gun_left_border, gun_left_white, _ => { log('fire'); });
-const gun_left_button_red   = button(gun_left_border, gun_left_red  );
-const gun_left_button_white = button(gun_left_border, gun_left_white);
+const gun_left_button_ready = pair(gun_left_white, gun_left_border, _ => { log('fire'); });
+const gun_left_button_red   = pair(gun_left_red  , gun_left_border );
+const gun_left_button_white = pair(gun_left_white, gun_left_border );
 
 const gun_left_buttons = [
 	gun_left_button_ready,
