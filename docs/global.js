@@ -259,10 +259,10 @@ window.image = (src, x = 0, y = 0, s = 1) => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_button(border_image, color_image, func = null) {
+function c_button(border_image, color_image, f = null) {
 	this.border_image = border_image;
 	this.color_image  = color_image;
-	this.func         = func;
+	this.f            = f;
 }
 
 c_button.prototype.draw = function() {
@@ -272,16 +272,45 @@ c_button.prototype.draw = function() {
 
 c_button.prototype.click = function() {
 	if (this.color_image.click()) {
-		if (this.func !== null) this.func();
+		if (this.f !== null) this.f();
 		return true;
 	} else {
 		return false;
 	}
 };
 
-window.button = (border_image, color_image, func) => {
-	return new c_button(border_image, color_image);
+window.button = (border_image, color_image, f = null) => {
+	return new c_button(border_image, color_image, f);
 };
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// button group
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+function c_button_group(buttons, f = null) {
+	this.buttons = buttons;
+	this.f       = f;
+}
+
+c_button_group.prototype.draw = function() {
+	this.buttons.forEach(o => o.draw());
+};
+
+c_button_group.prototype.click = function() {
+	if (this.buttons.some(o => o.click())) {
+		if (this.f !== null) this.f();
+		return true;
+	} else {
+		return false;
+	}
+};
+
+window.button_group = (buttons, f = null) => {
+	return new c_button_group(buttons, f);
+};
+
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -330,48 +359,48 @@ window.checkbox2 = (off_button, on_button = null) => {
 
 ///////////////////////////////////////
 
-function c_checkbox(border_image, off_image, on_func, on_image, off_func) {
-	this.border_image = border_image;
-	this.off_image    = off_image   ;
-	this.on_image     = on_image    ;
-	this.off_func     = off_func    ;
-	this.on_func      = on_func     ;
-	this.on           = false       ;
-}
+// function c_checkbox(border_image, off_image, on_func, on_image, off_func) {
+// 	this.border_image = border_image;
+// 	this.off_image    = off_image   ;
+// 	this.on_image     = on_image    ;
+// 	this.off_func     = off_func    ;
+// 	this.on_func      = on_func     ;
+// 	this.on           = false       ;
+// }
 
-c_checkbox.prototype.draw = function() {
-	if (this.on) {
-		if (this.on_image === null) return;
-		this.on_image.draw();
-	} else {
-		this.off_image.draw();
-	}
-	this.border_image.draw();
-};
+// c_checkbox.prototype.draw = function() {
+// 	if (this.on) {
+// 		if (this.on_image === null) return;
+// 		this.on_image.draw();
+// 	} else {
+// 		this.off_image.draw();
+// 	}
+// 	this.border_image.draw();
+// };
 
-c_checkbox.prototype.click = function() {
-	if (this.on && this.on_image === null) return false;
-	if (this.off_image.click()) {
-		if (this.on) {
-			if (this.off_func !== null) {
-				this.off_func();
-			}
-			this.on = false;
-		} else {
-			if (this.on_func !== null) {
-				this.on_func();
-			}
-			this.on = true;
-		}
-		return true;
-	} else {
-		return false;
-	}
-};
+// c_checkbox.prototype.click = function() {
+// 	if (this.on && this.on_image === null) return false;
+// 	if (this.off_image.click()) {
+// 		if (this.on) {
+// 			if (this.off_func !== null) {
+// 				this.off_func();
+// 			}
+// 			this.on = false;
+// 		} else {
+// 			if (this.on_func !== null) {
+// 				this.on_func();
+// 			}
+// 			this.on = true;
+// 		}
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// };
 
-window.checkbox = (border_image, off_image, on_func = null, on_image = null, off_func = null) => {
-	return new c_checkbox(border_image, off_image, on_func, on_image, off_func);
-};
+// window.checkbox = (border_image, off_image, on_func = null, on_image = null, off_func = null) => {
+// 	return new c_checkbox(border_image, off_image, on_func, on_image, off_func);
+// };
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -551,12 +580,17 @@ window.back_button = button(
     image("./global/images/upper_left_red.png")
 );
 
-window.silence_button = checkbox(
-    image("./global/images/upper_right_border.png"),
-    image("./global/images/upper_right_green.png"),
-    silence_off,
-    image("./global/images/upper_right_white.png"),
-    silence_on
+window.silence_button = checkbox2(
+    button(
+		image("./global/images/upper_right_border.png"), 
+		image("./global/images/upper_right_green.png"), 
+		silence_off
+	),
+    button(
+		image("./global/images/upper_right_border.png"), 
+		image("./global/images/upper_right_white.png"), 
+		silence_on
+	)
 );
 
 window.on_click  = null; // set in page start func
