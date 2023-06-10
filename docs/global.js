@@ -289,7 +289,7 @@ window.button = (border_image, color_image, func) => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_checkbox(border_image, off_image, on_image, off_func, on_func) {
+function c_checkbox(border_image, off_image, on_func, on_image, off_func) {
 	this.border_image = border_image;
 	this.off_image    = off_image   ;
 	this.on_image     = on_image    ;
@@ -300,6 +300,7 @@ function c_checkbox(border_image, off_image, on_image, off_func, on_func) {
 
 c_checkbox.prototype.draw = function() {
 	if (this.on) {
+		if (this.on_image === null) return;
 		this.on_image.draw();
 	} else {
 		this.off_image.draw();
@@ -308,6 +309,7 @@ c_checkbox.prototype.draw = function() {
 };
 
 c_checkbox.prototype.click = function() {
+	if (this.on && this.on_image === null) return false;
 	if (this.off_image.click()) {
 		if (this.on) {
 			if (this.off_func !== null) {
@@ -326,10 +328,9 @@ c_checkbox.prototype.click = function() {
 	}
 };
 
-window.checkbox = (border_image, off_image, on_image, off_func = null, on_func = null) => {
-	return new c_checkbox(border_image, off_image, on_image, off_func, on_func);
+window.checkbox = (border_image, off_image, on_func = null, on_image = null, off_func = null) => {
+	return new c_checkbox(border_image, off_image, on_func, on_image, off_func);
 };
-
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -481,8 +482,8 @@ window.back_button = button(
 window.silence_button = checkbox(
     image("./global/images/upper_right_border.png"),
     image("./global/images/upper_right_green.png"),
-    image("./global/images/upper_right_white.png"),
     silence_off,
+    image("./global/images/upper_right_white.png"),
     silence_on
 );
 
