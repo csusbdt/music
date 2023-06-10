@@ -62,16 +62,6 @@ const bullet_left_3 = button(bullet_left_border_3, bullet_left_red_3);
 
 const bullet_left = once(gun_speed, null, [ bullet_left_0, bullet_left_1, bullet_left_2, bullet_left_3 ]);
 
-// const gun_left_on = _ => {
-// 	setTimeout(_ => { gun_left.on = false; gun_left.draw(); }, gun_speed);
-// 	bullet_left.start();
-// };
-
-// const gun_left = checkbox2(
-// 	button(gun_left_border, gun_left_white, gun_left_on),
-// 	button(gun_left_border, gun_left_red, null)
-// );
-
 const gun_left_button_ready = button(gun_left_border, gun_left_white, _ => { log('fire'); });
 const gun_left_button_red   = button(gun_left_border, gun_left_red  );
 const gun_left_button_white = button(gun_left_border, gun_left_white);
