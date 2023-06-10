@@ -382,6 +382,37 @@ window.once = (t, action, images) => {
     return new c_once(t, action, images);
 };
 
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// animated button
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+const c_anim_button_action = function(f) {
+	this.checkbox.on = false;
+	if (f !== null) f();
+}
+
+function c_anim_button(buttons, t, f) {
+	assert(buttons.length > 1);
+	this.checkbox = checkbox(buttons[0].border_image, buttons[0].color_image);
+	this.once     = once(t, c_anim_button_action.bind(this, f), buttons.slice(1));
+}
+
+c_anim_button.prototype.draw = function() {
+	this.checkbox.draw();
+	this.once.draw();
+};
+
+c_anim_button.prototype.click = function() {
+	if (this.checkbox.click()) {
+		this.once.start();
+	}
+};
+
+window.anim_button = (buttons, t, f = null) => new c_anim_button(buttons, t, f);
+
 //////////////////////////////////////////////////////////////////////////////////////
 //
 // radio buttons

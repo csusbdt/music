@@ -20,13 +20,13 @@ const big_button_red      = image("./home/images/big_button_red.png"     );
 const big_button_red_1    = image("./home/images/big_button_red_1.png"   );
 const big_button_red_2    = image("./home/images/big_button_red_2.png"   );
 
-const big_button_images = [ 
-    button(big_button_border_1, big_button_red_1), 
-    button(big_button_border_2, big_button_red_2) 
+const big_buttons = [
+    button(big_button_border  , big_button_red  ),
+    button(big_button_border_1, big_button_red_1),
+    button(big_button_border_2, big_button_red_2)
 ];
 
-const big_once_action = _ => {
-    big_button.on = false;
+const big_action = _ => {
     if (inner_ring.on && outer_ring.on) {
         start_space_shooter();
     } else if (inner_ring.on || outer_ring.on) {
@@ -36,11 +36,7 @@ const big_once_action = _ => {
     }
 };
 
-const big_once = once(100, big_once_action, big_button_images);
-
-const big_button = checkbox(big_button_border, big_button_red, _ => {
-    big_once.start();
-});
+const big_button = anim_button(big_buttons, 100, big_action);
 
 const draw_list = [ bg_blue, silence_button, inner_ring, outer_ring, big_button ];
     
