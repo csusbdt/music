@@ -43,6 +43,9 @@ window.log = m => console.log(m);
 // alpha === false speeds up drawing of transparent images
 window.ctx = canvas.getContext('2d', { alpha: false });
 
+const click_test_canvas = document.createElement('canvas');
+const click_test_ctx    = click_test_canvas.getContext("2d", { willReadFrequently: true });
+
 let design_width  = 1000 ;
 let design_height = 1000 ;
 let scale         = 1    ;
@@ -74,11 +77,39 @@ window.adjust_canvas = _ => {
 	canvas.style.left = left;
 	canvas.style.top  = top ;
 	ctx.setTransform(scale, 0, 0, scale, 0, 0);
+	
+	click_test_canvas.width  = design_width; 
+	click_test_canvas.height = design_height;
+    click_test_ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
 window.addEventListener('resize', adjust_canvas);
 
 adjust_canvas();
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// click test canvas
+//
+///////////////////////////////////////////////////////////////////////////////
+
+const click_test = (image, x = 0, y = 0, s = 1) => {
+    click_test_ctx.clearRect(0, 0, click_test_canvas.width, click_test_canvas.height);
+    const dx      = x            ;
+    const dy      = y            ;
+    const sx      = 0            ;
+    const sy      = 0            ;
+    const sWidth  = image.width  ;
+    const sHeight = image.height ;
+    const dWidth  = sWidth * s   ;
+    const dHeight = sHeight * s  ;
+	click_test_ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+    const image_data = click_test_ctx.getImageData(0, 0, click_test_canvas.width, click_test_canvas.height);
+    let int_x = Math.floor(click_x);
+    let int_y = Math.floor(click_y);
+    const i = Math.floor((image_data.width * int_y + int_x) * 4);
+	return image_data.data[i] !== 0;
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -192,18 +223,21 @@ window.bg_white  = new c_bg(rgb_white );
 //
 ////////////////////////////////////////////////////////////////////////////////////
 
-function c_image(src, x = 0, y = 0, s = 1) {
+function c_image(src, x = 0, y = 0, s = 1, f = null) {
     this.image     = new Image();
     this.image.src = src;
     this.x         = x;
     this.y         = y;
     this.s         = s;
+    this.f         = f;
 }
 
-c_image.prototype.clone = function(x = 0, y = 0, s = 1) {
-    return new c_image(this.image.src, x, y, s);
+c_image.prototype.clone = function(x = 0, y = 0, s = 1, f = null) {
+    return new c_image(this.image.src, x, y, s, f);
 };
 
+// The visible position of the image will not correspond to clickable area 
+// if x, y or s of the draw function are set other than the defaults.
 c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
 	if (this.image.complete) {
 		const dx      = this.x + x           ;
@@ -222,31 +256,12 @@ c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
 	}
 };
 
-const click_test_canvas = document.createElement('canvas');
-const click_test_ctx    = click_test_canvas.getContext("2d", { willReadFrequently: true });
-
 c_image.prototype.click = function() {
     if (!this.image.complete) {
 		return false;
+	} else {
+		return click_test(this.image, this.x, this.y, this.s);
 	}
-	click_test_canvas.width  = design_width; 
-	click_test_canvas.height = design_height;
-    click_test_ctx.setTransform(1, 0, 0, 1, 0, 0);
-    click_test_ctx.clearRect(0, 0, click_test_canvas.width, click_test_canvas.height);
-    const dx      = this.x            ;
-    const dy      = this.y            ;
-    const sx      = 0                 ;
-    const sy      = 0                 ;
-    const sWidth  = this.image.width  ;
-    const sHeight = this.image.height ;
-    const dWidth  = sWidth * this.s   ;
-    const dHeight = sHeight * this.s  ;
-	click_test_ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
-    const image_data = click_test_ctx.getImageData(0, 0, click_test_canvas.width, click_test_canvas.height);
-    let x = Math.floor(click_x);
-    let y = Math.floor(click_y);
-    const i = Math.floor((image_data.width * y + x) * 4);
-	return image_data.data[i] !== 0;
 };
 
 window.image = (src, x = 0, y = 0, s = 1) => {
