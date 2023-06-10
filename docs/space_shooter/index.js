@@ -68,10 +68,10 @@ const gun_left_button_white = pair(gun_left_white, gun_left_border );
 
 const gun_left_buttons = [
 	gun_left_button_ready,
-	button_group([gun_left_button_red  , bullet_left_0]),
-	button_group([gun_left_button_white, bullet_left_1]),
-	button_group([gun_left_button_white, bullet_left_2]),
-	button_group([gun_left_button_white, bullet_left_3])
+	array([gun_left_button_red  , bullet_left_0]),
+	array([gun_left_button_white, bullet_left_1]),
+	array([gun_left_button_white, bullet_left_2]),
+	array([gun_left_button_white, bullet_left_3])
 ];
 
 const gun_left_action = _ => { log('hit'); };
