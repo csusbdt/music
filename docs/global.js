@@ -32,6 +32,8 @@ window.addEventListener('unhandledrejection', e => {
 	}
 });
 
+window.log = m => console.log(m);
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // canvas
@@ -132,7 +134,7 @@ window.get_item = (key, _default) => {
 		set_item(key, _default);
 		return _default;
 	} else {
-		return JSON.parse(i);
+		return JSON.parse(item);
 	}
 };
 
@@ -157,36 +159,6 @@ const rgb_blue   = `rgb(${colors.blue  [0]}, ${colors.blue  [1]}, ${colors.blue 
 const rgb_yellow = `rgb(${colors.yellow[0]}, ${colors.yellow[1]}, ${colors.yellow[2]})`;
 const rgb_black  = `rgb(${colors.black [0]}, ${colors.black [1]}, ${colors.black [2]})`;
 const rgb_white  = `rgb(${colors.white [0]}, ${colors.white [1]}, ${colors.white [2]})`;
-
-window.draw_red_bg = _ => {
-	ctx.fillStyle = rgb_red;
-	ctx.fillRect(0, 0, design_width, design_height);
-};
-
-window.draw_green_bg = _ => {
-	ctx.fillStyle = rgb_green;
-	ctx.fillRect(0, 0, design_width, design_height);
-};
-
-window.draw_blue_bg = _ => {
-	ctx.fillStyle = rgb_blue;
-	ctx.fillRect(0, 0, design_width, design_height);
-};
-
-window.draw_yellow_bg = _ => {
-	ctx.fillStyle = rgb_yellow;
-	ctx.fillRect(0, 0, design_width, design_height);
-};
-
-window.draw_black_bg = _ => {
-	ctx.fillStyle = rgb_black;
-	ctx.fillRect(0, 0, design_width, design_height);
-};
-
-window.draw_white_bg = _ => {
-	ctx.fillStyle = rgb_white;
-	ctx.fillRect(0, 0, design_width, design_height);
-};
 
 ////////////////////////////////////////////////////////////////////////////////////
 //
@@ -245,7 +217,7 @@ c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
 		ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
 	} else {
 		if (this.image.onload === null) {
-			this.image.onload = this.draw.bind(this, x, y, s);
+			this.image.onload = on_resize;
 		}
 	}
 };
@@ -281,6 +253,84 @@ window.image = (src, x = 0, y = 0, s = 1) => {
     return new c_image(src, x, y, s);
 };
 
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// button
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+function c_button(border_image, color_image, func = null) {
+	this.border_image = border_image;
+	this.color_image  = color_image;
+	this.func         = func;
+}
+
+c_button.prototype.draw = function() {
+	this.border_image.draw();
+	this.color_image.draw();
+};
+
+c_button.prototype.click = function() {
+	if (this.color_image.click()) {
+		if (this.func !== null) this.func();
+		return true;
+	} else {
+		return false;
+	}
+};
+
+window.button = (border_image, color_image, func) => {
+	return new c_button(border_image, color_image);
+};
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// checkbox
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+function c_checkbox(border_image, off_image, on_image, off_func, on_func) {
+	this.border_image = border_image;
+	this.off_image    = off_image   ;
+	this.on_image     = on_image    ;
+	this.off_func     = off_func    ;
+	this.on_func      = on_func     ;
+	this.on           = false       ;
+}
+
+c_checkbox.prototype.draw = function() {
+	if (this.on) {
+		this.on_image.draw();
+	} else {
+		this.off_image.draw();
+	}
+	this.border_image.draw();
+};
+
+c_checkbox.prototype.click = function() {
+	if (this.off_image.click()) {
+		if (this.on) {
+			if (this.off_func !== null) {
+				this.off_func();
+			}
+			this.on = false;
+		} else {
+			if (this.on_func !== null) {
+				this.on_func();
+			}
+			this.on = true;
+		}
+		return true;
+	} else {
+		return false;
+	}
+};
+
+window.checkbox = (border_image, off_image, on_image, off_func = null, on_func = null) => {
+	return new c_checkbox(border_image, off_image, on_image, off_func, on_func);
+};
+
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //
 // once
@@ -291,25 +341,35 @@ function c_once(t, action, buttons) {
     this.action = action;
     this.t       = t;
     this.buttons = buttons;
-    this.i       = 0;
+    this.i       = null;
 }
 
 c_once.prototype.draw = function() {
+	if (this.i === null) return;
     this.buttons[this.i].draw();
 };
 
 c_once.prototype.next = function() {
+	if (this.i === null) return;
 	++this.i;
 	if (this.i === this.buttons.length) {
-		this.i  = 0;
-        this.action();
+		this.i  = null;
+        if (this.action !== null) this.action();
     } else {
-        on_resize();
         setTimeout(this.next.bind(this), this.t);
     }
+	on_resize();
+};
+
+c_once.prototype.start = function() {
+	if (this.i !== null) return;
+	this.i = 0;
+	setTimeout(this.next.bind(this), this.t);
+	on_resize();
 };
 
 c_once.prototype.click = function() {
+	if (this.i === null) return false;
     if (this.i !== 0) {
         return;
 	} else if (this.buttons[0].click()) {
@@ -406,84 +466,6 @@ c_radio_buttons.prototype.click = function() {
 window.radio_buttons = (...radio_buttons) => {
 	return new c_radio_buttons(radio_buttons);
 };
-
-//////////////////////////////////////////////////////////////////////////////////////
-//
-// checkbox
-//
-//////////////////////////////////////////////////////////////////////////////////////
-
-function c_checkbox(border_image, off_image, on_image, off_func, on_func) {
-	this.border_image = border_image;
-	this.off_image    = off_image   ;
-	this.on_image     = on_image    ;
-	this.off_func     = off_func    ;
-	this.on_func      = on_func     ;
-	this.on           = false       ;
-}
-
-c_checkbox.prototype.draw = function() {
-	if (this.on) {
-		this.on_image.draw();
-	} else {
-		this.off_image.draw();
-	}
-	this.border_image.draw();
-};
-
-c_checkbox.prototype.click = function() {
-	if (this.off_image.click()) {
-		if (this.on) {
-			if (this.off_func !== null) {
-				this.off_func();
-			}
-			this.on = false;
-		} else {
-			if (this.on_func !== null) {
-				this.on_func();
-			}
-			this.on = true;
-		}
-		return true;
-	} else {
-		return false;
-	}
-};
-
-window.checkbox = (border_image, off_image, on_image, off_func = null, on_func = null) => {
-	return new c_checkbox(border_image, off_image, on_image, off_func, on_func);
-};
-
-//////////////////////////////////////////////////////////////////////////////////////
-//
-// button
-//
-//////////////////////////////////////////////////////////////////////////////////////
-
-function c_button(border_image, color_image, func = null) {
-	this.border_image = border_image;
-	this.color_image  = color_image;
-	this.func         = func;
-}
-
-c_button.prototype.draw = function() {
-	this.border_image.draw();
-	this.color_image.draw();
-};
-
-c_button.prototype.click = function() {
-	if (this.color_image.click()) {
-		if (this.func !== null) this.func();
-		return true;
-	} else {
-		return false;
-	}
-};
-
-window.button = (border_image, color_image, func) => {
-	return new c_button(border_image, color_image);
-};
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //

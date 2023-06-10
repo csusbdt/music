@@ -41,183 +41,53 @@ const window_border         = image("./space_shooter/images/window_border.png");
 const window_exterior       = image("./space_shooter/images/window_exterior.png");
 const window_interior       = image("./space_shooter/images/window_interior.png");
 
-const a = [ bg_blue, silence_button, back_button ];
+const bullet_left_0 = button(bullet_left_border_0, bullet_left_red_0);
+const bullet_left_1 = button(bullet_left_border_1, bullet_left_red_1);
+const bullet_left_2 = button(bullet_left_border_2, bullet_left_red_2);
+const bullet_left_3 = button(bullet_left_border_3, bullet_left_red_3);
 
+const bullet_left = once(100, null, [ bullet_left_0, bullet_left_1, bullet_left_2, bullet_left_3 ]);
 
-let update_id             = null   ;
+const gun_left_on = _ => {
+	setTimeout(_ => { gun_left.on = false; gun_left.draw(); }, 100);
+	bullet_left.start();
+};
 
-let ship_i                = 0      ; 
-let explosion_left_i      = null   ; 
-let explosion_right_i     = null   ; 
-let bullet_left_i         = null   ; 
-let bullet_right_i        = null   ; 
-let gun_left_i            = 0      ; 
-let gun_right_i           = 0      ; 
+const gun_left = checkbox(gun_left_border, gun_left_white, gun_left_red, null, gun_left_on);
 
+const draw_list  = [ 
+	window_interior, window_exterior, 
+	gun_left, bullet_left,
+	silence_button, back_button, window_border 
+];
+const draw = _ => {
+	draw_list.forEach(o => { 
+		if (typeof o === 'object' && o.draw !== undefined) {
+			return o.draw(); 
+		}
+	});
+};
 
+const click_list = [ silence_button, back_button, gun_left ];
 const click = _ => {
 	if (back_button.click()) {
 		start_home();
-	} else if (a.some(o => { return o.click(); })) {
-		draw();
-	}
+	} else if (click_list.some(o => { 
+		if (typeof o === 'object' && o.click !== undefined) {
+			return o.click(); 
+		} else {
+			return false;
+		}
+	})) draw();
 };
-
-//const click = _ => {
-// 	const p = design_coords(e);
-// 	if (portal_i === 0) {
-// 		if (inside_portal(p)) {
-// 			portal_i = 1;
-//     	} else if (inside_exit(p)) {
-// 			stop();
-//             start_home();
-//     	}
-//     } else if (
-//         portal_i          === null && 
-//         explosion_left_i  === null && 
-//         explosion_right_i === null &&
-//         bullet_left_i     === null && 
-//         bullet_right_i    === null  
-//     ) {
-//         if (inside_gun_left(p)) {
-//             bullet_left_i = 0;
-//             gun_left_i    = 1;
-//         } else if (inside_gun_right(p)) {
-//             bullet_right_i = 0;
-//             gun_right_i    = 1;
-//         }
-//     }
-//};
-
-// const exit = _ => {
-// 	clearInterval(update_id);
-// 	update_id = null;
-// };
-
-
-const draw = _ => {
-	a.forEach(o => { o.draw(); });
-	back_button.draw();
-	
-//	draw_blue_bg();
-//    draw_green_bg();
-//	i_gun_left_border.draw();
-	//i_gun_left_blue.draw();
-	
-// 	if (ship_i === 0) {
-// 		draw(i_ship_left);
-// 	} else if (ship_i === 1 || ship_i === 3) {
-// 		draw(i_ship_middle);
-// 	} else if (ship_i === 2) {
-// 		draw(i_ship_right);
-// 	}
-
-// 	if (explosion_left_i === 0) {
-// 		draw(i_explosion_left_0);
-// 	} else if (explosion_left_i === 1) {
-// 		draw(i_explosion_left_1);
-// 	} else if (explosion_left_i === 2) {
-// 		draw(i_explosion_left_2);
-// 	}
-	
-// 	if (explosion_right_i === 0) {
-// 		draw(i_explosion_right_0);
-// 	} else if (explosion_right_i === 1) {
-// 		draw(i_explosion_right_1);
-// 	} else if (explosion_right_i === 2) {
-// 		draw(i_explosion_right_2);
-// 	}
-
-// 	draw(i_gun_left_border);
-// 	if (gun_left_i === 0) {
-// 		draw(i_gun_left_blue);
-// 	} else {
-// 		draw(i_gun_left_red);
-// 	}
-
-// 	draw(i_gun_right_border);
-// 	if (gun_right_i === 0) {
-// 		draw(i_gun_right_blue);
-// 	} else {
-// 		draw(i_gun_right_red);
-// 	}
-
-// 	if (bullet_left_i === 0) {
-// 		draw(i_bullet_left_0);		
-// 	} else if (bullet_left_i === 1) {
-// 		draw(i_bullet_left_1);		
-// 	} else if (bullet_left_i === 2) {
-// 		draw(i_bullet_left_0, 0, -140);		
-// 	} else if (bullet_right_i === 0) {
-// 		draw(i_bullet_right_0);		
-// 	} else if (bullet_right_i === 1) {
-// 		draw(i_bullet_right_1);		
-// 	} else if (bullet_right_i === 2) {
-// 		draw(i_bullet_right_0, 0, -120);
-// 	} 
-	
-// 	if (blue_dot_i === 0) {
-// 		draw(i_blue_dot);
-// 	} 
-
-// 	if (ship_i !== null && ++ship_i === 4) ship_i = 0;
-
-// 	if (bullet_left_i !== null && ++bullet_left_i === 3) {
-// 		bullet_left_i = null;
-// 	} else if (bullet_left_i === 1)	{
-// 		gun_left_i = 0;
-// 	} else if (bullet_left_i === 2 && ship_i === 0) {
-// 		bullet_left_i = null;
-// 		ship_i = null;
-// 		explosion_left_i = 0;
-// 	} else if (explosion_left_i === 0) {
-// 		explosion_left_i = 1;
-// 	} else if (explosion_left_i === 1) {
-// 		explosion_left_i = 2;
-// 	} else if (explosion_left_i === 2) {
-// 		explosion_left_i = null;
-// 		portal_i = 4;
-// 		return;
-// 	}
-	
-// 	if (bullet_right_i !== null && ++bullet_right_i === 3) {
-// 		bullet_right_i = null;
-// 	} else if (bullet_right_i === 1)	{
-// 		gun_right_i = 0;
-// 	} else if (bullet_right_i === 2 && ship_i === 2) {
-// 		bullet_right_i = null;
-// 		ship_i = null;
-// 		explosion_right_i = 0;
-// 	} else if (explosion_right_i === 0) {
-// 		explosion_right_i = 1;
-// 	} else if (explosion_right_i === 1) {
-// 		explosion_right_i = 2;
-// 	} else if (explosion_right_i === 2) {
-// 		explosion_right_i = null;
-// //		portal_i = 4;
-// 		return;
-// 	}
-};
-
-// const update = _ => {
-// };
 
 const start = _ => {
+	set_item('page', "./space_shooter/index.js");
     on_click  = click;
     on_resize = draw;
-    draw();
-
-	
-	// ship_i            = 0      ;
-	// explosion_left_i  = null   ;
-	// explosion_right_i = null   ;
-	// bullet_left_i     = null   ;
-	// bullet_right_i    = null   ;
-	// gun_left_i        = 0      ;
-	// gun_right_i       = 0      ;
-	
-//	update_id = setInterval(update, 350);
-	
+    draw();	
 };
 
 export default start;
+
+	
