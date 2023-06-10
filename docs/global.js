@@ -289,6 +289,47 @@ window.button = (border_image, color_image, func) => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
+
+function c_checkbox2(off_button, on_button) {
+	this.off_button = off_button;
+	this.on_button  = on_button ;
+	this.on           = false   ;
+}
+
+c_checkbox2.prototype.draw = function() {
+	if (this.on) {
+		if (this.on_button !== null) this.on_button.draw();
+	} else {
+		this.off_button.draw();	
+	}
+};
+
+c_checkbox2.prototype.click = function() {
+	if (this.on) {
+		if (this.on_button === null) {
+			return false;
+		} else {
+			if (this.on_button.click()) {
+				this.on = false;
+				return true;
+			} else return false;
+		}
+	} else {
+		if (this.off_button.click()) {
+			this.on = true;
+			return true;
+		} else {
+			return false;
+		}
+	}
+};
+
+window.checkbox2 = (off_button, on_button = null) => {
+	return new c_checkbox2(off_button, on_button);
+};
+
+///////////////////////////////////////
+
 function c_checkbox(border_image, off_image, on_func, on_image, off_func) {
 	this.border_image = border_image;
 	this.off_image    = off_image   ;
@@ -396,7 +437,7 @@ const c_anim_button_action = function(f) {
 
 function c_anim_button(buttons, t, f) {
 	assert(buttons.length > 1);
-	this.checkbox = checkbox(buttons[0].border_image, buttons[0].color_image);
+	this.checkbox = checkbox2(buttons[0], null);
 	this.once     = once(t, c_anim_button_action.bind(this, f), buttons.slice(1));
 }
 

@@ -10,8 +10,8 @@ const outer_border = image("./home/images/outer_ring_border.png");
 const outer_red    = image("./home/images/outer_ring_red.png"   );
 const outer_green  = image("./home/images/outer_ring_green.png" );
 
-const inner_ring = checkbox(inner_border, inner_red, null, inner_green);
-const outer_ring = checkbox(outer_border, outer_red, null, outer_green);
+const inner_ring = checkbox2(button(inner_border, inner_red), button(inner_border, inner_green));
+const outer_ring = checkbox2(button(outer_border, outer_red), button(outer_border, outer_green));
 
 const big_button_border   = image("./home/images/big_button_border.png"  );
 const big_button_border_1 = image("./home/images/big_button_border_1.png");
