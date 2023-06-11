@@ -35,12 +35,31 @@ const bullet_right_red_2    = bullet_left_red_2.clone(350, 0);
 const bullet_right_red_3    = bullet_left_red_3.clone(350, 0);
 const bullet_right_red_4    = bullet_left_red_4.clone(350, 0);
 
-const gun_left_border       = image("./space_shooter/images/gun_left_border.png");
-const gun_left_red          = image("./space_shooter/images/gun_left_red.png");
-const gun_left_white        = image("./space_shooter/images/gun_left_white.png");
-const gun_right_border      = image("./space_shooter/images/gun_right_border.png");
-const gun_right_red         = image("./space_shooter/images/gun_right_red.png");
-const gun_right_white       = image("./space_shooter/images/gun_right_white.png");
+const gun_left_border       = image("./space_shooter/images/gun_left_border.png"  );
+const gun_left_red          = image("./space_shooter/images/gun_left_red.png"     );
+const gun_left_white        = image("./space_shooter/images/gun_left_white.png"   );
+const gun_right_border      = image("./space_shooter/images/gun_right_border.png" );
+const gun_right_red         = image("./space_shooter/images/gun_right_red.png"    );
+const gun_right_white       = image("./space_shooter/images/gun_right_white.png"  );
+
+const left_explosion_0      = image("./space_shooter/images/left_explosion_0.png" );
+const left_explosion_1      = image("./space_shooter/images/left_explosion_1.png" );
+const left_explosion_2      = image("./space_shooter/images/left_explosion_2.png" );
+const left_explosion_3      = image("./space_shooter/images/left_explosion_3.png" );
+
+const right_explosion_0     = image("./space_shooter/images/right_explosion_0.png");
+const right_explosion_1     = image("./space_shooter/images/right_explosion_1.png");
+const right_explosion_2     = image("./space_shooter/images/right_explosion_2.png");
+const right_explosion_3     = image("./space_shooter/images/right_explosion_3.png");
+
+// explosions
+
+const left_explosion = once2([
+	left_explosion_0,
+	left_explosion_1,
+	left_explosion_2,
+	left_explosion_3
+], 100, _ => ship.start());
 
 // ship 
 
@@ -62,27 +81,6 @@ const bullet_left_2 = pair2(bullet_left_red_2, bullet_left_border_2);
 const bullet_left_3 = pair2(bullet_left_red_3, bullet_left_border_3);
 const bullet_left_4 = pair2(bullet_left_red_4, bullet_left_border_4);
 
-//const bullet_left = once(gun_speed, null, [ bullet_left_0, bullet_left_1, bullet_left_2, bullet_left_3, bullet_left_4 ]);
-
-// const gun_left_button_ready = pair(gun_left_white, gun_left_border, _ => { log('fire'); });
-// const gun_left_button_red   = pair(gun_left_red  , gun_left_border );
-// const gun_left_button_white = pair(gun_left_white, gun_left_border );
-
-// const gun_left_buttons = [
-// 	gun_left_button_ready,
-// 	array([gun_left_button_red  , bullet_left_0]),
-// 	array([gun_left_button_white, bullet_left_1]),
-// 	array([gun_left_button_white, bullet_left_2]),
-// 	array([gun_left_button_white, bullet_left_3])
-// ];
-
-// const gun_left_action = _ => { log('hit'); };
-
-// const gun_left = anim_button(gun_left_buttons, 100, gun_left_action);
-
-// const gun_white = pair2(gun_left_white, gun_left_border);
-// const gun_red   = pair2(gun_left_red  , gun_left_border);
-
 const bullet_left_objs = [
 	bullet_left_0,
 	bullet_left_1,
@@ -96,13 +94,18 @@ const bullet_left   = once2(bullet_left_objs, 100, null);
 const gun_left_fire = _ => {
 	bullet_left.start();
 	setTimeout(_ => gun_left.set_off(), gun_speed);
+	setTimeout(_ => {
+		if (ship.i === 3) {
+			left_explosion.start();
+			ship.stop();
+		}
+	}, gun_speed * 4);
 };
 const gun_left = checkbox2(pair(gun_left_white, gun_left_border), pair(gun_left_red, gun_left_border), gun_left_fire);
 
 const draw_list  = [ 
-	window_interior, window_exterior, ship, 
-	gun_left, bullet_left,
-	silence_button, back_button, window_border 
+	window_interior, ship, gun_left, bullet_left, left_explosion,
+	silence_button, back_button, window_exterior, window_border 
 ];
 
 const draw = _ => {
@@ -111,13 +114,8 @@ const draw = _ => {
 
 const click_list = [ silence_button, back_button, gun_left ];
 const click = _ => {
-	if (back_button.click()) {
-		start_home();
-		return;
-	}
-	if (click_list.some(o => o.click())) {
-		draw(); // maybe not needed, or remove from constructors
-	}
+	if (back_button.click()) return start_home();                    // CHECK
+	if (click_list.some(o => o.click())) draw(); // maybe not needed, or remove from constructors
 };
 
 const start = _ => {
@@ -125,7 +123,6 @@ const start = _ => {
     on_click  = click;
     on_resize = draw;
 	ship.start();
-	//gun_left.start();
     draw();	
 };
 

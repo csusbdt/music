@@ -441,7 +441,7 @@ c_loop.prototype.stop = function() {
 	if (!this.started) return;
 	this.started = false;
 	if (this.id !== null) {
-		cancelTimeout(this.id);
+		clearTimeout(this.id);
 		this.id = null;
 	}
 	on_resize();
