@@ -417,6 +417,54 @@ window.array2 = (objs, on_click = null) => {
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
+// loop
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+function c_loop(objs, t) {
+	assert(Array.isArray(objs));
+    this.objs    = objs;
+    this.t       = t;
+    this.i       = 0;
+    this.id      = null;
+	this.started = false;
+}
+
+c_loop.prototype.start = function() {
+	if (this.started) return;
+	this.started = true;
+	this.id = setTimeout(this.next.bind(this), this.t);
+	on_resize();
+};
+
+c_loop.prototype.stop = function() {
+	if (!this.started) return;
+	this.started = false;
+	if (this.id !== null) {
+		cancelTimeout(this.id);
+		this.id = null;
+	}
+	on_resize();
+};
+
+c_loop.prototype.draw = function() {
+	if (!this.started) return;
+    this.objs[this.i].draw();
+};
+
+c_loop.prototype.next = function() {
+	if (!this.started) return;
+	if (++this.i === this.objs.length) this.i = 0;
+    this.id = setTimeout(this.next.bind(this), this.t);
+	on_resize();
+};
+
+window.loop = (objs, t = 300) => {
+    return new c_loop(objs, t);
+};
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
 // array
 //
 //////////////////////////////////////////////////////////////////////////////////////

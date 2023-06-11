@@ -50,7 +50,7 @@ const ship_right  = pair2(ship_right_yellow, ship_right_border  );
 
 const ships = [ ship_left, ship_middle, ship_right, ship_middle ];
 
-const ship = once2(ships, _ => ship.loop(), 300);
+const ship = loop(ships, 300);
 
 // guns 
 
@@ -125,7 +125,6 @@ const start = _ => {
     on_click  = click;
     on_resize = draw;
 	ship.start();
-	ship.next();
 	gun_left.start();
     draw();	
 };
