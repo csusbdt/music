@@ -886,20 +886,20 @@ window.radio_buttons = (...radio_buttons) => {
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 window.back_button = pair2(
-    image("./global/images/upper_left_red.png"   ),
+    image("./global/images/upper_left_green.png"   ),
     image("./global/images/upper_left_border.png")
 );
 
 window.silence_button = checkbox2(
     pair2(
-		image("./global/images/upper_right_border.png"), 
 		image("./global/images/upper_right_green.png" ),
-		silence_off
+		image("./global/images/upper_right_border.png"), 
+		silence_on
 	),
     pair2(
-		image("./global/images/upper_right_border.png"), 
 		image("./global/images/upper_right_white.png" ),
-		silence_on
+		image("./global/images/upper_right_border.png"), 
+		silence_off
 	)
 );
 
