@@ -478,9 +478,12 @@ c_array.prototype.draw = function() {
 	this.images.forEach(image => image.draw());
 };
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// call to click_test needs to be fixed
+//
 c_array.prototype.click = function() {
 	if (click_test(this.images.map(i => i.image), this.x, this.y, this.s)) {
-		images.forEach(image => { if (image.f !== null) image.f(); });
+		this.images.forEach(image => { if (image.f !== null) image.f(); });
 		if (this.f !== null) this.f();
 		return true;
 	} else {
@@ -498,9 +501,11 @@ window.array = (images, f = null) => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_checkbox2(o_off, o_on) {
+function c_checkbox2(o_off, o_on, f_on = null, f_off = null) {
 	this.o_off = o_off;
 	this.o_on  = o_on ;
+	this.f_on  = f_on ;
+	this.f_off = f_off;
 	this.on    = false;
 }
 
@@ -512,6 +517,20 @@ c_checkbox2.prototype.draw = function() {
 	}
 };
 
+c_checkbox2.prototype.set_off = function() {
+	if (this.on) {
+		this.on = false;
+		on_resize();
+	}
+};
+
+c_checkbox2.prototype.set_on = function() {
+	if (!this.on) {
+		this.on = true;
+		on_resize();
+	}
+};
+
 c_checkbox2.prototype.click = function() {
 	if (this.on) {
 		if (this.o_on === null) {
@@ -519,6 +538,7 @@ c_checkbox2.prototype.click = function() {
 		} else {
 			if (this.o_on.click()) {
 				this.on = false;
+				if (this.f_off !== null) this.f_off();
 				return true;
 			} else {
 				return false;
@@ -527,6 +547,7 @@ c_checkbox2.prototype.click = function() {
 	} else {
 		if (this.o_off.click()) {
 			this.on = true;
+			if (this.f_on !== null) this.f_on();
 			return true;
 		} else {
 			return false;
@@ -534,8 +555,8 @@ c_checkbox2.prototype.click = function() {
 	}
 };
 
-window.checkbox2 = (o_off, o_on = null) => {
-	return new c_checkbox2(o_off, o_on);
+window.checkbox2 = (o_off, o_on = null, f_on = null, f_off = null) => {
+	return new c_checkbox2(o_off, o_on, f_on, f_off);r
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -588,24 +609,46 @@ window.checkbox = (off_array, on_array = null) => {
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-function c_once2(objs, on_end = null, t = 100) {
+function c_once2(objs, t = 100, on_end = null) {
 	assert(Array.isArray(objs));
     this.objs    = objs;
     this.on_end  = on_end;
     this.t       = t;
-    this.i       = null;
+    this.i       = 0;
+	this.id      = null;
+	this.started = false;
 }
 
+c_once2.prototype.start = function() {
+	if (this.started) return;
+	this.started = true;
+	this.i  = 0;
+	this.id = setTimeout(this.next.bind(this), this.t);
+	on_resize();
+};
+
+c_once2.prototype.stop = function() {
+	if (!this.started) return;
+	this.started = false;
+	this.i = 0;
+	if (this.id !== null) {
+		cancelTimeout(this.id);
+		this.id = null;
+	}
+	on_resize();
+};
+
 c_once2.prototype.draw = function() {
-	if (this.i === null) return;
+	if (!this.started) return;
     this.objs[this.i].draw();
 };
 
 c_once2.prototype.next = function() {
-	if (this.i === null) return;
-	++this.i;
-	if (this.i === this.objs.length) {
-		this.i = null;
+	if (!this.started) return;
+	if (++this.i === this.objs.length) {
+		this.i = 0;
+		this.id = null;
+		this.started = false;
         if (this.on_end !== null) this.on_end();
     } else {
         setTimeout(this.next.bind(this), this.t);
@@ -613,32 +656,8 @@ c_once2.prototype.next = function() {
 	on_resize();
 };
 
-c_once2.prototype.start = function() {
-	if (this.i !== null) return;
-	this.i = 0;
-//	setTimeout(this.next.bind(this), this.t);
-	on_resize();
-};
-
-c_once2.prototype.loop = function() {
-	if (this.i !== null) return;
-	this.i = 0;
-	setTimeout(this.next.bind(this), this.t);
-	on_resize();
-};
-
-c_once2.prototype.click = function() {
-	if (this.i !== 0) return false;
-	if (this.objs[0].click()) {
-		this.next();
-		return true;
-	} else {
-	    return false;
-	}
-};
-
-window.once2 = (objs, on_end = null, t = 100) => {
-    return new c_once2(objs, on_end, t);
+window.once2 = (objs, t = 100, on_end = null) => {
+    return new c_once2(objs, t, on_end);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////

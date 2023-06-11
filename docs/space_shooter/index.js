@@ -80,44 +80,44 @@ const bullet_left_4 = pair2(bullet_left_red_4, bullet_left_border_4);
 
 // const gun_left = anim_button(gun_left_buttons, 100, gun_left_action);
 
-const gun_barrel_white = pair2(gun_left_white, gun_left_border);
-const gun_barrel_red   = pair2(gun_left_red  , gun_left_border);
+// const gun_white = pair2(gun_left_white, gun_left_border);
+// const gun_red   = pair2(gun_left_red  , gun_left_border);
 
-const gun_left_objs = [
-	gun_barrel_white,
-	pair2(gun_barrel_red  , bullet_left_0),
-	pair2(gun_barrel_white, bullet_left_1),
-	pair2(gun_barrel_white, bullet_left_2),
-	pair2(gun_barrel_white, bullet_left_3),
-	pair2(gun_barrel_white, bullet_left_4)	
+const bullet_left_objs = [
+	bullet_left_0,
+	bullet_left_1,
+	bullet_left_2,
+	bullet_left_3,
+	bullet_left_4	
 ];
 
-const gun_left = once2(gun_left_objs, _ => gun_left.start(), gun_speed);
+const bullet_left   = once2(bullet_left_objs, 100, null);
+
+const gun_left_fire = _ => {
+	bullet_left.start();
+	setTimeout(_ => gun_left.set_off(), gun_speed);
+};
+const gun_left = checkbox2(pair(gun_left_white, gun_left_border), pair(gun_left_red, gun_left_border), gun_left_fire);
 
 const draw_list  = [ 
-	window_interior, window_exterior, 
-	ship, gun_left, 
+	window_interior, window_exterior, ship, 
+	gun_left, bullet_left,
 	silence_button, back_button, window_border 
 ];
+
 const draw = _ => {
-	draw_list.forEach(o => { 
-		if (typeof o === 'object' && o.draw !== undefined) {
-			return o.draw(); 
-		}
-	});
+	draw_list.forEach(o => o.draw());
 };
 
 const click_list = [ silence_button, back_button, gun_left ];
 const click = _ => {
 	if (back_button.click()) {
 		start_home();
-	} else if (click_list.some(o => { 
-		if (typeof o === 'object' && o.click !== undefined) {
-			return o.click(); 
-		} else {
-			return false;
-		}
-	})) draw();
+		return;
+	}
+	if (click_list.some(o => o.click())) {
+		draw(); // maybe not needed, or remove from constructors
+	}
 };
 
 const start = _ => {
@@ -125,7 +125,7 @@ const start = _ => {
     on_click  = click;
     on_resize = draw;
 	ship.start();
-	gun_left.start();
+	//gun_left.start();
     draw();	
 };
 
