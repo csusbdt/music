@@ -243,18 +243,16 @@ c_image.prototype.clone = function(x = 0, y = 0, s = 1, f = null) {
     return new c_image(this.image.src, x, y, s, f);
 };
 
-// The visible position of the image will not correspond to clickable area 
-// if x, y or s of the draw function are set other than the defaults.
-c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
+c_image.prototype.draw = function() {
 	if (this.image.complete) {
-		const dx      = this.x + x           ;
-		const dy      = this.y + y           ;
-		const sx      = 0                    ;
-		const sy      = 0                    ;
-	    const sWidth  = this.image.width     ;
-	    const sHeight = this.image.height    ;
-	    const dWidth  = sWidth * this.s * s  ;
-	    const dHeight = sHeight * this.s * s ;
+		const dx      = this.x           ;
+		const dy      = this.y           ;
+		const sx      = 0                ;
+		const sy      = 0                ;
+	    const sWidth  = this.image.width ;
+	    const sHeight = this.image.height;
+	    const dWidth  = sWidth * this.s  ;
+	    const dHeight = sHeight * this.s ;
 		ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
 	} else {
 		if (this.image.onload === null) {
@@ -263,12 +261,96 @@ c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
 	}
 };
 
+// The visible position of the image will not correspond to clickable area 
+// if x, y or s of the draw function are set other than the defaults.
+// c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
+// 	if (this.image.complete) {
+// 		const dx      = this.x + x           ;
+// 		const dy      = this.y + y           ;
+// 		const sx      = 0                    ;
+// 		const sy      = 0                    ;
+// 	    const sWidth  = this.image.width     ;
+// 	    const sHeight = this.image.height    ;
+// 	    const dWidth  = sWidth * this.s * s  ;
+// 	    const dHeight = sHeight * this.s * s ;
+// 		ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
+// 	} else {
+// 		if (this.image.onload === null) {
+// 			this.image.onload = on_resize;
+// 		}
+// 	}
+// };
+
 c_image.prototype.click = function() {
-	return click_test(this.image, this.x, this.y, this.s);
+	if (click_test(this.image, this.x, this.y, this.s)) {
+		if (this.f !== null) this.f();
+		return true;
+	} else {
+		return false;
+	}
 };
 
-window.image = (src, x = 0, y = 0, s = 1) => {
-    return new c_image(src, x, y, s);
+window.image = (src, x = 0, y = 0, s = 1, f = null) => {
+    return new c_image(src, x, y, s, f);
+};
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//
+// obj
+//
+////////////////////////////////////////////////////////////////////////////////////
+
+function c_obj(image, on_click = null) {
+    this.image    = image;
+	this.on_click = on_click;
+}
+
+c_obj.prototype.draw = function() {
+	this.image.draw();
+};
+
+c_obj.prototype.click = function() {
+	if(click_test(this.image)) {
+		if (this.on_click !== null) this.on_click();
+		return true;
+	} else {
+		return false;
+	}
+};
+
+window.obj = (image, on_click = null) => {
+    return new c_obj(image, on_click);
+};
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// pair 2
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+function c_pair2(first, second, on_click = null) {
+	this.first    = first;
+	this.second   = second;
+	this.on_click = on_click;
+}
+
+c_pair2.prototype.draw = function() {
+	this.first.draw();
+	this.second.draw();
+};
+
+c_pair2.prototype.click = function() {
+	if (this.first.click() || this.second.click()) {
+		if (this.on_click !== null) this.on_click();
+		return true;
+	} else {
+		return false;
+	}
+};
+
+window.pair2 = (first, second, on_click = null) => {
+	return new c_pair2(first, second, on_click);
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -306,6 +388,35 @@ window.pair = (first_image, second_image, f = null) => {
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
+// array 2
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+function c_array2(objs, on_click = null) {
+	assert(Array.isArray(objs));
+	this.objs     = objs;
+	this.on_click = on_click;
+}
+
+c_array2.prototype.draw = function() {
+	this.objs.forEach(o => o.draw());
+};
+
+c_array2.prototype.click = function(f = null) {
+	if (this.objs.some(o => o.click())) {
+		this.on_click();
+		return true;
+	} else {
+		return false;
+	}
+};
+
+window.array2 = (objs, on_click = null) => {
+	return new c_array(objs, on_click);
+};
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
 // array
 //
 //////////////////////////////////////////////////////////////////////////////////////
@@ -330,67 +441,54 @@ c_array.prototype.click = function() {
 };
 
 window.array = (images, f = null) => {
-	return new c_pair(images, f);
+	return new c_array(images, f);
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
-// button
+// checkbox 2
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-// function c_button(border_image, color_image, f = null) {
-// 	this.border_image = border_image;
-// 	this.color_image  = color_image;
-// 	this.f            = f;
-// }
+function c_checkbox2(o_off, o_on) {
+	this.o_off = o_off;
+	this.o_on  = o_on ;
+	this.on    = false;
+}
 
-// c_button.prototype.draw = function() {
-// 	this.border_image.draw();
-// 	this.color_image.draw();
-// };
+c_checkbox2.prototype.draw = function() {
+	if (this.on) {
+		if (this.o_on !== null) this.o_on.draw();
+	} else {
+		this.o_off.draw();	
+	}
+};
 
-// c_button.prototype.click = function() {
-// 	if (this.color_image.click()) {
-// 		if (this.f !== null) this.f();
-// 		return true;
-// 	} else {
-// 		return false;
-// 	}
-// };
+c_checkbox2.prototype.click = function() {
+	if (this.on) {
+		if (this.o_on === null) {
+			return false;
+		} else {
+			if (this.o_on.click()) {
+				this.on = false;
+				return true;
+			} else {
+				return false;
+			}
+		}
+	} else {
+		if (this.o_off.click()) {
+			this.on = true;
+			return true;
+		} else {
+			return false;
+		}
+	}
+};
 
-// window.button = (border_image, color_image, f = null) => {
-// 	return new c_button(border_image, color_image, f);
-// };
-
-//////////////////////////////////////////////////////////////////////////////////////
-//
-// button group
-//
-//////////////////////////////////////////////////////////////////////////////////////
-
-// function c_button_group(buttons, f = null) {
-// 	this.buttons = buttons;
-// 	this.f       = f;
-// }
-
-// c_button_group.prototype.draw = function() {
-// 	this.buttons.forEach(o => o.draw());
-// };
-
-// c_button_group.prototype.click = function() {
-// 	if (this.buttons.some(o => o.click())) {
-// 		if (this.f !== null) this.f();
-// 		return true;
-// 	} else {
-// 		return false;
-// 	}
-// };
-
-// window.button_group = (buttons, f = null) => {
-// 	return new c_button_group(buttons, f);
-// };
-
+window.checkbox2 = (o_off, o_on = null) => {
+	return new c_checkbox2(o_off, o_on);
+};
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -436,50 +534,64 @@ window.checkbox = (off_array, on_array = null) => {
 	return new c_checkbox(off_array, on_array);
 };
 
-///////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+//
+// once 2
+//
+////////////////////////////////////////////////////////////////////////////////////////
 
-// function c_checkbox(border_image, off_image, on_func, on_image, off_func) {
-// 	this.border_image = border_image;
-// 	this.off_image    = off_image   ;
-// 	this.on_image     = on_image    ;
-// 	this.off_func     = off_func    ;
-// 	this.on_func      = on_func     ;
-// 	this.on           = false       ;
-// }
+function c_once2(objs, on_end = null, t = 100) {
+	assert(Array.isArray(objs));
+    this.objs    = objs;
+    this.on_end  = on_end;
+    this.t       = t;
+    this.i       = null;
+}
 
-// c_checkbox.prototype.draw = function() {
-// 	if (this.on) {
-// 		if (this.on_image === null) return;
-// 		this.on_image.draw();
-// 	} else {
-// 		this.off_image.draw();
-// 	}
-// 	this.border_image.draw();
-// };
+c_once2.prototype.draw = function() {
+	if (this.i === null) return;
+    this.objs[this.i].draw();
+};
 
-// c_checkbox.prototype.click = function() {
-// 	if (this.on && this.on_image === null) return false;
-// 	if (this.off_image.click()) {
-// 		if (this.on) {
-// 			if (this.off_func !== null) {
-// 				this.off_func();
-// 			}
-// 			this.on = false;
-// 		} else {
-// 			if (this.on_func !== null) {
-// 				this.on_func();
-// 			}
-// 			this.on = true;
-// 		}
-// 		return true;
-// 	} else {
-// 		return false;
-// 	}
-// };
+c_once2.prototype.next = function() {
+	if (this.i === null) return;
+	++this.i;
+	if (this.i === this.objs.length) {
+		this.i = null;
+        if (this.on_end !== null) this.on_end();
+    } else {
+        setTimeout(this.next.bind(this), this.t);
+    }
+	on_resize();
+};
 
-// window.checkbox = (border_image, off_image, on_func = null, on_image = null, off_func = null) => {
-// 	return new c_checkbox(border_image, off_image, on_func, on_image, off_func);
-// };
+c_once2.prototype.start = function() {
+	if (this.i !== null) return;
+	this.i = 0;
+//	setTimeout(this.next.bind(this), this.t);
+	on_resize();
+};
+
+c_once2.prototype.loop = function() {
+	if (this.i !== null) return;
+	this.i = 0;
+	setTimeout(this.next.bind(this), this.t);
+	on_resize();
+};
+
+c_once2.prototype.click = function() {
+	if (this.i !== 0) return false;
+	if (this.objs[0].click()) {
+		this.next();
+		return true;
+	} else {
+	    return false;
+	}
+};
+
+window.once2 = (objs, on_end = null, t = 100) => {
+    return new c_once2(objs, on_end, t);
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -488,8 +600,8 @@ window.checkbox = (off_array, on_array = null) => {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 function c_once(t, f, objs) {
-    this.f     = f;
     this.t     = t;
+    this.f     = f;
     this.objs  = objs;
     this.i     = null;
 }
@@ -503,7 +615,7 @@ c_once.prototype.next = function() {
 	if (this.i === null) return;
 	++this.i;
 	if (this.i === this.objs.length) {
-		this.i  = null;
+		this.i = null;
         if (this.f !== null) this.f();
     } else {
         setTimeout(this.next.bind(this), this.t);
@@ -519,18 +631,18 @@ c_once.prototype.start = function() {
 };
 
 c_once.prototype.click = function() {
-	if (this.i === null) return false;
-    if (this.i !== 0) {
-        return;
-	} else if (this.objs[0].click()) {
-		this.next();
+	if (this.i === 0) {
+		if (this.objs[0].click()) {
+			this.next();
+			return true;
+		}
 	}
+    return false;
 };
 
 window.once = (t, f, objs) => {
     return new c_once(t, f, objs);
 };
-
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -561,6 +673,58 @@ c_anim_button.prototype.click = function() {
 };
 
 window.anim_button = (objs, t, f = null) => new c_anim_button(objs, t, f);
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// radio buttons 2
+//
+//     off_func called before on_func
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+// function c_radio_buttons2(radio_buttons) {
+// 	this.radio_buttons = radio_buttons;
+// }
+
+// c_radio_buttons2.prototype.draw = function() {
+// 	this.radio_buttons.forEach(radio_button => radio_button.draw());
+// }
+
+// c_radio_buttons2.prototype.click = function() {
+// 	let on_radio_button = null;
+// 	for (let i = 0; i < this.radio_buttons.length; ++i) {
+// 		if (this.radio_buttons[i].on) {
+// 			on_radio_button = this.radio_buttons[i];
+// 			break;
+// 		}
+// 	}
+// 	for (let i = 0; i < this.radio_buttons.length; ++i) {
+// 		if (this.radio_buttons[i].click()) {
+// 			on_checkbox.set_off();
+			
+// 			if (this.radio_buttons[i] === this.on_button) {
+// 				this.radio_buttons[i].set_off();
+// 				this.on_button = null;
+// 			} else {
+// 				if (this.on_button !== null) {
+// 					this.on_button.set_off();
+// 				}
+// 				this.radio_buttons[i].set_on();				
+// 				this.on_button = this.radio_buttons[i];
+// 			}
+// 			return true;
+// 		}
+// 	}
+// 	return false;
+// };
+
+// window.radio_buttons2 = (checkboxes) => {
+// 	return new c_radio_buttons2(checkboxes);
+// };
+
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -654,20 +818,20 @@ window.radio_buttons = (...radio_buttons) => {
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-window.back_button = pair(
-    image("./global/images/upper_left_red.png"),
+window.back_button = pair2(
+    image("./global/images/upper_left_red.png"   ),
     image("./global/images/upper_left_border.png")
 );
 
-window.silence_button = checkbox(
-    pair(
+window.silence_button = checkbox2(
+    pair2(
 		image("./global/images/upper_right_border.png"), 
-		image("./global/images/upper_right_green.png"), 
+		image("./global/images/upper_right_green.png" ),
 		silence_off
 	),
-    pair(
+    pair2(
 		image("./global/images/upper_right_border.png"), 
-		image("./global/images/upper_right_white.png"), 
+		image("./global/images/upper_right_white.png" ),
 		silence_on
 	)
 );
