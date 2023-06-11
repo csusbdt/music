@@ -142,14 +142,20 @@ const left_explosion = once2([
 	left_explosion_1,
 	left_explosion_2,
 	left_explosion_3
-], 100, _ => ship.start());
+], 100, _ => { 
+//	ship.start();
+	start_home();
+});
 
 const right_explosion = once2([
 	right_explosion_0,
 	right_explosion_1,
 	right_explosion_2,
 	right_explosion_3
-], 100, _ => ship.start());
+], 100, _ => { 
+//	ship.start();
+	start_home();
+});
 
 // draw
 
