@@ -226,7 +226,7 @@ window.bg_white  = new c_bg(rgb_white );
 
 ////////////////////////////////////////////////////////////////////////////////////
 //
-// image obj
+// image 
 //
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -276,42 +276,9 @@ window.image = (src, x = 0, y = 0, s = 1, f = null) => {
 
 ////////////////////////////////////////////////////////////////////////////////////
 //
-// obj
+// image obj
 //
 ////////////////////////////////////////////////////////////////////////////////////
-
-// functon start_obj_f() {
-// 	if (!this.started) this.start();
-// }
-
-// window.start_obj = o => {
-// 	if (o.started === undefined) {
-// 		o.started = false;
-// 	}
-// 	if (o.start === undefined) {
-// 		o.start = start_obj_f.bind(o);
-// 	}
-// 	if (!o.started) {
-// 		o.start();
-// 	}
-// }
-
-// functon stop_obj_f() {
-// 	if (this.started) this.stop();
-// }
-
-// window.stop_obj = o => {
-// 	if (o.started === undefined) {
-// 		o.started = true;
-// 	}
-// 	if (o.stop === undefined) {
-// 		o.stop = stop_obj.bind(o);
-// 	}
-// 	if (!o.started) {
-// 		o.start();
-// 	}
-// }
-
 
 function c_img(src, x = 0, y = 0, s = 1) {
     this.image     = new Image();
@@ -351,6 +318,11 @@ window.img = (src, x = 0, y = 0, s = 1) => {
     return new c_img(src, x, y, s);
 };
 
+////////////////////////////////////////////////////////////////////////////////////
+//
+// obj
+//
+////////////////////////////////////////////////////////////////////////////////////
 
 function c_obj(objs, on_click = null) {
 	if (!Array.isArray(objs)) objs = [objs];
@@ -381,9 +353,9 @@ c_obj.prototype.click = function() {
 	if (!this.started) return false;
 	for (let i = 0; i < this.objs.length; ++i) {
 		const o = this.objs[i];
-		if (o.click(this)) {
+		if (o.click()) {
 			if (this.on_click !== null) this.on_click(o);
-			return true;	
+			return true;
 		}
 	}
 	return false;

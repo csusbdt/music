@@ -17,12 +17,6 @@ function c_wave(f, w) {
 	this.g = null;
 }
 
-c_wave.prototype.init = function() {
-};
-
-const phi = 1.61803398875;
-const p   = 0.61803398875;
-
 c_wave.prototype.start = function() {
 	if (this.g === null) {
 		if (!audio_started) start_audio();
