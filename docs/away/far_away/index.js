@@ -1,5 +1,5 @@
 import start_away from "../index.js";
-import { wave, stop_audio } from "./wave.js";
+import { wave } from "./wave.js";
 
 const phi = 1.61803398875;
 
@@ -45,6 +45,12 @@ function c_click_seq(objs, on_end = null) {
 	this.started = false ;
 }
 
+c_click_seq.prototype.stop = function() {
+	this.i       = 0    ;
+	this.started = false;
+	return this;
+};
+
 c_click_seq.prototype.start = function() {
 	if (!this.started) {
 		this.started = true;
@@ -76,16 +82,6 @@ const checkbox = (off_obj, on_obj) => click_seq([ off_obj, on_obj ], o => o.star
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-log();
-log(scale(6, 100, 1));
-log(scale(6, 100, 2));
-log(scale(6, 100, 3));
-log(scale(6, 100, 4));
-log(scale(6, 100, 5));
-log(scale(6, 100, 6));
-
-
-
 const wave_0 = wave(phi);
 const wave_1 = wave(scale(6, 100, 0));
 const wave_2 = wave(scale(6, 100, 1));
@@ -110,7 +106,14 @@ export default _ => {
 	set_item('page', "./away/far_away/index.js");
 	on_resize = _ => draw_list.forEach(o => o.draw());
 	on_click = _ => {
-		if (back_button.click()) return start_away();
+		if (back_button.click()) {
+			stop_audio_f = _ => {
+				[ obj_0, obj_1, obj_2, obj_3, obj_4, obj_5, obj_6 ].forEach(o => o.stop());
+				[ wave_0, wave_1, wave_2, wave_3, wave_4, wave_5, wave_6 ].forEach(o => o.stop());
+			};
+			start_away();
+			return;
+		}
 		if (click_list.some(o => o.click())) on_resize();
 	};
 	start_list.forEach(o => {

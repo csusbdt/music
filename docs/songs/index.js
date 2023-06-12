@@ -62,6 +62,7 @@ const draw = _ => {
 
 const click = _ => {
 	if (back_button.click()) {
+		stop_audio_f = _ => play_buttons.clear(); 
 		start_home();
 	} else if (a.some(o => { return o.click(); })) {
 		draw();

@@ -6,7 +6,7 @@ let ramp_down   = 0;
 let loop_id     = null;
 
 const setup_graph = _ => {
-	if (gain !== null) gain.disconnect();
+	stop_audio();
     gain = audio.createGain();
 	gain.gain.value = 0;
 	gain.connect(main_gain);
@@ -23,10 +23,10 @@ const setup_graph = _ => {
 };
 
 const teardown_graph = _ => {
-        gain.disconnect();
-        gain        = null;
-        o_left      = null;
-        o_right     = null;
+	gain.disconnect();
+	gain        = null;
+	o_left  = null;
+	o_right = null;
 };
 
 const play_notes = (notes, ramp_up = 0, ramp_down = 0) => {

@@ -154,6 +154,30 @@ window.silence_off = _ => {
 	main_gain.gain.setTargetAtTime(1, audio.currentTime, .1);
 };
 
+window.start_audio = _ => {
+	if (gain !== null) return;
+//	stop_audio();
+	//	if (gain !== null) gain.disconnect();
+	gain = audio.createGain();
+	gain.connect(main_gain);
+//	audio_started = true;
+};
+
+window.stop_audio_f = null;
+
+window.stop_audio = _ => {
+//	if (gain === null) return;
+	if (stop_audio_f !== null) {
+		stop_audio_f();
+		stop_audio_f = null;
+	}
+	if (gain !== null) {
+		gain.disconnect();
+		gain = null;
+	}
+};
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
 // local storage
@@ -976,6 +1000,13 @@ c_radio_buttons.prototype.click = function() {
 		}
 	}
 	return false;
+};
+
+c_radio_buttons.prototype.clear = function() {
+	if (this.on_button !== null) {
+		this.on_button.set_off();
+		this.on_button = null;
+	}
 };
 
 window.radio_buttons = (...radio_buttons) => {

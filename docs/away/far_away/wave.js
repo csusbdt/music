@@ -1,18 +1,19 @@
 
 
-let audio_started = false;
+//let audio_started = false;
 
-const start_audio = _ => {
-	if (gain !== null) gain.disconnect();
-    gain = audio.createGain();
-	gain.connect(main_gain);
-	audio_started = true;
-};
+// const start_audio = _ => {
+// 	stop_audio();
+// //	if (gain !== null) gain.disconnect();
+//     gain = audio.createGain();
+// 	gain.connect(main_gain);
+// 	audio_started = true;
+// };
 
-const stop_audio = _ => { 
-	gain.disconnect(); 
-	gain = null; 
-};
+// const stop_audio = _ => { 
+// 	gain.disconnect(); 
+// 	gain = null; 
+// };
 
 function c_wave(f, w) {
 	this.f = f;
@@ -21,7 +22,7 @@ function c_wave(f, w) {
 
 c_wave.prototype.start = function() {
 	if (this.g === null) {
-		if (!audio_started) start_audio();
+		start_audio();
 		this.g = audio.createGain();
 		this.g.connect(main_gain);
 		this.g.gain.value = 0;
@@ -34,14 +35,17 @@ c_wave.prototype.start = function() {
 };
 
 c_wave.prototype.stop = function() {
-	this.g.gain.setTargetAtTime(0, audio.currentTime, .1);
+	if (this.g !== null) {
+		this.g.gain.setTargetAtTime(0, audio.currentTime, .1);
+		this.g = null;
+	}
 };
 
 const wave = (f) => {
 	return new c_wave(f);
 };
 
-export { wave, stop_audio };
+export { wave };
 
 
 /*
