@@ -200,7 +200,7 @@ const rgb_white  = `rgb(${colors.white [0]}, ${colors.white [1]}, ${colors.white
 
 ////////////////////////////////////////////////////////////////////////////////////
 //
-// bg
+// bg obj
 //
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -226,7 +226,7 @@ window.bg_white  = new c_bg(rgb_white );
 
 ////////////////////////////////////////////////////////////////////////////////////
 //
-// image
+// image obj
 //
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -261,26 +261,6 @@ c_image.prototype.draw = function() {
 	}
 };
 
-// The visible position of the image will not correspond to clickable area 
-// if x, y or s of the draw function are set other than the defaults.
-// c_image.prototype.draw = function(x = 0, y = 0, s = 1) {
-// 	if (this.image.complete) {
-// 		const dx      = this.x + x           ;
-// 		const dy      = this.y + y           ;
-// 		const sx      = 0                    ;
-// 		const sy      = 0                    ;
-// 	    const sWidth  = this.image.width     ;
-// 	    const sHeight = this.image.height    ;
-// 	    const dWidth  = sWidth * this.s * s  ;
-// 	    const dHeight = sHeight * this.s * s ;
-// 		ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
-// 	} else {
-// 		if (this.image.onload === null) {
-// 			this.image.onload = on_resize;
-// 		}
-// 	}
-// };
-
 c_image.prototype.click = function() {
 	if (click_test(this.image, this.x, this.y, this.s)) {
 		if (this.f !== null) this.f();
@@ -294,34 +274,185 @@ window.image = (src, x = 0, y = 0, s = 1, f = null) => {
     return new c_image(src, x, y, s, f);
 };
 
-
 ////////////////////////////////////////////////////////////////////////////////////
 //
 // obj
 //
 ////////////////////////////////////////////////////////////////////////////////////
 
-function c_obj(image, on_click = null) {
-    this.image    = image;
-	this.on_click = on_click;
+// functon start_obj_f() {
+// 	if (!this.started) this.start();
+// }
+
+// window.start_obj = o => {
+// 	if (o.started === undefined) {
+// 		o.started = false;
+// 	}
+// 	if (o.start === undefined) {
+// 		o.start = start_obj_f.bind(o);
+// 	}
+// 	if (!o.started) {
+// 		o.start();
+// 	}
+// }
+
+// functon stop_obj_f() {
+// 	if (this.started) this.stop();
+// }
+
+// window.stop_obj = o => {
+// 	if (o.started === undefined) {
+// 		o.started = true;
+// 	}
+// 	if (o.stop === undefined) {
+// 		o.stop = stop_obj.bind(o);
+// 	}
+// 	if (!o.started) {
+// 		o.start();
+// 	}
+// }
+
+
+function c_img(src, x = 0, y = 0, s = 1) {
+    this.image     = new Image();
+    this.image.src = src;
+    this.x         = x;
+    this.y         = y;
+    this.s         = s;
 }
 
-c_obj.prototype.draw = function() {
-	this.image.draw();
+c_img.prototype.clone = function(x = 0, y = 0, s = 1) {
+    return new c_img(this.image.src, x, y, s);
 };
 
-c_obj.prototype.click = function() {
-	if(click_test(this.image)) {
-		if (this.on_click !== null) this.on_click();
-		return true;
+c_img.prototype.draw = function() {
+	if (this.image.complete) {
+		const dx      = this.x           ;
+		const dy      = this.y           ;
+		const sx      = 0                ;
+		const sy      = 0                ;
+	    const sWidth  = this.image.width ;
+	    const sHeight = this.image.height;
+	    const dWidth  = sWidth * this.s  ;
+	    const dHeight = sHeight * this.s ;
+		ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
 	} else {
-		return false;
+		if (this.image.onload === null) {
+			this.image.onload = on_resize;
+		}
 	}
 };
 
-window.obj = (image, on_click = null) => {
-    return new c_obj(image, on_click);
+c_img.prototype.click = function() {
+	return click_test(this.image, this.x, this.y, this.s);
 };
+
+window.img = (src, x = 0, y = 0, s = 1) => {
+    return new c_img(src, x, y, s);
+};
+
+
+function c_obj(objs, on_click = null) {
+	if (!Array.isArray(objs)) objs = [objs];
+    this.objs     = objs;
+	this.on_click = on_click;
+	this.started  = false;
+}
+
+c_obj.prototype.start = function() {
+	if (this.started) return;
+	this.started = true;
+	this.objs.forEach(o => o.start !== undefined && o.start());
+	return this;
+};
+
+c_obj.prototype.stop = function() {
+	if (!this.started) return;
+	this.started = false;
+	this.objs.forEach(o => o.stop !== undefined && o.stop());
+};
+
+c_obj.prototype.draw = function() {
+	if (!this.started) return;
+	this.objs.forEach(o => o.draw());
+};
+
+c_obj.prototype.click = function() {
+	if (!this.started) return false;
+	for (let i = 0; i < this.objs.length; ++i) {
+		const o = this.objs[i];
+		if (o.click(this)) {
+			if (this.on_click !== null) this.on_click(o);
+			return true;	
+		}
+	}
+	return false;
+};
+
+window.obj = (objs, on_click = null) => {
+    return new c_obj(objs, on_click);
+};
+
+// window.obj_pair = (first, second, on_click = null) => {
+// 	return new c_obj([first, second], on_click);
+// };
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// c_obj_once
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+function c_obj_seq(objs, t, on_end = null) {
+	assert(Array.isArray(objs));
+	this.objs = objs;
+	this.t = t;
+	this.on_end = on_end;
+	this.i = 0;
+	this.started  = false;
+	this.id = null;
+}
+
+function c_obj_seq_next() {
+	if (!this.started) return;
+	if (++i === this.objs.length) {
+		this.i = 0;
+		this.started = false;
+		clearInterval(this.id);
+		this.id = null;
+		if (this.on_end !== null) this.on_end(this);
+	}
+}
+
+c_obj_seq.prototype.start = function() {
+	if (this.started) return;
+	this.started = true;
+	const o = this.objs[0];
+	if (o.start !== undefined) o.start();
+	this.i = 0;
+	this.id = setInterval(c_obj_seq_next.bind(this), this.t);
+};
+
+c_obj_seq.prototype.stop = function() {
+	if (!this.started) return;
+	this.started = false;
+	const o = this.objs[this.i];
+	if (o.stop !== undefined) o.stop();
+};
+
+c_obj_seq.prototype.draw = function() {
+	if (!this.started) return;
+	this.objs[this.i].draw();
+};
+
+c_obj_seq.prototype.click = function() {
+	return false;
+};
+
+window.obj_seq = (objs, t, on_end = null) => {
+	return new c_obj_seq(objs, t, on_end);
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -392,28 +523,28 @@ window.pair = (first_image, second_image, f = null) => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_array2(objs, on_click = null) {
-	assert(Array.isArray(objs));
-	this.objs     = objs;
-	this.on_click = on_click;
-}
+// function c_array2(objs, on_click = null) {
+// 	assert(Array.isArray(objs));
+// 	this.objs     = objs;
+// 	this.on_click = on_click;
+// }
 
-c_array2.prototype.draw = function() {
-	this.objs.forEach(o => o.draw());
-};
+// c_array2.prototype.draw = function() {
+// 	this.objs.forEach(o => o.draw());
+// };
 
-c_array2.prototype.click = function(f = null) {
-	if (this.objs.some(o => o.click())) {
-		this.on_click();
-		return true;
-	} else {
-		return false;
-	}
-};
+// c_array2.prototype.click = function(f = null) {
+// 	if (this.objs.some(o => o.click())) {
+// 		this.on_click();
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// };
 
-window.array2 = (objs, on_click = null) => {
-	return new c_array(objs, on_click);
-};
+// window.array2 = (objs, on_click = null) => {
+// 	return new c_array(objs, on_click);
+// };
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -918,3 +1049,12 @@ canvas.addEventListener('click', e => {
 addEventListener('resize', _ => {
 	if (on_resize !== null) on_resize();
 });
+
+window.start_page = (draw_list, click_list, start_list = null, pathname = null) => {
+	on_resize = _ => draw_list.forEach(o => o.draw());
+	on_click  = _ => click_list.some(o => o.click());
+	if (start_list !== null) start_list.forEach(o => o.start());
+	if (pathname !== null) set_item('page', pathname);
+	draw();
+}
+

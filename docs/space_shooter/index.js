@@ -157,7 +157,7 @@ const right_explosion = once2([
 	start_home();
 });
 
-// draw
+// page start
 
 const draw_list  = [ 
 	window_interior, 
@@ -166,27 +166,17 @@ const draw_list  = [
 	ship, window_exterior, silence_button, back_button, window_border 
 ];
 
-const draw = _ => {
-	draw_list.forEach(o => o.draw());
-};
-
-// click
-
 const click_list = [ silence_button, back_button, gun_left, gun_right ];
 
-const click = _ => {
-	if (back_button.click()) return start_home();                    // CHECK
-	if (click_list.some(o => o.click())) draw(); // maybe not needed, or remove from constructors
+const start_list = [ ship ];
+
+export default _ => {
+	set_item('page', "./space_shooter/index.js");	
+	on_resize = _ => draw_list.forEach(o => o.draw());
+	on_click = _ => {
+		if (back_button.click()) return start_home();
+		if (click_list.some(o => o.click())) on_resize();
+	};
+	start_list.forEach(o => o.start());
+	on_resize();
 };
-
-// start
-
-const start = _ => {
-	set_item('page', "./space_shooter/index.js");
-    on_click  = click;
-    on_resize = draw;
-	ship.start();
-    draw();	
-};
-
-export default start;
