@@ -76,14 +76,23 @@ const checkbox = (off_obj, on_obj) => click_seq([ off_obj, on_obj ], o => o.star
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+log();
+log(scale(6, 100, 1));
+log(scale(6, 100, 2));
+log(scale(6, 100, 3));
+log(scale(6, 100, 4));
+log(scale(6, 100, 5));
+log(scale(6, 100, 6));
+
+
 
 const wave_0 = wave(phi);
-const wave_1 = wave(80 * phi);
-const wave_2 = wave(92);
-const wave_3 = wave(92 * phi);
-const wave_4 = wave(104);
-const wave_5 = wave(104 * phi);
-const wave_6 = wave(80);
+const wave_1 = wave(scale(6, 100, 0));
+const wave_2 = wave(scale(6, 100, 1));
+const wave_3 = wave(scale(6, 100, 2));
+const wave_4 = wave(scale(6, 100, 3));
+const wave_5 = wave(scale(6, 100, 4));
+const wave_6 = wave(scale(6, 100, 5));
 
 const obj_0 = checkbox(obj([white_0, border_0], _ => wave_0.start()), obj([green_0, border_0], _ => wave_0.stop ()));
 const obj_1 = checkbox(obj([white_1, border_1], _ => wave_1.start()), obj([green_1, border_1], _ => wave_1.stop ()));

@@ -1030,3 +1030,15 @@ window.start_page = (draw_list, click_list, start_list = null, pathname = null) 
 	draw();
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+// math stuff
+//
+///////////////////////////////////////////////////////////////////////////////////////////
+
+window.PHI = 1.61803398875;
+
+// See http://www.phy.mtu.edu/~suits/NoteFreqCalcs.html
+window.scale = (octave_tones, base_frequency, half_notes_away_from_base) => {
+	return base_frequency * Math.pow(Math.pow(2, 1.0 / octave_tones), half_notes_away_from_base);
+};
