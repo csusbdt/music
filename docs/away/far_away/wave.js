@@ -39,7 +39,7 @@ const wave = (f) => {
 	return new c_wave(f);
 };
 
-export { wave };
+export { wave, stop_audio };
 
 
 /*
