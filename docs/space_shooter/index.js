@@ -2,18 +2,18 @@ import start_home from "../home/index.js" ;
 
 // window
 
-const window_border         = image("./space_shooter/images/window_border.png"  );
-const window_exterior       = image("./space_shooter/images/window_exterior.png");
-const window_interior       = image("./space_shooter/images/window_interior.png");
+const window_border         = img("./space_shooter/images/window_border.png"  );
+const window_exterior       = img("./space_shooter/images/window_exterior.png");
+const window_interior       = img("./space_shooter/images/window_interior.png");
 
 // ship 
 
-const ship_left_border      = image("./space_shooter/images/ship_left_border.png"  );
-const ship_left_yellow      = image("./space_shooter/images/ship_left_yellow.png"  );
-const ship_middle_border    = image("./space_shooter/images/ship_middle_border.png");
-const ship_middle_yellow    = image("./space_shooter/images/ship_middle_yellow.png");
-const ship_right_border     = image("./space_shooter/images/ship_right_border.png" );
-const ship_right_yellow     = image("./space_shooter/images/ship_right_yellow.png" );
+const ship_left_border      = img("./space_shooter/images/ship_left_border.png"  );
+const ship_left_yellow      = img("./space_shooter/images/ship_left_yellow.png"  );
+const ship_middle_border    = img("./space_shooter/images/ship_middle_border.png");
+const ship_middle_yellow    = img("./space_shooter/images/ship_middle_yellow.png");
+const ship_right_border     = img("./space_shooter/images/ship_right_border.png" );
+const ship_right_yellow     = img("./space_shooter/images/ship_right_yellow.png" );
 
 const ship_left   = pair2(ship_left_yellow, ship_left_border    );
 const ship_middle = pair2(ship_middle_yellow, ship_middle_border);
@@ -27,12 +27,12 @@ const ship        = loop(ships, 300);
 
 const gun_speed = 100;
 
-const gun_left_border       = image("./space_shooter/images/gun_left_border.png"  );
-const gun_left_red          = image("./space_shooter/images/gun_left_red.png"     );
-const gun_left_white        = image("./space_shooter/images/gun_left_white.png"   );
-const gun_right_border      = image("./space_shooter/images/gun_right_border.png" );
-const gun_right_red         = image("./space_shooter/images/gun_right_red.png"    );
-const gun_right_white       = image("./space_shooter/images/gun_right_white.png"  );
+const gun_left_border       = img("./space_shooter/images/gun_left_border.png"  );
+const gun_left_red          = img("./space_shooter/images/gun_left_red.png"     );
+const gun_left_white        = img("./space_shooter/images/gun_left_white.png"   );
+const gun_right_border      = img("./space_shooter/images/gun_right_border.png" );
+const gun_right_red         = img("./space_shooter/images/gun_right_red.png"    );
+const gun_right_white       = img("./space_shooter/images/gun_right_white.png"  );
 
 const gun_left_fire = _ => {
 	bullet_left.start();

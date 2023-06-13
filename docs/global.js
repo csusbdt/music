@@ -371,6 +371,12 @@ c_img.prototype.start = function() {
 	return this;
 };
 
+c_img.prototype.stop = function() {
+	if (!this.started) return;
+	this.started = false;
+	return this;
+};
+
 c_img.prototype.draw = function() {
 	if (!this.started) return;
 	if (this.image.complete) {
@@ -504,7 +510,7 @@ window.objs = (objs, on_click = null) => new c_objs(objs, on_click);
 //
 // click_seq
 //
-// a click_seq allows user to click through a list of objs
+// allows user to click through a list of objs
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -551,7 +557,9 @@ window.click_seq = (objs, on_click = null) => new c_click_seq(objs, on_click);
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
-// c_obj_once
+// c_obj_seq
+//
+// a click starts animation 
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -567,12 +575,14 @@ function c_obj_seq(objs, t, on_end = null) {
 
 function c_obj_seq_next() {
 	if (!this.started) return;
-	if (++i === this.objs.length) {
+	if (++this.i === this.objs.length) {
 		this.i = 0;
 		this.started = false;
 		clearInterval(this.id);
 		this.id = null;
 		if (this.on_end !== null) this.on_end(this);
+	} else {
+		on_resize();
 	}
 }
 
@@ -580,7 +590,9 @@ c_obj_seq.prototype.start = function() {
 	if (this.started) return;
 	this.started = true;
 	const o = this.objs[0];
-	if (o.start !== undefined) o.start();
+	this.objs.forEach(o => o.start(this));
+	//if (o.start !== undefined) o.start();
+//	o.start();
 	this.i = 0;
 	this.id = setInterval(c_obj_seq_next.bind(this), this.t);
 };
@@ -668,35 +680,6 @@ c_pair.prototype.click = function() {
 window.pair = (first_image, second_image, f = null) => {
 	return new c_pair(first_image, second_image, f);
 };
-
-//////////////////////////////////////////////////////////////////////////////////////
-//
-// array 2
-//
-//////////////////////////////////////////////////////////////////////////////////////
-
-// function c_array2(objs, on_click = null) {
-// 	assert(Array.isArray(objs));
-// 	this.objs     = objs;
-// 	this.on_click = on_click;
-// }
-
-// c_array2.prototype.draw = function() {
-// 	this.objs.forEach(o => o.draw());
-// };
-
-// c_array2.prototype.click = function(f = null) {
-// 	if (this.objs.some(o => o.click())) {
-// 		this.on_click();
-// 		return true;
-// 	} else {
-// 		return false;
-// 	}
-// };
-
-// window.array2 = (objs, on_click = null) => {
-// 	return new c_array(objs, on_click);
-// };
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
