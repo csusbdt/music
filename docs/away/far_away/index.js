@@ -49,33 +49,20 @@ const exit_page = _ => {
 			o.i = 0;
 		}
 	});
-	stop_audio();
+	stop_audio().then(start_away);
 };
 
-const draw_list  = [ bg_blue, silence_button, back_button, obj_0, obj_1, obj_2, obj_3, obj_4, obj_5, obj_6 ];
-const click_list = [          silence_button, back_button, obj_0, obj_1, obj_2, obj_3, obj_4, obj_5, obj_6 ];
-const start_list = [                                       obj_0, obj_1, obj_2, obj_3, obj_4, obj_5, obj_6 ];
-
-//set_item("./away/far_away/index.js audio_started", false);
+const draw_list  = [ bg_blue, silence_button, back_button, ...buttons ];
+const click_list = [          silence_button, back_button, ...buttons ];
+const start_list = [                                       ...buttons ];
 
 export default _ => {
 	set_item('page', "./away/far_away/index.js");
-//	start_audio();
 	on_resize = _ => draw_list.forEach(o => o.draw());
 	on_click = _ => {
-		if (back_button.click()) {
-			// stop_audio_f = _ => {
-			// 	[ obj_0, obj_1, obj_2, obj_3, obj_4, obj_5, obj_6 ].forEach(o => o.stop());
-			// 	[ wave_0, wave_1, wave_2, wave_3, wave_4, wave_5, wave_6 ].forEach(o => o.stop());
-			// };
-			stop_audio();
-			start_away();
-			return;
-		}
-		if (click_list.some(o => o.click())) on_resize();
+		if (back_button.click()) exit_page();
+		else if (click_list.some(o => o.click())) on_resize();
 	};
-	start_list.forEach(o => {
-		o.start();
-	});
+	start_list.forEach(o => o.start());
 	on_resize();
 };

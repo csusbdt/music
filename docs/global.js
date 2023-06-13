@@ -128,7 +128,7 @@ const click_test = (images, x = 0, y = 0, s = 1) => {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 window.audio   = null;
-let main_gain  = null;
+let main_gain  = null; // used by silence button
 window.gain    = null; // used by pages
 
 window.init_audio = _ => {
@@ -160,19 +160,16 @@ window.start_audio = _ => {
 	gain.connect(main_gain);
 };
 
-//window.stop_audio_f = null;
-
 window.stop_audio = _ => {
 	assert(gain !== null);
-//	if (gain === null) return;
-	// if (stop_audio_f !== null) {
-	// 	stop_audio_f(); // could result in a call to stop_audio
-	// 	stop_audio_f = null;
-	// }
-//	if (gain !== null) { // in case stop_audio_f cleared gain
-		gain.disconnect();
-		gain = null;
-//	}
+	return new Promise(resolve => {
+		gain.gain.setTargetAtTime(0, audio.currentTime, .1);
+		setTimeout(_ => {
+			gain.disconnect();
+			gain = null;
+			resolve();
+		}, 120);
+	});
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
