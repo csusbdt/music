@@ -34,6 +34,121 @@ window.addEventListener('unhandledrejection', e => {
 
 window.log = m => console.log(m);
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// local storage
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+const version = "music_0_";
+
+window.set_item = (key, item) => {
+	localStorage.setItem(version + key, JSON.stringify(item));
+};
+
+window.get_item = (key, _default) => {
+	let item = localStorage.getItem(version + key);
+	if (item === null) {
+		set_item(key, _default);
+		return _default;
+	} else {
+		return JSON.parse(item);
+	}
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// audio
+//
+// init_audio is called with every click on the canvas with <canvas onclick="init_audio();"
+// This will run before all other click handlers. 
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+window.audio   = null;
+let main_gain  = null; // used by silence button
+window.gain    = null; // used by pages
+
+window.init_audio = _ => {
+	// this function must run in click handler to work on apple hardware
+	if (audio === null) {
+		audio = new (window.AudioContext || window.webkitAudioContext)();
+	}
+	if (audio.state === "suspended") {
+		audio.resume();
+	}
+	if (main_gain === null) {
+		main_gain = audio.createGain();
+		main_gain.gain.value = 1;
+		main_gain.connect(audio.destination);
+	}
+};
+
+window.silence_on = _ => {
+	main_gain.gain.setTargetAtTime(0, audio.currentTime, .1);
+};
+
+window.silence_off = _ => {
+	main_gain.gain.setTargetAtTime(1, audio.currentTime, .1);
+};
+
+window.start_audio = _ => {
+	if (gain === null) {
+		gain = audio.createGain();
+		gain.connect(main_gain);
+	}
+};
+
+window.stop_audio = _ => {
+	return new Promise(resolve => {
+		if (gain === null) {
+			resolve();
+		} else {
+			gain.gain.setTargetAtTime(0, audio.currentTime, .1);
+			setTimeout(_ => {
+				gain.disconnect();
+				gain = null;
+				resolve();
+			}, 120);
+		}
+	});
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// c_tone
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+function c_tone(f, v = 1) {
+	this.f = f;
+	this.v = v;
+	this.g = null;
+}
+
+c_tone.prototype.start = function() {
+	if (this.g === null) {
+		start_audio();
+		this.g = audio.createGain();
+		this.g.connect(gain);
+		this.g.gain.value = 0;
+		this.o = audio.createOscillator();
+		this.o.frequency.value = this.f;
+		this.o.start();
+		this.o.connect(this.g);
+	}
+	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .1);
+};
+
+c_tone.prototype.stop = function() {
+	if (this.g !== null) {
+		this.g.gain.setTargetAtTime(0, audio.currentTime, .1);
+		this.g = null;
+	}
+};
+
+window.tone = (f, v = 1) => new c_tone(f, v);
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // canvas
@@ -120,97 +235,6 @@ const click_test = (images, x = 0, y = 0, s = 1) => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
-// audio
-//
-// init_audio is called with every click on the canvas with <canvas onclick="init_audio();"
-// This will run before all other click handlers. 
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-window.audio   = null;
-let main_gain  = null; // used by silence button
-window.gain    = null; // used by pages
-
-window.init_audio = _ => {
-	// this function must run in click handler to work on apple hardware
-	if (audio === null) {
-		audio = new (window.AudioContext || window.webkitAudioContext)();
-	}
-	if (audio.state === "suspended") {
-		audio.resume();
-	}
-	if (main_gain === null) {
-		main_gain = audio.createGain();
-		main_gain.gain.value = 1;
-		main_gain.connect(audio.destination);
-	}
-};
-
-window.silence_on = _ => {
-	main_gain.gain.setTargetAtTime(0, audio.currentTime, .1);
-};
-
-window.silence_off = _ => {
-	main_gain.gain.setTargetAtTime(1, audio.currentTime, .1);
-};
-
-window.start_audio = _ => {
-	assert(gain === null);
-	gain = audio.createGain();
-	gain.connect(main_gain);
-};
-
-window.stop_audio = _ => {
-	assert(gain !== null);
-	return new Promise(resolve => {
-		gain.gain.setTargetAtTime(0, audio.currentTime, .1);
-		setTimeout(_ => {
-			gain.disconnect();
-			gain = null;
-			resolve();
-		}, 120);
-	});
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// c_tone
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-function c_tone(f, v = 1) {
-	this.f = f;
-	this.v = v;
-	this.g = null;
-}
-
-c_tone.prototype.start = function() {
-	if (this.g === null) {
-		start_audio();
-		this.g = audio.createGain();
-		this.g.connect(gain);
-		this.g.gain.value = 0;
-		this.o = audio.createOscillator();
-		this.o.frequency.value = this.f;
-		this.o.start();
-		this.o.connect(this.g);
-	}
-	this.g.gain.setTargetAtTime(1, audio.currentTime, .1);
-};
-
-c_tone.prototype.stop = function() {
-	if (this.g !== null) {
-		this.g.gain.setTargetAtTime(0, audio.currentTime, .1);
-		this.g = null;
-	}
-};
-
-const tone = (f) => {
-	return new c_tone(f);
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
 // c_wave
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -244,28 +268,6 @@ const tone = (f) => {
 // const wave = (f) => {
 // 	return new c_wave(f);
 // };
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// local storage
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-const version = "music_0_";
-
-window.set_item = (key, item) => {
-	localStorage.setItem(version + key, JSON.stringify(item));
-};
-
-window.get_item = (key, _default) => {
-	let item = localStorage.getItem(version + key);
-	if (item === null) {
-		set_item(key, _default);
-		return _default;
-	} else {
-		return JSON.parse(item);
-	}
-};
 
 ///////////////////////////////////////////////////////////////////////////////////
 //
