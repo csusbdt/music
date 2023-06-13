@@ -246,42 +246,6 @@ const click_test = (images, x = 0, y = 0, s = 1) => {
 	return image_data.data[i] !== 0;
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// c_wave
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-// function c_wave(f) {
-// 	this.f = f;	
-// 	this.g = null;
-// }
-
-// c_wave.prototype.start = function() {
-// 	if (this.g === null) {
-// 		start_audio();
-// 		this.g = audio.createGain();
-// 		this.g.connect(main_gain);
-// 		this.g.gain.value = 0;
-// 		this.o = audio.createOscillator();
-// 		this.o.frequency.value = this.f;
-// 		this.o.start();
-// 		this.o.connect(this.g);
-// 	}
-// 	this.g.gain.setTargetAtTime(1, audio.currentTime, .1);
-// };
-
-// c_wave.prototype.stop = function() {
-// 	if (this.g !== null) {
-// 		this.g.gain.setTargetAtTime(0, audio.currentTime, .1);
-// 		this.g = null;
-// 	}
-// };
-
-// const wave = (f) => {
-// 	return new c_wave(f);
-// };
-
 ///////////////////////////////////////////////////////////////////////////////////
 //
 // color palette
@@ -428,7 +392,7 @@ c_img.prototype.draw = function() {
 
 c_img.prototype.click = function() {
 	if (this.started && click_test(this.image, this.x, this.y, this.s)) {
-		if (this.on_click !== null) this.on_click();
+		if (this.on_click !== null) this.on_click(this);
 		return true;
 	} else {
 		return false;
@@ -527,7 +491,7 @@ c_objs.prototype.draw = function() {
 
 c_objs.prototype.click = function() {
 	if (this.started && this.objs.some(o => o.click())) {
-		if (this.on_click !== null) this.on_click();
+		if (this.on_click !== null) this.on_click(this);
 		return true;
 	} else {
 		return false;
@@ -575,7 +539,7 @@ c_click_seq.prototype.click = function() {
 		if (++this.i === this.objs.length) {
 			this.i = 0;
 		}
-		if (this.on_click !== null) this.on_click();
+		if (this.on_click !== null) this.on_click(this);
 		return true;
 	} else {
 		return false;
@@ -661,7 +625,7 @@ c_pair2.prototype.draw = function() {
 
 c_pair2.prototype.click = function() {
 	if (this.first.click() || this.second.click()) {
-		if (this.on_click !== null) this.on_click();
+		if (this.on_click !== null) this.on_click(this);
 		return true;
 	} else {
 		return false;

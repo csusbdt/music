@@ -1,6 +1,6 @@
 import song from "./song.js";
 
-const song_0 = song([	
+const song_0_notes = [	
 	[ 77, 0.50, 0.86],
 	[ 52, 0.34, 0.60],
 	[ 49, 0.62, 0.22],
@@ -19,9 +19,9 @@ const song_0 = song([
 	[153, 0.46, 0.23],
 	[134, 0.34, 0.27],
 	[ 97, 0.30, 0.70]
-]);
+];
 
-const song_1 = song([
+const song_1_notes = [
 	[ 77, 0.50, 0.86],
 	[ 52, 0.34, 0.86],
 	[ 77, 0.62, 0.86],
@@ -36,9 +36,9 @@ const song_1 = song([
 	[135, 0.45, 0.43],
 	[152, 0.32, 0.21],
 	[248, 0.26, 0.22]
-]);
+];
 
-const song_2 = song([
+const song_2_notes = [
     [160, .25, 1.10 - 0   ],
 	[ 47, .52, 2.10 - 1.10],
 	[ 65, .42, 3.14 - 2.10],
@@ -47,9 +47,9 @@ const song_2 = song([
 	[ 96, .18, 6.20 - 5.22],
 	[ 51, .42, 7.19 - 6.20],
 	[ 69, .66, 8.26 - 7.19]
-]);
+];
 
-const song_3 = song([
+const song_3_notes = [
     [127, 0.25, .59],
     [249, 0.52, .40],
     [335, 0.34, .40],
@@ -57,9 +57,9 @@ const song_3 = song([
     [142, 0.62, .22],
     [201, 0.59, .26],
     [172, 0.38, .40]
-]);
+];
 
-const happy_birthday = song([
+const happy_birthday_notes = [
 	[311,0.5,0.84],
 	[311,0.5,0.28],
 	[349.085697024215,0.5,0.56],
@@ -87,6 +87,12 @@ const happy_birthday = song([
 	[465.9735009086481,0.5,0.56],
 	[415.13519464688073,0.5,1.12],
 	[0, 0, 1]
-]);
+];
+
+const song_0         = song(song_0_notes, 0, 0, 3);
+const song_1         = song(song_1_notes, 0, 0, 3);
+const song_2         = song(song_2_notes, 0, 0, 3);
+const song_3         = song(song_3_notes, 0, 0, 3);
+const happy_birthday = song(happy_birthday_notes, 0.02, 0.05, 3);
 
 export { song_0, song_1, song_2, song_3, happy_birthday };

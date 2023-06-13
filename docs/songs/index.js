@@ -7,17 +7,7 @@ import { song_3 }  from "./songs.js"      ;
 const path = n => "./songs/images/" + n + ".png";
 const pair = (first, second, on_click) => objs([img(path(first)), img(path(second))], on_click);
 
-const on_0   = pair("play_big_green", "play_big_border", _ => song_0.stop());
-
-const off_0  = pair("play_big_red"  , "play_big_border", _ => song_0.start());
-
-const obj_0 = click_seq([off_0, on_0]);
-
-const buttons = [ obj_0 ];
-
-
-
-const on = self => {
+const off_all = _ => {
 	buttons.forEach(o => {
 		if (o.i === 1) {
 			o.objs[1].on_click();
@@ -25,6 +15,17 @@ const on = self => {
 		}
 	});
 };
+
+const on_0   = pair("play_big_green", "play_big_border", _ => song_0.stop());
+const on_1   = pair("play_medium_1_green", "play_medium_1_border", _ => song_1.stop());
+
+const off_0  = pair("play_big_red"     , "play_big_border"     , _ => { off_all(); song_0.start(); });
+const off_1  = pair("play_medium_1_red", "play_medium_1_border", _ => { off_all(); song_1.start(); });
+
+const obj_0 = click_seq([off_0, on_0]);
+const obj_1 = click_seq([off_1, on_1]);
+
+const buttons = [ obj_0, obj_1 ];
 
 // const song_0_button = radio_button(
 // 	image("./songs/images/play_big_border.png"     ),
