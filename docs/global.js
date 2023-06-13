@@ -160,18 +160,19 @@ window.start_audio = _ => {
 	gain.connect(main_gain);
 };
 
-window.stop_audio_f = null;
+//window.stop_audio_f = null;
 
 window.stop_audio = _ => {
-	if (gain === null) return;
-	if (stop_audio_f !== null) {
-		stop_audio_f(); // could result in a call to stop_audio
-		stop_audio_f = null;
-	}
-	if (gain !== null) { // in case stop_audio_f cleared gain
+	assert(gain !== null);
+//	if (gain === null) return;
+	// if (stop_audio_f !== null) {
+	// 	stop_audio_f(); // could result in a call to stop_audio
+	// 	stop_audio_f = null;
+	// }
+//	if (gain !== null) { // in case stop_audio_f cleared gain
 		gain.disconnect();
 		gain = null;
-	}
+//	}
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -373,19 +374,29 @@ window.image = (src, x = 0, y = 0, s = 1, f = null) => {
 //
 ////////////////////////////////////////////////////////////////////////////////////
 
-function c_img(src, x = 0, y = 0, s = 1) {
+function c_img(src, x = 0, y = 0, s = 1, on_click = null) {
+	assert(typeof src === 'string');
     this.image     = new Image();
     this.image.src = src;
     this.x         = x;
     this.y         = y;
     this.s         = s;
+	this.on_click  = on_click;
+	this.started   = false;
 }
 
-c_img.prototype.clone = function(x = 0, y = 0, s = 1) {
-    return new c_img(this.image.src, x, y, s);
+c_img.prototype.clone = function(x = 0, y = 0, s = 1, on_click = null) {
+    return new c_img(this.image.src, x, y, s, on_click);
+};
+
+c_img.prototype.start = function() {
+	if (this.started) return;
+	this.started = true;
+	return this;
 };
 
 c_img.prototype.draw = function() {
+	if (!this.started) return;
 	if (this.image.complete) {
 		const dx      = this.x           ;
 		const dy      = this.y           ;
@@ -404,11 +415,16 @@ c_img.prototype.draw = function() {
 };
 
 c_img.prototype.click = function() {
-	return click_test(this.image, this.x, this.y, this.s);
+	if (this.started && click_test(this.image, this.x, this.y, this.s)) {
+		if (this.on_click !== null) this.on_click();
+		return true;
+	} else {
+		return false;
+	}
 };
 
-window.img = (src, x = 0, y = 0, s = 1) => {
-    return new c_img(src, x, y, s);
+window.img = (src, x = 0, y = 0, s = 1, on_click = null) => {
+    return new c_img(src, x, y, s, on_click);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -419,46 +435,46 @@ window.img = (src, x = 0, y = 0, s = 1) => {
 //
 ////////////////////////////////////////////////////////////////////////////////////
 
-function c_obj(objs, on_click = null) {
-	if (!Array.isArray(objs)) objs = [objs];
-    this.objs     = objs;
-	this.on_click = on_click;
-	this.started  = false;
-}
+// function c_obj(objs, on_click = null) {
+// 	if (!Array.isArray(objs)) objs = [objs];
+//     this.objs     = objs;
+// 	this.on_click = on_click;
+// 	this.started  = false;
+// }
 
-c_obj.prototype.start = function() {
-	if (this.started) return;
-	this.started = true;
-	this.objs.forEach(o => o.start !== undefined && o.start());
-	return this;
-};
+// c_obj.prototype.start = function() {
+// 	if (this.started) return;
+// 	this.started = true;
+// 	this.objs.forEach(o => o.start !== undefined && o.start());
+// 	return this;
+// };
 
-c_obj.prototype.stop = function() {
-	if (!this.started) return;
-	this.started = false;
-	this.objs.forEach(o => o.stop !== undefined && o.stop());
-};
+// c_obj.prototype.stop = function() {
+// 	if (!this.started) return;
+// 	this.started = false;
+// 	this.objs.forEach(o => o.stop !== undefined && o.stop());
+// };
 
-c_obj.prototype.draw = function() {
-	if (!this.started) return;
-	this.objs.forEach(o => o.draw());
-};
+// c_obj.prototype.draw = function() {
+// 	if (!this.started) return;
+// 	this.objs.forEach(o => o.draw());
+// };
 
-c_obj.prototype.click = function() {
-	if (!this.started) return false;
-	for (let i = 0; i < this.objs.length; ++i) {
-		const o = this.objs[i];
-		if (o.click()) {
-			if (this.on_click !== null) this.on_click(o);
-			return true;
-		}
-	}
-	return false;
-};
+// c_obj.prototype.click = function() {
+// 	if (!this.started) return false;
+// 	for (let i = 0; i < this.objs.length; ++i) {
+// 		const o = this.objs[i];
+// 		if (o.click()) {
+// 			if (this.on_click !== null) this.on_click(o);
+// 			return true;
+// 		}
+// 	}
+// 	return false;
+// };
 
-window.obj = (objs, on_click = null) => {
-    return new c_obj(objs, on_click);
-};
+// window.obj = (objs, on_click = null) => {
+//     return new c_obj(objs, on_click);
+// };
 
 // window.obj_pair = (first, second, on_click = null) => {
 // 	return new c_obj([first, second], on_click);
@@ -466,18 +482,18 @@ window.obj = (objs, on_click = null) => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// obj_list
+// objs
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function c_obj_list(objs, on_click = null) {
+function c_objs(objs, on_click = null) {
 	assert(Array.isArray(objs));
 	this.objs    = objs     ;
 	this.on_click = on_click;
 	this.started = false    ;
 }
 
-c_obj_list.prototype.stop = function() {
+c_objs.prototype.stop = function() {
 	if (this.started) {
 		this.started = false;
 		this.objs.forEach(o => o.stop());
@@ -485,7 +501,7 @@ c_obj_list.prototype.stop = function() {
 	return this;
 };
 
-c_obj_list.prototype.start = function() {
+c_objs.prototype.start = function() {
 	if (!this.started) {
 		this.started = true;
 		this.objs.forEach(o => o.start());
@@ -493,11 +509,11 @@ c_obj_list.prototype.start = function() {
 	return this;
 };
 
-c_obj_list.prototype.draw = function() {
+c_objs.prototype.draw = function() {
 	if (this.started) this.objs.forEach(o => o.draw());
 };
 
-c_obj_list.prototype.click = function() {
+c_objs.prototype.click = function() {
 	if (this.started && this.objs.some(o => o.click())) {
 		if (this.on_click !== null) this.on_click();
 		return true;
@@ -506,7 +522,7 @@ c_obj_list.prototype.click = function() {
 	}
 };
 
-window.obj_list = (objs, on_click = null) => new c_obj_list(objs, on_click);
+window.objs = (objs, on_click = null) => new c_objs(objs, on_click);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //

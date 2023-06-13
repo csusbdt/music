@@ -1,37 +1,9 @@
 import start_away from "../index.js";
 import { wave } from "../wave.js";
 
-// images
-
-const path = n => "./away/far_away/images/" + n + ".png";
-
-const white_0  = img(path("white_0" ));
-const white_1  = img(path("white_1" ));
-const white_2  = img(path("white_2" ));
-const white_3  = img(path("white_3" ));
-const white_4  = img(path("white_4" ));
-const white_5  = img(path("white_5" ));
-const white_6  = img(path("white_6" ));
-
-const green_0  = img(path("green_0" ));
-const green_1  = img(path("green_1" ));
-const green_2  = img(path("green_2" ));
-const green_3  = img(path("green_3" ));
-const green_4  = img(path("green_4" ));
-const green_5  = img(path("green_5" ));
-const green_6  = img(path("green_6" ));
-
-const border_0 = img(path("border_0"));
-const border_1 = img(path("border_1"));
-const border_2 = img(path("border_2"));
-const border_3 = img(path("border_3"));
-const border_4 = img(path("border_4"));
-const border_5 = img(path("border_5"));
-const border_6 = img(path("border_6"));
-
 // waves
 
-const wave_0 = wave(phi);
+const wave_0 = wave(PHI);
 const wave_1 = wave(scale(6, 100, 0));
 const wave_2 = wave(scale(6, 100, 1));
 const wave_3 = wave(scale(6, 100, 2));
@@ -39,35 +11,45 @@ const wave_4 = wave(scale(6, 100, 3));
 const wave_5 = wave(scale(6, 100, 4));
 const wave_6 = wave(scale(6, 100, 5));
 
+// objs
 
+const path = n => "./away/far_away/images/" + n + ".png";
+const pair = (first, second, on_click) => objs([img(path(first)), img(path(second))], on_click);
 
-const button = (border, off_color, on_color, wave) => {
-	const o = click_seq(
-		obj_list([ obj(off_color)])
-}
-obj([white_0, border_0], _ => wave_0.start();
+const on_0   = pair("white_0", "border_0", _ => wave_0.stop());
+const on_1   = pair("white_1", "border_1", _ => wave_1.stop());
+const on_2   = pair("white_2", "border_2", _ => wave_2.stop());
+const on_3   = pair("white_3", "border_3", _ => wave_3.stop());
+const on_4   = pair("white_4", "border_4", _ => wave_4.stop());
+const on_5   = pair("white_5", "border_5", _ => wave_5.stop());
+const on_6   = pair("white_6", "border_6", _ => wave_6.stop());
 
+const off_0  = pair("green_0", "border_0", _ => wave_0.start());
+const off_1  = pair("green_1", "border_1", _ => wave_1.start());
+const off_2  = pair("green_2", "border_2", _ => wave_2.start());
+const off_3  = pair("green_3", "border_3", _ => wave_3.start());
+const off_4  = pair("green_4", "border_4", _ => wave_4.start());
+const off_5  = pair("green_5", "border_5", _ => wave_5.start());
+const off_6  = pair("green_6", "border_6", _ => wave_6.start());
 
-// checkboxes
+const obj_0 = click_seq([off_0, on_0]);
+const obj_1 = click_seq([off_1, on_1]);
+const obj_2 = click_seq([off_2, on_2]);
+const obj_3 = click_seq([off_3, on_3]);
+const obj_4 = click_seq([off_4, on_4]);
+const obj_5 = click_seq([off_5, on_5]);
+const obj_6 = click_seq([off_6, on_6]);
 
-const checkbox = (off_obj, on_obj) => click_seq([ off_obj, on_obj ]);
-
-const obj_0 = checkbox(obj([white_0, border_0], _ => wave_0.start()), obj([green_0, border_0], _ => wave_0.stop ()));
-const obj_1 = checkbox(obj([white_1, border_1], _ => wave_1.start()), obj([green_1, border_1], _ => wave_1.stop ()));
-const obj_2 = checkbox(obj([white_2, border_2], _ => wave_2.start()), obj([green_2, border_2], _ => wave_2.stop ()));
-const obj_3 = checkbox(obj([white_3, border_3], _ => wave_3.start()), obj([green_3, border_3], _ => wave_3.stop ()));
-const obj_4 = checkbox(obj([white_4, border_4], _ => wave_4.start()), obj([green_4, border_4], _ => wave_4.stop ()));
-const obj_5 = checkbox(obj([white_5, border_5], _ => wave_5.start()), obj([green_5, border_5], _ => wave_5.stop ()));
-const obj_6 = checkbox(obj([white_6, border_6], _ => wave_6.start()), obj([green_6, border_6], _ => wave_6.stop ()));
-
-const checkboxes = [ obj_0, obj_1, obj_2, obj_3, obj_4, obj_5, obj_6 ];
+const buttons = [ obj_0, obj_1, obj_2, obj_3, obj_4, obj_5, obj_6 ];
 
 const exit_page = _ => {
-	checkboxes.forEach(o => {
+	buttons.forEach(o => {
 		if (o.i === 1) {
-			o.on_end()
+			o.objs[1].on_click();
+			o.i = 0;
 		}
 	});
+	stop_audio();
 };
 
 const draw_list  = [ bg_blue, silence_button, back_button, obj_0, obj_1, obj_2, obj_3, obj_4, obj_5, obj_6 ];
