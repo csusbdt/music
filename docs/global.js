@@ -120,9 +120,10 @@ window.stop_audio = _ => {
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-function c_tone(f, v = 1) {
+function c_tone(f, v = 1, b = 0) {
 	this.f = f;
 	this.v = v;
+	this.b = b;
 	this.g = null;
 }
 
@@ -132,10 +133,22 @@ c_tone.prototype.start = function() {
 		this.g = audio.createGain();
 		this.g.connect(gain);
 		this.g.gain.value = 0;
-		this.o = audio.createOscillator();
-		this.o.frequency.value = this.f;
-		this.o.start();
-		this.o.connect(this.g);
+
+		const merger = new ChannelMergerNode(audio);
+		merger.connect(this.g);
+		const o_left  = audio.createOscillator();
+		const o_right = audio.createOscillator();
+		o_left.connect(merger, 0, 0);
+		o_right.connect(merger, 0, 1);
+		o_left.frequency.value = this.f; 
+		o_right.frequency.value = this.f + this.b;
+		o_left.start();
+		o_right.start();    
+		
+//		this.o = audio.createOscillator();
+//		this.o.frequency.value = this.f;
+//		this.o.start();
+//		this.o.connect(this.g);
 	}
 	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .1);
 };
@@ -147,7 +160,7 @@ c_tone.prototype.stop = function() {
 	}
 };
 
-window.tone = (f, v = 1) => new c_tone(f, v);
+window.tone = (f, v = 1, b = 0) => new c_tone(f, v, b);
 
 ///////////////////////////////////////////////////////////////////////////////
 //

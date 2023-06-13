@@ -2,15 +2,15 @@ import start_away from "../index.js";
 
 // tones
 
-const tone_0 = tone(PHI);
-const tone_1 = tone(scale(6, 100, 0));
-const tone_2 = tone(scale(6, 100, 1));
-const tone_3 = tone(scale(6, 100, 2));
-const tone_4 = tone(scale(6, 100, 3));
-const tone_5 = tone(scale(6, 100, 4));
-const tone_6 = tone(scale(6, 100, 5));
+const tone_0 = tone(PHI             , 1, 1);
+const tone_1 = tone(scale(6, 100, 0), 1, 3);
+const tone_2 = tone(scale(6, 100, 1), 1, 3);
+const tone_3 = tone(scale(6, 100, 2), 1, 3);
+const tone_4 = tone(scale(6, 100, 3), 1, 3);
+const tone_5 = tone(scale(6, 100, 4), 1, 3);
+const tone_6 = tone(scale(6, 100, 5), 1, 3);
 
-// objs
+// buttons
 
 const path = n => "./away/far_away/images/" + n + ".png";
 const pair = (first, second, on_click) => objs([img(path(first)), img(path(second))], on_click);
@@ -41,6 +41,12 @@ const obj_6 = click_seq([off_6, on_6]);
 
 const buttons = [ obj_0, obj_1, obj_2, obj_3, obj_4, obj_5, obj_6 ];
 
+// control
+
+const draw_list  = [ bg_blue, silence_button, back_button, ...buttons ];
+const click_list = [          silence_button, back_button, ...buttons ];
+const start_list = [                                       ...buttons ];
+
 const exit_page = _ => {
 	buttons.forEach(o => {
 		if (o.i === 1) {
@@ -50,10 +56,6 @@ const exit_page = _ => {
 	});
 	stop_audio().then(start_away);
 };
-
-const draw_list  = [ bg_blue, silence_button, back_button, ...buttons ];
-const click_list = [          silence_button, back_button, ...buttons ];
-const start_list = [                                       ...buttons ];
 
 export default _ => {
 	set_item('page', "./away/far_away/index.js");
