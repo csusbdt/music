@@ -1,8 +1,6 @@
 import start_away from "../index.js";
 import { wave } from "./wave.js";
 
-const phi = 1.61803398875;
-
 // img, obj
 
 const path = n => "./away/far_away/images/" + n + ".png";
@@ -31,56 +29,9 @@ const border_4 = img(path("border_4"));
 const border_5 = img(path("border_5"));
 const border_6 = img(path("border_6"));
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// click_seq
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function c_click_seq(objs, on_end = null) {
-	assert(Array.isArray(objs));
-	this.objs    = objs  ;
-	this.i       = 0     ;
-	this.on_end  = on_end;
-	this.started = false ;
-}
-
-c_click_seq.prototype.stop = function() {
-	this.i       = 0    ;
-	this.started = false;
-	return this;
-};
-
-c_click_seq.prototype.start = function() {
-	if (!this.started) {
-		this.started = true;
-		this.objs.forEach(o => o.start(this));
-	}
-	return this;
-};
-
-c_click_seq.prototype.draw = function() {
-	if (this.started) this.objs[this.i].draw();
-};
-
-c_click_seq.prototype.click = function() {
-	if (this.started && this.objs[this.i].click()) {
-		if (++this.i === this.objs.length) {
-			this.i = 0;
-			this.started = false;
-			if (this.on_end !== null) this.on_end(this);
-		}
-		return true;
-	} else {
-		return false;
-	}
-};
-
-window.click_seq = (objs, on_end = null) => new c_click_seq(objs, on_end);
-
 const checkbox = (off_obj, on_obj) => click_seq([ off_obj, on_obj ], o => o.start());
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+let audio_started = false;
 
 const wave_0 = wave(phi);
 const wave_1 = wave(scale(6, 100, 0));
@@ -102,15 +53,19 @@ const draw_list  = [ bg_blue, silence_button, back_button, obj_0, obj_1, obj_2, 
 const click_list = [          silence_button, back_button, obj_0, obj_1, obj_2, obj_3, obj_4, obj_5, obj_6 ];
 const start_list = [                                       obj_0, obj_1, obj_2, obj_3, obj_4, obj_5, obj_6 ];
 
+//set_item("./away/far_away/index.js audio_started", false);
+
 export default _ => {
 	set_item('page', "./away/far_away/index.js");
+//	start_audio();
 	on_resize = _ => draw_list.forEach(o => o.draw());
 	on_click = _ => {
 		if (back_button.click()) {
-			stop_audio_f = _ => {
-				[ obj_0, obj_1, obj_2, obj_3, obj_4, obj_5, obj_6 ].forEach(o => o.stop());
-				[ wave_0, wave_1, wave_2, wave_3, wave_4, wave_5, wave_6 ].forEach(o => o.stop());
-			};
+			// stop_audio_f = _ => {
+			// 	[ obj_0, obj_1, obj_2, obj_3, obj_4, obj_5, obj_6 ].forEach(o => o.stop());
+			// 	[ wave_0, wave_1, wave_2, wave_3, wave_4, wave_5, wave_6 ].forEach(o => o.stop());
+			// };
+			stop_audio();
 			start_away();
 			return;
 		}

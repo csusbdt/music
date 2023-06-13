@@ -127,9 +127,9 @@ const click_test = (images, x = 0, y = 0, s = 1) => {
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-window.audio     = null;
-window.main_gain = null;
-window.gain      = null; // used by pages
+window.audio   = null;
+let main_gain  = null;
+window.gain    = null; // used by pages
 
 window.init_audio = _ => {
 	// this function must run in click handler to work on apple hardware
@@ -155,28 +155,97 @@ window.silence_off = _ => {
 };
 
 window.start_audio = _ => {
-	if (gain !== null) return;
-//	stop_audio();
-	//	if (gain !== null) gain.disconnect();
+	assert(gain === null);
 	gain = audio.createGain();
 	gain.connect(main_gain);
-//	audio_started = true;
 };
 
 window.stop_audio_f = null;
 
 window.stop_audio = _ => {
-//	if (gain === null) return;
+	if (gain === null) return;
 	if (stop_audio_f !== null) {
-		stop_audio_f();
+		stop_audio_f(); // could result in a call to stop_audio
 		stop_audio_f = null;
 	}
-	if (gain !== null) {
+	if (gain !== null) { // in case stop_audio_f cleared gain
 		gain.disconnect();
 		gain = null;
 	}
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// c_tone
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+function c_tone(f, v = 1) {
+	this.f = f;
+	this.v = v;
+	this.g = null;
+}
+
+c_tone.prototype.start = function() {
+	if (this.g === null) {
+		start_audio();
+		this.g = audio.createGain();
+		this.g.connect(gain);
+		this.g.gain.value = 0;
+		this.o = audio.createOscillator();
+		this.o.frequency.value = this.f;
+		this.o.start();
+		this.o.connect(this.g);
+	}
+	this.g.gain.setTargetAtTime(1, audio.currentTime, .1);
+};
+
+c_tone.prototype.stop = function() {
+	if (this.g !== null) {
+		this.g.gain.setTargetAtTime(0, audio.currentTime, .1);
+		this.g = null;
+	}
+};
+
+const tone = (f) => {
+	return new c_tone(f);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// c_wave
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+// function c_wave(f) {
+// 	this.f = f;	
+// 	this.g = null;
+// }
+
+// c_wave.prototype.start = function() {
+// 	if (this.g === null) {
+// 		start_audio();
+// 		this.g = audio.createGain();
+// 		this.g.connect(main_gain);
+// 		this.g.gain.value = 0;
+// 		this.o = audio.createOscillator();
+// 		this.o.frequency.value = this.f;
+// 		this.o.start();
+// 		this.o.connect(this.g);
+// 	}
+// 	this.g.gain.setTargetAtTime(1, audio.currentTime, .1);
+// };
+
+// c_wave.prototype.stop = function() {
+// 	if (this.g !== null) {
+// 		this.g.gain.setTargetAtTime(0, audio.currentTime, .1);
+// 		this.g = null;
+// 	}
+// };
+
+// const wave = (f) => {
+// 	return new c_wave(f);
+// };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -392,6 +461,54 @@ window.obj = (objs, on_click = null) => {
 // window.obj_pair = (first, second, on_click = null) => {
 // 	return new c_obj([first, second], on_click);
 // };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// click_seq
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function c_click_seq(objs, on_end = null) {
+	assert(Array.isArray(objs));
+	this.objs    = objs  ;
+	this.i       = 0     ;
+	this.on_end  = on_end;
+	this.started = false ;
+}
+
+c_click_seq.prototype.stop = function() {
+	this.i       = 0    ;
+	this.started = false;
+	return this;
+};
+
+c_click_seq.prototype.start = function() {
+	if (!this.started) {
+		this.started = true;
+		this.objs.forEach(o => o.start(this));
+	}
+	return this;
+};
+
+c_click_seq.prototype.draw = function() {
+	if (this.started) this.objs[this.i].draw();
+};
+
+c_click_seq.prototype.click = function() {
+	if (this.started && this.objs[this.i].click()) {
+		if (++this.i === this.objs.length) {
+			this.i = 0;
+			this.started = false;
+			if (this.on_end !== null) this.on_end(this);
+		}
+		return true;
+	} else {
+		return false;
+	}
+};
+
+window.click_seq = (objs, on_end = null) => new c_click_seq(objs, on_end);
+
 
 //////////////////////////////////////////////////////////////////////////////////////
 //

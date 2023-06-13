@@ -21,10 +21,10 @@ function c_wave(f, w) {
 }
 
 c_wave.prototype.start = function() {
+	if (gain === null) start_audio();
 	if (this.g === null) {
-		start_audio();
 		this.g = audio.createGain();
-		this.g.connect(main_gain);
+		this.g.connect(gain);
 		this.g.gain.value = 0;
 		this.o = audio.createOscillator();
 		this.o.frequency.value = this.f;

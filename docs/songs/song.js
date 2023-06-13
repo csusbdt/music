@@ -6,10 +6,13 @@ let ramp_down   = 0;
 let loop_id     = null;
 
 const setup_graph = _ => {
-	stop_audio();
-    gain = audio.createGain();
-	gain.gain.value = 0;
-	gain.connect(main_gain);
+	if (gain !== null) {
+		stop_audio();
+	}
+	start_audio();
+//    gain = audio.createGain();
+//	gain.gain.value = 0;
+//	gain.connect(main_gain);
 	const merger = new ChannelMergerNode(audio);
 	merger.connect(gain);
 	o_left  = audio.createOscillator();
@@ -23,8 +26,9 @@ const setup_graph = _ => {
 };
 
 const teardown_graph = _ => {
-	gain.disconnect();
-	gain        = null;
+	stop_audio();
+//	gain.disconnect();
+//	gain        = null;
 	o_left  = null;
 	o_right = null;
 };
