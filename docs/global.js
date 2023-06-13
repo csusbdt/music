@@ -415,6 +415,8 @@ window.img = (src, x = 0, y = 0, s = 1) => {
 //
 // obj
 //
+// obj adds on_click and start/stop to images
+//
 ////////////////////////////////////////////////////////////////////////////////////
 
 function c_obj(objs, on_click = null) {
@@ -464,16 +466,62 @@ window.obj = (objs, on_click = null) => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// click_seq
+// obj_list
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function c_click_seq(objs, on_end = null) {
+function c_obj_list(objs, on_click = null) {
 	assert(Array.isArray(objs));
-	this.objs    = objs  ;
-	this.i       = 0     ;
-	this.on_end  = on_end;
-	this.started = false ;
+	this.objs    = objs     ;
+	this.on_click = on_click;
+	this.started = false    ;
+}
+
+c_obj_list.prototype.stop = function() {
+	if (this.started) {
+		this.started = false;
+		this.objs.forEach(o => o.stop());
+	}
+	return this;
+};
+
+c_obj_list.prototype.start = function() {
+	if (!this.started) {
+		this.started = true;
+		this.objs.forEach(o => o.start());
+	}
+	return this;
+};
+
+c_obj_list.prototype.draw = function() {
+	if (this.started) this.objs.forEach(o => o.draw());
+};
+
+c_obj_list.prototype.click = function() {
+	if (this.started && this.objs.some(o => o.click())) {
+		if (this.on_click !== null) this.on_click();
+		return true;
+	} else {
+		return false;
+	}
+};
+
+window.obj_list = (objs, on_click = null) => new c_obj_list(objs, on_click);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// click_seq
+//
+// a click_seq allows user to click through a list of objs
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function c_click_seq(objs, on_click = null) {
+	assert(Array.isArray(objs));
+	this.objs     = objs    ;
+	this.on_click = on_click;
+	this.i        = 0       ;
+	this.started  = false   ;
 }
 
 c_click_seq.prototype.stop = function() {
@@ -498,16 +546,15 @@ c_click_seq.prototype.click = function() {
 	if (this.started && this.objs[this.i].click()) {
 		if (++this.i === this.objs.length) {
 			this.i = 0;
-			this.started = false;
-			if (this.on_end !== null) this.on_end(this);
 		}
+		if (this.on_click !== null) this.on_click();
 		return true;
 	} else {
 		return false;
 	}
 };
 
-window.click_seq = (objs, on_end = null) => new c_click_seq(objs, on_end);
+window.click_seq = (objs, on_click = null) => new c_click_seq(objs, on_click);
 
 
 //////////////////////////////////////////////////////////////////////////////////////
