@@ -554,7 +554,6 @@ c_click_seq.prototype.click = function() {
 
 window.click_seq = (objs, on_click = null) => new c_click_seq(objs, on_click);
 
-
 //////////////////////////////////////////////////////////////////////////////////////
 //
 // c_obj_seq
@@ -591,8 +590,6 @@ c_obj_seq.prototype.start = function() {
 	this.started = true;
 	const o = this.objs[0];
 	this.objs.forEach(o => o.start(this));
-	//if (o.start !== undefined) o.start();
-//	o.start();
 	this.i = 0;
 	this.id = setInterval(c_obj_seq_next.bind(this), this.t);
 };
