@@ -1,72 +1,76 @@
-import start_away           from "../away/index.js"          ;
-import start_songs          from "../songs/index.js"         ;
-import start_space_shooter  from "../space_shooter/index.js" ;
+import start_home from "../home/index.js";
 
-// tones
+function c_img(src, x = 0, y = 0) {
+    this.image     = new Image();
+    this.image.src = src;
+	this.x         = x;
+	this.y         = y;
+}
 
-const tone_0 = tone(scale(6, 240, 0), 1, 3);
-
-// buttons
-
-const border_img = img("./global/images/upper_left_border.png", 0, 200);
-const red_img = img("./global/images/upper_left_yellow.png", 0, 200);
-const green_img = img("./global/images/upper_left_yellow.png", 0, 200);
-const blue_img = img("./global/images/upper_left_yellow.png", 0, 200);
-const yellow_img = img("./global/images/upper_left_yellow.png", 0, 200);
-const white_img = img("./global/images/upper_left_yellow.png", 0, 200);
-const black_img = img("./global/images/upper_left_yellow.png", 0, 200);
-
-const button_obj = (color, x, y) => {
-	const border_img = img("./global/images/upper_left_border.png"       , x, y);
-	const color_img  = img("./global/images/upper_left_" + color + ".png", x, y);	
-	return objs([color_img, border_img]);
+c_img.prototype.draw = function() {	
+	if (this.image.complete) {
+		ctx.drawImage(this.image, this.x, this.y);
+	} else {
+		this.image.onload = on_resize;
+	}
 };
 
-const yellow_obj = button_obj("yellow",   0, 200);
-const green_obj  = button_obj("green" ,   0, 200);
+const img   = (n, x = 0, y = 0) => new c_img("./compose/images/" + n + ".png", x, y);
+const click = img               => click_test(img.image, img.x, img.y);
 
-const button_00_00 = click_seq([green_obj, yellow_obj])
 
-const test = [ button_00_00 ];
 
-const path = n => "./away/far_away/images/" + n + ".png";
-const pair = (first, second, on_click) => objs([img(path(first)), img(path(second))], on_click);
+// const waver_tone_0 = tone(PHI, 1, 0);
+// const waver_tone_0 = tone(scale(6, 240, 0), 1, 3);
 
-const off_all = _ => {
-	buttons.forEach(o => {
-		if (o.i === 1) {
-			o.objs[1].on_click();
-			o.i = 0;
-		}
-	});
+
+const x =   0;
+const y =  30;
+const d = 130;
+
+const grid = [
+	[
+		[ img("white", x + 0 * d, y + 0 * d), img("white", x + 1 * d, y + 0 * d) ],
+		[ img("white", x + 0 * d, y + 1 * d), img("white", x + 1 * d, y + 1 * d) ]
+	], [
+		[ img("red"  , x + 0 * d, y + 0 * d), img("red"  , x + 1 * d, y + 0 * d) ],
+		[ img("red"  , x + 0 * d, y + 1 * d), img("red"  , x + 1 * d, y + 1 * d) ]		
+	]
+];
+
+const borders = [
+	[ img("border", x + 0 * d, y + 0 * d), img("border", x + 1 * d, y + 0 * d) ],
+	[ img("border", x + 0 * d, y + 1 * d), img("border", x + 1 * d, y + 1 * d) ]
+];
+
+let cols = [
+	[ 0, 0 ],
+	[ 1, 0 ]
+];
+	
+const draw_page = _ => {
+	bg_blue.draw();
+	back_button.draw();
+	borders.forEach(row => row.forEach(o => o.draw()));
+//	cols.forEach(n => n.forEach(r => grid[r][c].draw()));
 };
 
-const off_inner  = pair("green_0", "border_0", _ => tone_0.start());
+const click_page = _ => {
+	if (back_button.click()) return exit_page();
+	on_resize();
+};
 
-const on_inner   = pair("white_0", "border_0", _ => tone_0.stop());
+const exit_page = _ => {
+	stop_audio().then(start_home);
+};
 
-const obj_inner = click_seq([off_inner, on_inner]);
-
-const buttons = [ obj_inner, ...test ];
-
-// control
-
-const draw_list  = [ bg_blue, silence_button, back_button, ...buttons ];
-const click_list = [          silence_button, back_button, ...buttons ];
-const start_list = [                                       ...buttons ];
-
-// const exit_page = next_page => {
-// 	off_all();
-// 	stop_audio().then(next_page);
-// };
+const start_page = _ => {
+};
 
 export default _ => {
-	set_item('page', "./compose/index.js");
-	on_resize = _ => draw_list.forEach(o => o.draw());
-	on_click = _ => {
-		if (back_button.click()) return start_songs();
-		else if (click_list.some(o => o.click())) on_resize();
-	};
-	start_list.forEach(o => o.start());
+	set_item('page', "./compose/index.js");	
+	on_resize = draw_page;
+	on_click  = click_page;
+	start_page();
 	on_resize();
 };

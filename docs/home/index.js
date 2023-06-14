@@ -1,6 +1,7 @@
 import start_away           from "../away/index.js"          ;
 import start_songs          from "../songs/index.js"         ;
 import start_space_shooter  from "../space_shooter/index.js" ;
+import start_compose        from "../compose/index.js"       ;
 
 // buttons
 
@@ -23,12 +24,14 @@ const inner_ring = click_seq([objs([inner_red, inner_border]), objs([inner_green
 const outer_ring = click_seq([objs([outer_red, outer_border]), objs([outer_green, outer_border])]);
 
 const big_action = _ => {
-    if (inner_ring.i === 1 && outer_ring.i === 1) {
-        start_space_shooter();
-	} else if (inner_ring.i === 1 || outer_ring.i === 1) {
-        start_away();
-    } else {
+    if (inner_ring.i === 0 && outer_ring.i === 0) {
         start_songs();
+	} else if (inner_ring.i === 1 && outer_ring.i === 0) {
+        start_compose();
+	} else if (inner_ring.i === 0 && outer_ring.i === 1) {
+        start_space_shooter();
+	} else if (inner_ring.i === 1 && outer_ring.i === 1) {
+        start_away();
     }
 };
 
