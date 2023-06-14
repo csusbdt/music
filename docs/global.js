@@ -221,7 +221,7 @@ adjust_canvas();
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-const click_test = (images, x = 0, y = 0, s = 1) => {
+window.click_test = (images, x = 0, y = 0, s = 1) => {
 	if (!Array.isArray(images)) images = [images];
 	for (let i = 0; i < images.length; ++i) {
 		if (!images[i].complete) return false;
@@ -506,6 +506,58 @@ c_objs.prototype.click = function() {
 
 window.objs = (objs, on_click = null) => new c_objs(objs, on_click);
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// obj_list
+//
+// only one obj in list is in started state
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function c_obj_list(objs, on_click = null) {
+	assert(Array.isArray(objs));
+	this.objs     = objs    ;
+	this.on_click = on_click;
+	this.i        = 0       ;
+	this.started  = false   ;
+}
+
+c_click_seq.prototype.stop = function() {
+	assert(this.started);
+	this.started = false;
+	this.obj(this.i).stop(this);
+	this.i = 0;
+	return this;
+};
+
+c_click_seq.prototype.start = function() {
+	assert(!this.started); 
+	this.started = true;
+	this.i = 0;
+	this.objs[0].start(this);
+	return this;
+};
+
+c_click_seq.prototype.draw = function() {
+	if (this.started) this.objs[this.i].draw();
+};
+
+c_click_seq.prototype.click = function() {
+	if (this.started && this.objs[this.i].click()) {
+		if (++this.i === this.objs.length) {
+			this.i = 0;
+		}
+		if (this.on_click !== null) this.on_click(this);
+		return true;
+	} else {
+		return false;
+	}
+};
+
+window.obj_list = (objs, on_click = null) => new c_obj_list(objs, on_click);
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // click_seq
@@ -523,14 +575,19 @@ function c_click_seq(objs, on_click = null) {
 }
 
 c_click_seq.prototype.stop = function() {
-	this.i       = 0    ;
-	this.started = false;
+	if (this.started) {
+		this.i = 0;
+		this.started = false;
+		this.objs.forEach(o => o.stop(this));
+	}
 	return this;
 };
 
 c_click_seq.prototype.start = function() {
 	if (!this.started) {
+		this.i = 0;
 		this.started = true;
+		//this.objs(this.i).start(this);
 		this.objs.forEach(o => o.start(this));
 	}
 	return this;
@@ -580,25 +637,25 @@ function c_obj_seq_next() {
 		clearInterval(this.id);
 		this.id = null;
 		if (this.on_end !== null) this.on_end(this);
-	} else {
-		on_resize();
 	}
+	on_resize();
 }
 
 c_obj_seq.prototype.start = function() {
 	if (this.started) return;
 	this.started = true;
-	const o = this.objs[0];
 	this.objs.forEach(o => o.start(this));
 	this.i = 0;
 	this.id = setInterval(c_obj_seq_next.bind(this), this.t);
+	return this;
 };
 
 c_obj_seq.prototype.stop = function() {
 	if (!this.started) return;
 	this.started = false;
-	const o = this.objs[this.i];
-	if (o.stop !== undefined) o.stop();
+	this.objs.forEach(o => o.stop(this));
+	this.i = 0;
+	return this;
 };
 
 c_obj_seq.prototype.draw = function() {
