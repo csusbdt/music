@@ -209,7 +209,7 @@ window.adjust_canvas = _ => {
 	click_test_canvas.width  = design_width; 
 	click_test_canvas.height = design_height;
     click_test_ctx.setTransform(1, 0, 0, 1, 0, 0);
-}
+};
 
 window.addEventListener('resize', adjust_canvas);
 
