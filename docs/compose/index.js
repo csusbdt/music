@@ -71,30 +71,38 @@ const draw_borders = _ => {
 	}
 };
 
-const stop_waves = _ => {
+const stop_waves = (cb = null) => {
+	assert(waves.length !== 0);
+	assert(window.stop_page_audio === null);
 	waves.length = 0;
+	stop_audio(cb);
 };
 
 const start_waves = _ => {
+	assert(waves.length === 0);
+	assert(on_resize = draw_page);
+	assert(on_click === click_page);
 	if (window.stop_page_audio !== null) {
 		on_click = null;
-		window.stop_page_audio(start_waves);
-		return;
+		window.stop_page_audio(_ => {
+			assert(window.stop_page_audio === null);
+			on_click = click_page;
+			start_waves();
+		});
+	} else {
+		start_audio();
+		for (let col = 0; col < cols; ++col) {
+			waves.push(tone(120, 1, 3));
+		}
+		click_page();
 	}
-	on_click = click_page;
-	start_audio();
-	for (let col = 0; col < cols; ++col) {
-		waves.push(tone(120, 1, 3));
-	}
-	click_page();
 };
 
 const stop_page_audio = (cb = null) => {
-	// a page module should never call its own stop_page_audio
 	assert(on_resize !== draw_page); 
+	assert(waves.length !== 0);
 	window.stop_page_audio = null;
-	stop_waves();
-	stop_audio(cb);
+	stop_waves(cb);
 };
 
 const click_page = _ => {
@@ -114,6 +122,11 @@ const draw_page = _ => {
 };
 
 export default _ => {
+	if (waves.length !== 0) {
+		assert(window.stop_page_audio === stop_page_audio);
+		assert(gain !== null);
+		window.stop_page_audio = null;
+	}	
 	set_item('page', "./compose/index.js");
 	on_click = click_page;	
 	on_resize = draw_page;

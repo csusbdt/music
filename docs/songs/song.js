@@ -40,7 +40,6 @@ c_song.prototype.play_notes = function() {
 
 c_song.prototype.start = function() {
 	assert(this.loop_id === null);
-	assert(gain === null);
 	start_audio();
 	this.merger = new ChannelMergerNode(audio);
 	this.merger.connect(gain);

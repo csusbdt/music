@@ -84,7 +84,7 @@ const stop_song = (cb = null) => {
 	assert(song_i !== null);
 	assert(on_click === click_page);
 	assert(window.stop_page_audio === null);
-	on_click = null
+	on_click = null;
 	songs[song_i].stop(_ => {
 		song_i = null;
 		on_click = click_page;
@@ -94,11 +94,26 @@ const stop_song = (cb = null) => {
 };
 
 const start_song = i => {
-	assert(i !== null);
+	assert(i !== undefined);
 	assert(on_click === click_page);
-	if (song_i !== null) stop_song(start_song.bind(null, i))
-	else {
-		assert(song_i === null);
+	assert(window.stop_page_audio !== stop_page_audio);
+	if (window.stop_page_audio !== null) {
+		on_click = null;
+		window.stop_page_audio(_ => {
+			assert(window.stop_page_audio === null);
+			assert(gain === null);
+			on_click = click_page;
+			start_song(i);
+		});
+	} else if (song_i !== null) {
+		assert(window.stop_page_audio === null);		
+		on_click = null;
+		stop_song(_ => {
+			assert(song_i === null);
+			on_click = click_page;
+			start_song(i);
+		});
+	} else {
 		song_i = i;
 		songs[song_i].start();
 		on_resize();
@@ -118,15 +133,14 @@ const stop_page_audio = (cb = null) => {
 const click_page = _ => {
 	if (back_button.click()) {
 		if (song_i !== null) {
+			assert(window.stop_page_audio === null);
 			window.stop_page_audio = stop_page_audio;
 		}
 		start_home();
-		return;
-	}
-	if (silence_button.click()) return on_resize();
-	for (let i = 0; i < reds.length; ++i) {
+	} else if (silence_button.click()) return on_resize();
+	else for (let i = 0; i < reds.length; ++i) {
 		if (click(reds[i])) {
-			if (song_i === i) stop_song()
+			if (song_i === i) stop_song();
 			else start_song(i);
 		 	return;
 		}
