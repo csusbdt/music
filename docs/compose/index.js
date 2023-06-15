@@ -69,16 +69,7 @@ const draw_borders = _ => {
 };
 
 const stop_waves = _ => {
-	return new Promise(resolve => {
-		assert(gain !== null);
-		gain.gain.setTargetAtTime(0, audio.currentTime, .1);
-		setTimeout(_ => {
-			gain.disconnect();
-			gain = null;
-			waves.length = 0;
-			resolve();
-		}, 120);
-	});
+	waves.length = 0;
 };
 
 const start_waves = _ => {

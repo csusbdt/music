@@ -4,55 +4,103 @@ import { song_1 }  from "./songs.js"      ;
 import { song_2 }  from "./songs.js"      ;
 import { song_3 }  from "./songs.js"      ;
 
-// buttons
+const songs = [ song_0, song_1, song_2, song_3 ];
 
-const path = n => "./songs/images/" + n + ".png";
-const pair = (first, second, on_click) => objs([img(path(first)), img(path(second))], on_click);
+function c_img(src) {
+    this.image     = new Image();
+    this.image.src = src;
+}
 
-const off_all = _ => {
-	buttons.forEach(o => {
-		if (o.i === 1) {
-			o.objs[1].on_click();
-			o.i = 0;
-		}
-	});
+c_img.prototype.draw = function() {	
+	if (this.image.complete) {
+		ctx.drawImage(this.image, 0, 0);
+	} else {
+		this.image.onload = on_resize;
+	}
 };
 
-const on_0   = pair("play_big_green"     , "play_big_border"     , _ => song_0.stop());
-const on_1   = pair("play_medium_1_green", "play_medium_1_border", _ => song_1.stop());
-const on_2   = pair("play_medium_2_green", "play_medium_2_border", _ => song_2.stop());
-const on_3   = pair("play_small_1_green" , "play_small_1_border" , _ => song_3.stop());
+const img = n => new c_img("./songs/images/" + n + ".png");
+const click = img => click_test(img.image);
 
-const off_0  = pair("play_big_red"     , "play_big_border"     , _ => { off_all(); song_0.start(); });
-const off_1  = pair("play_medium_1_red", "play_medium_1_border", _ => { off_all(); song_1.start(); });
-const off_2  = pair("play_medium_2_red", "play_medium_2_border", _ => { off_all(); song_2.start(); });
-const off_3  = pair("play_small_1_red" , "play_small_1_border" , _ => { off_all(); song_3.start(); });
+const borders = [
+	img("play_big_border"     ),
+	img("play_medium_1_border"),
+	img("play_medium_2_border"),
+	img("play_small_1_border" )
+];
 
-const obj_0 = click_seq([off_0, on_0]);
-const obj_1 = click_seq([off_1, on_1]);
-const obj_2 = click_seq([off_2, on_2]);
-const obj_3 = click_seq([off_3, on_3]);
+const greens = [
+	img("play_big_green"     ),
+	img("play_medium_1_green"),
+	img("play_medium_2_green"),
+	img("play_small_1_green" )
+];
 
-const buttons = [ obj_0, obj_1, obj_2, obj_3 ];
+const reds = [
+	img("play_big_red"       ),
+	img("play_medium_1_red"  ),
+	img("play_medium_2_red"  ),
+	img("play_small_1_red"   )
+];
 
-// control
+let song_i = null;
 
-const draw_list  = [ bg_blue, silence_button, back_button, ...buttons ];
-const click_list = [          silence_button, back_button, ...buttons ];
-const start_list = [                                       ...buttons ];
+const draw_page = _ => {
+	bg_blue.draw();
+	greens.forEach(o => o.draw());
+	if (song_i !== null) reds[song_i].draw();
+	borders.forEach(o => o.draw());
+	silence_button.draw();
+	back_button.draw();
+};
 
-const exit_page = next_page => {
-	off_all();
-	stop_audio().then(next_page);
+const stop_song = _ => {
+	assert(song_i !== null);
+	songs[song_i].stop();
+	song_i = null;
+	// caller must call stop_audio to halt playing of last tone
+};
+
+const click_page = _ => {
+	if (back_button.click()) return start_home();
+	if (silence_button.click()) return on_resize();
+	for (let i = 0; i < reds.length; ++i) {
+		if (click(reds[i])) {
+			if (song_i === null) {
+				on_click = null;
+				start_audio(stop_song).then(_ => {
+					song_i = i;
+					songs[song_i].start();
+					on_click = click_page;
+					on_resize();
+				});
+			} else if (song_i === i) {
+				on_click = null;
+				stop_song();
+				stop_audio().then(_ => {
+					on_click = click_page;					
+					on_resize();
+				});
+			} else {
+				on_click = null;
+				stop_song();
+				stop_audio().then(_ => {
+					start_audio(stop_song).then(_ => {
+						song_i = i;
+						songs[song_i].start();
+						on_click = click_page;
+						on_resize();
+					});
+				});
+			}
+			break;
+		}
+	}
 };
 
 export default _ => {
 	set_item('page', "./songs/index.js");
-	on_resize = _ => draw_list.forEach(o => o.draw());
-	on_click = _ => {
-		if (back_button.click()) exit_page(start_home);
-		else if (click_list.some(o => o.click())) on_resize();
-	};
-	start_list.forEach(o => o.start());
+	on_click  = click_page;	
+	on_resize = draw_page ;
 	on_resize();
 };

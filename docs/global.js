@@ -92,37 +92,40 @@ window.silence_off = _ => {
 	main_gain.gain.setTargetAtTime(1, audio.currentTime, .1);
 };
 
-let stop_page_audio = null;
+let reset_page = null;
 
-window.start_audio = (new_stop_page_audio = null) => {
+window.start_audio = (new_reset_page = null) => {
 	return new Promise(resolve => {
-		if (stop_page_audio !== null) {
-			stop_page_audio().then(_ => {
-				stop_page_audio = new_stop_page_audio;
+		if (reset_page !== null) {
+			reset_page();
+		}
+		reset_page = new_reset_page;
+		if (gain !== null) {
+			stop_audio().then(_ => {
 				gain = audio.createGain();
 				gain.connect(main_gain);
 				resolve();
 			});
 		} else {
-			stop_page_audio = new_stop_page_audio;
 			gain = audio.createGain();
 			gain.connect(main_gain);
 			resolve();
-		}		
+		}
 	});
 };
 
 window.stop_audio = _ => {
+	reset_page = null;
 	return new Promise(resolve => {
 		if (gain === null) {
 			resolve();
 		} else {
-			gain.gain.setTargetAtTime(0, audio.currentTime, .1);
+			gain.gain.setTargetAtTime(0, audio.currentTime, .05);
 			setTimeout(_ => {
 				gain.disconnect();
 				gain = null;
 				resolve();
-			}, 120);
+			}, 60);
 		}
 	});
 };
