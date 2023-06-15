@@ -61,7 +61,7 @@ window.get_item = (key, _default) => {
 // audio
 //
 // init_audio is called with every click on the canvas with <canvas onclick="init_audio();"
-// This will run before all other click handlers. 
+// This will run before all other click handlers. This may not be true. FIX clearInterval
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -92,42 +92,22 @@ window.silence_off = _ => {
 	main_gain.gain.setTargetAtTime(1, audio.currentTime, .1);
 };
 
-let reset_page = null;
+window.stop_page_audio = null;
 
-window.start_audio = (new_reset_page = null) => {
-	return new Promise(resolve => {
-		if (reset_page !== null) {
-			reset_page();
-		}
-		reset_page = new_reset_page;
-		if (gain !== null) {
-			stop_audio().then(_ => {
-				gain = audio.createGain();
-				gain.connect(main_gain);
-				resolve();
-			});
-		} else {
-			gain = audio.createGain();
-			gain.connect(main_gain);
-			resolve();
-		}
-	});
+window.start_audio = _ => {
+	assert(gain === null);
+	gain = audio.createGain();
+	gain.connect(main_gain);
 };
 
-window.stop_audio = _ => {
-	reset_page = null;
-	return new Promise(resolve => {
-		if (gain === null) {
-			resolve();
-		} else {
-			gain.gain.setTargetAtTime(0, audio.currentTime, .05);
-			setTimeout(_ => {
-				gain.disconnect();
-				gain = null;
-				resolve();
-			}, 60);
-		}
-	});
+window.stop_audio = (cb = null) => {
+	assert(gain !== null);
+	gain.gain.setTargetAtTime(0, audio.currentTime, .05);
+	setTimeout(_ => {
+		gain.disconnect();
+		gain = null;
+		if (cb !== null) cb();
+	}, 60);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////

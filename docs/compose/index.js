@@ -39,7 +39,6 @@ const waves = [];
 // const waver_tone_0 = tone(scale(6, 240, 0), 1, 3);
 
 
-
 const click_buttons = _ => {
 	for (let col = 0; col < cols; ++col) {
 		for (let row = 0; row < rows; ++row) {
@@ -55,7 +54,11 @@ const click_buttons = _ => {
 const draw_colors = _ => {
 	for (let col = 0; col < cols; ++col) {
 		for (let row = 0; row < rows; ++row) {
-			white.draw(col_x(col), row_y(row));
+			if (waves.length === 0) {
+				white.draw(col_x(col), row_y(row));			
+			} else {
+				yellow.draw(col_x(col), row_y(row));
+			}
 		}
 	}
 };
@@ -73,23 +76,34 @@ const stop_waves = _ => {
 };
 
 const start_waves = _ => {
+	if (window.stop_page_audio !== null) {
+		on_click = null;
+		window.stop_page_audio(start_waves);
+		return;
+	}
+	on_click = click_page;
+	start_audio();
 	for (let col = 0; col < cols; ++col) {
 		waves.push(tone(120, 1, 3));
 	}
+	click_page();
+};
+
+const stop_page_audio = (cb = null) => {
+	// a page module should never call its own stop_page_audio
+	assert(on_resize !== draw_page); 
+	window.stop_page_audio = null;
+	stop_waves();
+	stop_audio(cb);
 };
 
 const click_page = _ => {
-	if (back_button.click()) return start_home();
-	if (waves.length === 0) {
-		on_click = null;
-		start_audio(stop_waves).then(_ => {
-			start_waves();
-			on_click = click_page;
-			click_buttons();
-		});
-	} else {
-		click_buttons();
-	}
+	if (back_button.click()) {
+		window.stop_page_audio = stop_page_audio;
+		start_home();
+	} 
+	else if (waves.length === 0) start_waves();
+	else click_buttons();
 };
 
 const draw_page = _ => {

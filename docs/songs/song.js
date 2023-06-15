@@ -2,8 +2,6 @@
 //
 // song
 //
-// these objects are not responsible for starting and stopping audio
-//
 ///////////////////////////////////////////////////////////////////////////////
 
 function c_song(notes, ramp_up = 0, ramp_down = 0, binaural = 0) {
@@ -20,23 +18,6 @@ function c_song(notes, ramp_up = 0, ramp_down = 0, binaural = 0) {
 		this.duration += note[2];
 	});
 }
-
-c_song.prototype.start = function(stop_func = null) {
-	assert(this.loop_id === null);
-	assert(gain !== null);
-	this.merger = new ChannelMergerNode(audio);
-	this.merger.connect(gain);
-	this.o_left  = audio.createOscillator();
-	this.o_right = audio.createOscillator();
-	this.o_left.connect(this.merger, 0, 0);
-	this.o_right.connect(this.merger, 0, 1);
-	this.o_left.frequency.value = 0; 
-	this.o_right.frequency.value = 0;
-	this.o_left.start();
-	this.o_right.start();
-	this.loop_id = setInterval(this.play_notes.bind(this), this.duration * 1000 + 10);
-	this.play_notes();
-};
 
 c_song.prototype.play_notes = function() {
 	let t = 0;
@@ -57,15 +38,36 @@ c_song.prototype.play_notes = function() {
 	}
 };
 
-c_song.prototype.stop = function() {
+c_song.prototype.start = function() {
+	assert(this.loop_id === null);
+	assert(gain === null);
+	start_audio();
+	this.merger = new ChannelMergerNode(audio);
+	this.merger.connect(gain);
+	this.o_left  = audio.createOscillator();
+	this.o_right = audio.createOscillator();
+	this.o_left.connect(this.merger, 0, 0);
+	this.o_right.connect(this.merger, 0, 1);
+	this.o_left.frequency.value = 0; 
+	this.o_right.frequency.value = 0;
+	this.o_left.start();
+	this.o_right.start();
+	this.loop_id = setInterval(this.play_notes.bind(this), this.duration * 1000 + 10);
+	this.play_notes();
+};
+
+c_song.prototype.stop = function(cb) {
+	assert(this.loop_id !== null);
+	assert(gain !== null);
 	this.o_left.frequency.cancelScheduledValues(audio.currentTime);
 	this.o_right.frequency.cancelScheduledValues(audio.currentTime);
 	gain.gain.cancelScheduledValues(audio.currentTime);	
-	clearInterval(this.loop_id);		
+	clearInterval(this.loop_id);
 	this.loop_id = null;
 	this.merger  = null;
 	this.o_left  = null;
 	this.o_right = null;
+	stop_audio(cb);
 };
 
 const song = (notes, ramp_up = 0, ramp_down = 0, binaural = 0) => {

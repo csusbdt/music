@@ -54,51 +54,91 @@ const draw_page = _ => {
 	back_button.draw();
 };
 
-const stop_song = _ => {
+// const stop_song = (cb = null) => {
+// 	assert(song_i !== null);
+// 	assert(on_click === click_page);
+// 	on_click = null
+// 	songs[song_i].stop(_ => {
+// 		song_i = null;
+// 		on_click = click_page;
+// 		if (cb !== null) cb();
+// 	});
+// };
+
+// const start_song = (cb = null) => {
+// 	assert(song_i !== null);
+// 	assert(on_click === click_page);
+// 	if (window.stop_page_audio !== null) {
+// 		on_click = null;
+// 		window.stop_page_audio(_ => {
+// 			assert(window.stop_page_audio === null);
+// 			on_click = click_page;
+// 			songs[song_i].start();
+// 		});
+// 	} else {
+// 		songs[song_i].start();
+// 	}
+// };
+
+const stop_song = (cb = null) => {
 	assert(song_i !== null);
-	songs[song_i].stop();
-	song_i = null;
-	// caller must call stop_audio to halt playing of last tone
+	assert(on_click === click_page);
+	assert(window.stop_page_audio === null);
+	on_click = null
+	songs[song_i].stop(_ => {
+		song_i = null;
+		on_click = click_page;
+		if (cb !== null) cb();
+		else on_resize();
+	});
+};
+
+const start_song = i => {
+	assert(i !== null);
+	assert(on_click === click_page);
+	if (song_i !== null) stop_song(start_song.bind(null, i))
+	else {
+		assert(song_i === null);
+		song_i = i;
+		songs[song_i].start();
+		on_resize();
+	}
+};
+
+const stop_page_audio = (cb = null) => {
+	assert(on_resize !== draw_page);
+	assert(song_i !== null);
+	window.stop_page_audio = null;
+	songs[song_i].stop(_ => {
+		song_i = null;
+		if (cb !== null) cb();
+	});
 };
 
 const click_page = _ => {
-	if (back_button.click()) return start_home();
+	if (back_button.click()) {
+		if (song_i !== null) {
+			window.stop_page_audio = stop_page_audio;
+		}
+		start_home();
+		return;
+	}
 	if (silence_button.click()) return on_resize();
 	for (let i = 0; i < reds.length; ++i) {
 		if (click(reds[i])) {
-			if (song_i === null) {
-				on_click = null;
-				start_audio(stop_song).then(_ => {
-					song_i = i;
-					songs[song_i].start();
-					on_click = click_page;
-					on_resize();
-				});
-			} else if (song_i === i) {
-				on_click = null;
-				stop_song();
-				stop_audio().then(_ => {
-					on_click = click_page;					
-					on_resize();
-				});
-			} else {
-				on_click = null;
-				stop_song();
-				stop_audio().then(_ => {
-					start_audio(stop_song).then(_ => {
-						song_i = i;
-						songs[song_i].start();
-						on_click = click_page;
-						on_resize();
-					});
-				});
-			}
-			break;
+			if (song_i === i) stop_song()
+			else start_song(i);
+		 	return;
 		}
 	}
 };
 
 export default _ => {
+	if (song_i !== null) {
+		assert(window.stop_page_audio === stop_page_audio);
+		assert(gain !== null);
+		window.stop_page_audio = null;
+	}	
 	set_item('page', "./songs/index.js");
 	on_click  = click_page;	
 	on_resize = draw_page ;
