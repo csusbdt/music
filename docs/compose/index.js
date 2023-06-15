@@ -44,7 +44,7 @@ const click_buttons = _ => {
 	for (let col = 0; col < cols; ++col) {
 		for (let row = 0; row < rows; ++row) {
 			if (click(red, col_x(col), row_y(row))) {
-				log("hi");
+				waves[0].start();
 				on_resize();
 				return;
 			}

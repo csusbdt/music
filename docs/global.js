@@ -97,7 +97,7 @@ let stop_page_audio = null;
 window.start_audio = (new_stop_page_audio = null) => {
 	return new Promise(resolve => {
 		if (stop_page_audio !== null) {
-			stop_page_audio.then(_ => {
+			stop_page_audio().then(_ => {
 				stop_page_audio = new_stop_page_audio;
 				gain = audio.createGain();
 				gain.connect(main_gain);
@@ -142,7 +142,6 @@ function c_tone(f, v = 1, b = 0) {
 
 c_tone.prototype.start = function() {
 	if (this.g === null) {
-		start_audio();
 		this.g = audio.createGain();
 		this.g.connect(gain);
 		this.g.gain.value = 0;
