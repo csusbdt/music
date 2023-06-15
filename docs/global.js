@@ -92,11 +92,24 @@ window.silence_off = _ => {
 	main_gain.gain.setTargetAtTime(1, audio.currentTime, .1);
 };
 
-window.start_audio = _ => {
-	if (gain === null) {
-		gain = audio.createGain();
-		gain.connect(main_gain);
-	}
+let stop_page_audio = null;
+
+window.start_audio = (new_stop_page_audio = null) => {
+	return new Promise(resolve => {
+		if (stop_page_audio !== null) {
+			stop_page_audio.then(_ => {
+				stop_page_audio = new_stop_page_audio;
+				gain = audio.createGain();
+				gain.connect(main_gain);
+				resolve();
+			});
+		} else {
+			stop_page_audio = new_stop_page_audio;
+			gain = audio.createGain();
+			gain.connect(main_gain);
+			resolve();
+		}		
+	});
 };
 
 window.stop_audio = _ => {
@@ -133,7 +146,6 @@ c_tone.prototype.start = function() {
 		this.g = audio.createGain();
 		this.g.connect(gain);
 		this.g.gain.value = 0;
-
 		const merger = new ChannelMergerNode(audio);
 		merger.connect(this.g);
 		const o_left  = audio.createOscillator();
@@ -143,12 +155,7 @@ c_tone.prototype.start = function() {
 		o_left.frequency.value = this.f; 
 		o_right.frequency.value = this.f + this.b;
 		o_left.start();
-		o_right.start();    
-		
-//		this.o = audio.createOscillator();
-//		this.o.frequency.value = this.f;
-//		this.o.start();
-//		this.o.connect(this.g);
+		o_right.start();
 	}
 	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .1);
 };
@@ -206,21 +213,38 @@ window.adjust_canvas = _ => {
 	canvas.style.top  = top ;
 	ctx.setTransform(scale, 0, 0, scale, 0, 0);
 	
-	click_test_canvas.width  = design_width; 
-	click_test_canvas.height = design_height;
+	click_test_canvas.width  = design_width / 4; 
+	click_test_canvas.height = design_height / 4;
     click_test_ctx.setTransform(1, 0, 0, 1, 0, 0);
 };
 
-window.addEventListener('resize', adjust_canvas);
+window.on_resize = null; // should set when page starts
+
+window.addEventListener('resize', _ => {
+	adjust_canvas();
+	if (on_resize !== null) on_resize();
+});
 
 adjust_canvas();
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// click test 
+// click handling 
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+window.on_click  = null; // should set when page starts
+window.click_x   = null;
+window.click_y   = null;
+
+canvas.addEventListener('click', e => {
+	init_audio();
+    click_x = (e.pageX - left) / scale;
+	click_y = (e.pageY - top ) / scale;
+	if (on_click !== null) on_click();
+});
+
+// pixel perfect click detection
 window.click_test = (images, x = 0, y = 0, s = 1) => {
 	if (!Array.isArray(images)) images = [images];
 	for (let i = 0; i < images.length; ++i) {
@@ -237,11 +261,11 @@ window.click_test = (images, x = 0, y = 0, s = 1) => {
 	    const sHeight = image.height ;
 	    const dWidth  = sWidth * s   ;
 	    const dHeight = sHeight * s  ;
-		click_test_ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
+		click_test_ctx.drawImage(image, sx, sy, sWidth, sHeight, dx/4, dy/4, dWidth/4, dHeight/4);		
 	}
     const image_data = click_test_ctx.getImageData(0, 0, click_test_canvas.width, click_test_canvas.height);
-    let int_x = Math.floor(click_x);
-    let int_y = Math.floor(click_y);
+    let int_x = Math.floor(click_x / 4);
+    let int_y = Math.floor(click_y / 4);
     const i = Math.floor((image_data.width * int_y + int_x) * 4);
 	return image_data.data[i] !== 0;
 };
@@ -1230,29 +1254,30 @@ window.silence_button = checkbox2(
 	)
 );
 
-window.on_click  = null; // set in page start func
-window.click_x   = null;
-window.click_y   = null;
+// window.on_click  = null; // set in page start func
+// window.click_x   = null;
+// window.click_y   = null;
 
-window.on_resize = null; // set in page start func
+// window.on_resize = null; // set in page start func
 
-canvas.addEventListener('click', e => {
-    click_x = (e.pageX - left) / scale;
-	click_y = (e.pageY - top ) / scale;
-	if (on_click !== null) on_click();
-});
+// canvas.addEventListener('click', e => {
+// 	init_audio();
+//     click_x = (e.pageX - left) / scale;
+// 	click_y = (e.pageY - top ) / scale;
+// 	if (on_click !== null) on_click();
+// });
 
-addEventListener('resize', _ => {
-	if (on_resize !== null) on_resize();
-});
+// addEventListener('resize', _ => {
+// 	if (on_resize !== null) on_resize();
+// });
 
-window.start_page = (draw_list, click_list, start_list = null, pathname = null) => {
-	on_resize = _ => draw_list.forEach(o => o.draw());
-	on_click  = _ => click_list.some(o => o.click());
-	if (start_list !== null) start_list.forEach(o => o.start());
-	if (pathname !== null) set_item('page', pathname);
-	draw();
-}
+// window.start_page = (draw_list, click_list, start_list = null, pathname = null) => {
+// 	on_resize = _ => draw_list.forEach(o => o.draw());
+// 	on_click  = _ => click_list.some(o => o.click());
+// 	if (start_list !== null) start_list.forEach(o => o.start());
+// 	if (pathname !== null) set_item('page', pathname);
+// 	draw();
+// }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //

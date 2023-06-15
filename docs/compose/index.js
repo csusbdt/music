@@ -18,9 +18,6 @@ c_img.prototype.draw = function(x = 0, y = 0) {
 const img   = (  n, x = 0, y = 0) => new c_img("./compose/images/" + n + ".png", x, y);
 const click = (img, x = 0, y = 0) => click_test(img.image, img.x + x, img.y + y);
 
-// const waver_tone_0 = tone(PHI, 1, 0);
-// const waver_tone_0 = tone(scale(6, 240, 0), 1, 3);
-
 const red    = img("red"   ); 
 const green  = img("green" ); 
 const blue   = img("blue"  ); 
@@ -29,34 +26,79 @@ const white  = img("white" );
 const black  = img("black" ); 
 const border = img("border"); 
 
-const row_y = row => 30 + 130 * row;
-const col_x = col =>  0 + 130 * col;
+const cols = 7;
+const rows = 6;
 
-const draw_borders = _ => {
-	for (let col = 0; col < 5; ++col) {
-		for (let row = 0; row < 5; ++row) {
-			border.draw(col_x(col), row_y(row));
-		}		
+const row_y = row => 14 + 130 * row;
+const col_x = col => 0 + 122 * col;
+
+const waves = [];
+
+
+// const waver_tone_0 = tone(PHI, 1, 0);
+// const waver_tone_0 = tone(scale(6, 240, 0), 1, 3);
+
+
+
+const click_buttons = _ => {
+	for (let col = 0; col < cols; ++col) {
+		for (let row = 0; row < rows; ++row) {
+			if (click(red, col_x(col), row_y(row))) {
+				log("hi");
+				on_resize();
+				return;
+			}
+		}
 	}
-}
+};
 
 const draw_colors = _ => {
-	for (let col = 0; col < 5; ++col) {
-		for (let row = 0; row < 5; ++row) {
+	for (let col = 0; col < cols; ++col) {
+		for (let row = 0; row < rows; ++row) {
 			white.draw(col_x(col), row_y(row));
 		}
 	}
 };
 
-const click_all = _ => {
-	for (let col = 0; col < 5; ++col) {
-		for (let row = 0; row < 5; ++row) {
-			if (click(red, col_x(col), row_y(row))) {
-				return true;
-			}
-		}
+const draw_borders = _ => {
+	for (let col = 0; col < cols; ++col) {
+		for (let row = 0; row < rows; ++row) {
+			border.draw(col_x(col), row_y(row));
+		}		
 	}
-	return false;
+};
+
+const stop_waves = _ => {
+	return new Promise(resolve => {
+		assert(gain !== null);
+		gain.gain.setTargetAtTime(0, audio.currentTime, .1);
+		setTimeout(_ => {
+			gain.disconnect();
+			gain = null;
+			waves.length = 0;
+			resolve();
+		}, 120);
+	});
+};
+
+const start_waves = _ => {
+	for (let col = 0; col < cols; ++col) {
+		waves.push(tone(120, 1, 3));
+	}
+};
+
+const click_page = _ => {
+	if (back_button.click()) return start_home();
+	if (waves.length === 0) {
+		on_click = null;
+		start_audio(stop_waves).then(_ => {
+			start_waves();
+			on_click = click_page;
+			click_buttons();
+		});
+	} else {
+		click_buttons();
+	}
 };
 
 const draw_page = _ => {
@@ -66,22 +108,9 @@ const draw_page = _ => {
 	draw_borders();
 };
 
-const click_page = _ => {
-	if (back_button.click()) return exit_page();
-	if (click_all()) on_resize();
-};
-
-const exit_page = _ => {
-	stop_audio().then(start_home);
-};
-
-const start_page = _ => {
-};
-
 export default _ => {
-	set_item('page', "./compose/index.js");	
+	set_item('page', "./compose/index.js");
+	on_click = click_page;	
 	on_resize = draw_page;
-	on_click  = click_page;
-	start_page();
 	on_resize();
 };
