@@ -77,79 +77,92 @@ window.init_audio = _ => {
 	if (audio.state === "suspended") {
 		audio.resume();
 	}
-	if (main_gain === null) {
-		main_gain = audio.createGain();
-		main_gain.gain.value = 1;
-		main_gain.connect(audio.destination);
+	// if (main_gain === null) {
+	// 	main_gain = audio.createGain();
+	// 	main_gain.gain.value = 1;
+	// 	main_gain.connect(audio.destination);
+	// }
+	if (gain === null) {
+		gain = audio.createGain();
+		gain.gain.value = 1;
+		gain.connect(audio.destination);
 	}
 };
 
 window.silence_on = _ => {
-	main_gain.gain.setTargetAtTime(0, audio.currentTime, .1);
+	gain.gain.setTargetAtTime(0, audio.currentTime, .1);
 };
 
-window.silence_off = _ => {
-	main_gain.gain.setTargetAtTime(1, audio.currentTime, .1);
+ window.silence_off = _ => {
+	gain.gain.setTargetAtTime(1, audio.currentTime, .1);
 };
 
 window.stop_page_audio = null;
 
-window.start_audio = _ => {
-	assert(gain === null);
-	gain = audio.createGain();
-	gain.connect(main_gain);
-};
+// window.start_audio = _ => {
+// 	assert(gain === null);
+// 	gain = audio.createGain();
+// 	gain.connect(main_gain);
+// };
 
-window.stop_audio = (cb = null) => {
-	assert(gain !== null);
-	gain.gain.setTargetAtTime(0, audio.currentTime, .05);
-	setTimeout(_ => {
-		gain.disconnect();
-		gain = null;
-		if (cb !== null) cb();
-	}, 60);
-};
+// window.stop_audio = _ => {
+// 	assert(gain !== null);
+// 	gain.gain.setTargetAtTime(0, audio.currentTime, .1);
+// 	let g = gain;
+// 	gain = null;
+// 	setTimeout(_ => g.disconnect(), 120);
+// };
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// c_tone
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
+// window.stop_audio = (cb = null) => {
+// 	assert(gain !== null);
+// 	gain.gain.setTargetAtTime(0, audio.currentTime, .05);
+// 	setTimeout(_ => {
+// 		gain.disconnect();
+// 		gain = null;
+// 		if (cb !== null) cb();
+// 	}, 60);
+// };
 
-function c_tone(f, v = 1, b = 0) {
-	this.f = f;
-	this.v = v;
-	this.b = b;
-	this.g = null;
-}
+// ///////////////////////////////////////////////////////////////////////////////////////////////
+// //
+// // c_tone
+// //
+// ///////////////////////////////////////////////////////////////////////////////////////////////
 
-c_tone.prototype.start = function() {
-	if (this.g === null) {
-		this.g = audio.createGain();
-		this.g.connect(gain);
-		this.g.gain.value = 0;
-		const merger = new ChannelMergerNode(audio);
-		merger.connect(this.g);
-		const o_left  = audio.createOscillator();
-		const o_right = audio.createOscillator();
-		o_left.connect(merger, 0, 0);
-		o_right.connect(merger, 0, 1);
-		o_left.frequency.value = this.f; 
-		o_right.frequency.value = this.f + this.b;
-		o_left.start();
-		o_right.start();
-	}
-	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .1);
-};
+// function c_tone(f, v = 1, b = 0) {
+// 	this.f = f;
+// 	this.v = v;
+// 	this.b = b;
+// 	this.g = null;
+// }
 
-c_tone.prototype.stop = function() {
-	if (this.g !== null) {
-		this.g.gain.setTargetAtTime(0, audio.currentTime, .1);
-		this.g = null;
-	}
-};
+// c_tone.prototype.start = function(cb) {
+// 	if (this.g === null) {
+// 		this.g = audio.createGain();
+// 		this.g.connect(gain);
+// 		this.g.gain.value = 0;
+// 		const merger = new ChannelMergerNode(audio);
+// 		merger.connect(this.g);
+// 		const o_left  = audio.createOscillator();
+// 		const o_right = audio.createOscillator();
+// 		o_left.connect(merger, 0, 0);
+// 		o_right.connect(merger, 0, 1);
+// 		o_left.frequency.value = this.f; 
+// 		o_right.frequency.value = this.f + this.b;
+// 		o_left.start();
+// 		o_right.start();
+// 	}
+// 	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .1);
+// };
 
-window.tone = (f, v = 1, b = 0) => new c_tone(f, v, b);
+// c_tone.prototype.stop = function() {
+// 	if (this.g !== null) {
+// 		this.g.gain.setTargetAtTime(0, audio.currentTime, .1);
+// 		this.g = null;
+// 	}
+// };
+
+// window.tone = (f, v = 1, b = 0) => new c_tone(f, v, b);
 
 ///////////////////////////////////////////////////////////////////////////////
 //

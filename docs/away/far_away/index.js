@@ -1,69 +1,146 @@
 import start_away from "../index.js";
 
-// tones
+function c_tone(f, b = 0) {
+	this.f = f   ;
+	this.b = b   ;
+	this.g = null;
+}
 
-const tone_0 = tone(PHI             , 1, 1);
-const tone_1 = tone(scale(6, 100, 0), 1, 3);
-const tone_2 = tone(scale(6, 100, 1), 1, 3);
-const tone_3 = tone(scale(6, 100, 2), 1, 3);
-const tone_4 = tone(scale(6, 100, 3), 1, 3);
-const tone_5 = tone(scale(6, 100, 4), 1, 3);
-const tone_6 = tone(scale(6, 100, 5), 1, 3);
+c_tone.prototype.start = function() {
+	assert(this.g === null);
+	this.g = audio.createGain();
+	this.g.connect(gain);
+	this.g.gain.value = 0;
+	const merger = new ChannelMergerNode(audio);
+	merger.connect(this.g);
+	const o_left  = audio.createOscillator();
+	const o_right = audio.createOscillator();
+	o_left.connect(merger, 0, 0);
+	o_right.connect(merger, 0, 1);
+	o_left.frequency.value = this.f; 
+	o_right.frequency.value = this.f + this.b;
+	o_left.start();
+	o_right.start();
+	this.g.gain.setTargetAtTime(1, audio.currentTime, .1);
+	return this;
+};
 
-// buttons
+c_tone.prototype.stop = function() {
+	assert(this.g !== null);
+	this.g.gain.setTargetAtTime(0, audio.currentTime, .05);
+	let g = this.g;
+	this.g = null;
+	setTimeout(_ => g.disconnect(), 1000);
+};
 
-const path = n => "./away/far_away/images/" + n + ".png";
-const pair = (first, second, on_click) => objs([img(path(first)), img(path(second))], on_click);
+const tone = (f, b = 0) => new c_tone(f, b);
 
-const on_0   = pair("white_0", "border_0", _ => tone_0.stop());
-const on_1   = pair("white_1", "border_1", _ => tone_1.stop());
-const on_2   = pair("white_2", "border_2", _ => tone_2.stop());
-const on_3   = pair("white_3", "border_3", _ => tone_3.stop());
-const on_4   = pair("white_4", "border_4", _ => tone_4.stop());
-const on_5   = pair("white_5", "border_5", _ => tone_5.stop());
-const on_6   = pair("white_6", "border_6", _ => tone_6.stop());
+const tones = [
+	tone(PHI             , 1),
+	tone(scale(6, 100, 0), 3),
+	tone(scale(6, 100, 1), 3),
+	tone(scale(6, 100, 2), 3),
+	tone(scale(6, 100, 3), 3),
+	tone(scale(6, 100, 4), 3),
+	tone(scale(6, 100, 5), 3)
+];
 
-const off_0  = pair("green_0", "border_0", _ => tone_0.start());
-const off_1  = pair("green_1", "border_1", _ => tone_1.start());
-const off_2  = pair("green_2", "border_2", _ => tone_2.start());
-const off_3  = pair("green_3", "border_3", _ => tone_3.start());
-const off_4  = pair("green_4", "border_4", _ => tone_4.start());
-const off_5  = pair("green_5", "border_5", _ => tone_5.start());
-const off_6  = pair("green_6", "border_6", _ => tone_6.start());
+function c_img(src) {
+    this.image     = new Image();
+    this.image.src = src;
+}
 
-const obj_0 = click_seq([off_0, on_0]);
-const obj_1 = click_seq([off_1, on_1]);
-const obj_2 = click_seq([off_2, on_2]);
-const obj_3 = click_seq([off_3, on_3]);
-const obj_4 = click_seq([off_4, on_4]);
-const obj_5 = click_seq([off_5, on_5]);
-const obj_6 = click_seq([off_6, on_6]);
+c_img.prototype.draw = function() {	
+	if (this.image.complete) {
+		ctx.drawImage(this.image, 0, 0);
+	} else {
+		this.image.onload = on_resize;
+	}
+};
 
-const buttons = [ obj_0, obj_1, obj_2, obj_3, obj_4, obj_5, obj_6 ];
+const img = n => new c_img("./away/far_away/images/" + n + ".png");
+const click = img => click_test(img.image);
 
-// control
+const borders = [
+	img("border_0"),
+	img("border_1"),
+	img("border_2"),
+	img("border_3"),
+	img("border_4"),
+	img("border_5"),
+	img("border_6")
+];
 
-const draw_list  = [ bg_blue, silence_button, back_button, ...buttons ];
-const click_list = [          silence_button, back_button, ...buttons ];
-const start_list = [                                       ...buttons ];
+const colors = [
+	[ img("white_0"), img("green_0") ],
+	[ img("white_1"), img("green_1") ],
+	[ img("white_2"), img("green_2") ],
+	[ img("white_3"), img("green_3") ],
+	[ img("white_4"), img("green_4") ],
+	[ img("white_5"), img("green_5") ],
+	[ img("white_6"), img("green_6") ]
+];
 
-const exit_page = _ => {
-	buttons.forEach(o => {
-		if (o.i === 1) {
-			o.objs[1].on_click();
-			o.i = 0;
+const state = Array(borders.length).fill(0);
+
+const is_playing = _ => state.some(i => i === 1);
+
+const stop_page_audio = _ => {
+	assert(on_resize !== draw_page); 
+	assert(is_playing());
+	window.stop_page_audio = null;
+	for (let i = 0; i < state.length; ++i) {
+		if (state[i] === 1) {
+			state[i] = 0;
+			tones[i].stop();
 		}
-	});
-	stop_audio().then(start_away);
+	}
+};
+
+const click_page = _ => {
+	if (back_button.click()) {
+		on_click = null;
+		if (is_playing()) {
+			window.stop_page_audio = stop_page_audio;
+		} 
+		start_away();
+	} else for (let i = 0; i < state.length; ++i) {
+		if (click(colors[i][0])) {
+			if (!is_playing()) {
+				if (window.stop_page_audio !== null) {
+					window.stop_page_audio();
+				}
+			}
+			if (state[i] === 0) {
+				state[i] = 1;
+				tones[i].start();
+			} else {
+				state[i] = 0;
+				tones[i].stop();
+			}
+			on_resize();
+			return;
+		}
+	}
+};
+
+const draw_page = _ => {
+	bg_blue.draw();
+	for (let i = 0; i < state.length; ++i) {
+		colors[i][state[i]].draw();
+		borders[i].draw();
+	}
+	back_button.draw();
+	silence_button.draw();
 };
 
 export default _ => {
+	if (is_playing()) {
+		assert(window.stop_page_audio === stop_page_audio);
+		window.stop_page_audio = null;
+	}
 	set_item('page', "./away/far_away/index.js");
-	on_resize = _ => draw_list.forEach(o => o.draw());
-	on_click = _ => {
-		if (back_button.click()) exit_page();
-		else if (click_list.some(o => o.click())) on_resize();
-	};
-	start_list.forEach(o => o.start());
+	on_resize = draw_page;
+	on_click = click_page;
 	on_resize();
 };

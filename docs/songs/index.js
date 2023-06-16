@@ -54,55 +54,13 @@ const draw_page = _ => {
 	back_button.draw();
 };
 
-const stop_song = (cb = null) => {
-	assert(song_i !== null);
-	assert(on_resize === draw_page);
-	assert(window.stop_page_audio === null);
-	on_click = null;
-	songs[song_i].stop(_ => {
-		song_i = null;
-		on_click = click_page;
-		if (cb !== null) cb();
-		else on_resize();
-	});
-};
-
-const start_song = i => {
-	assert(i !== undefined);
-	assert(on_click === click_page);
-	assert(window.stop_page_audio !== stop_page_audio);
-	if (window.stop_page_audio !== null) {
-		on_click = null;
-		window.stop_page_audio(_ => {
-			assert(window.stop_page_audio === null);
-			assert(gain === null);
-			on_click = click_page;
-			start_song(i);
-		});
-	} else if (song_i !== null) {
-		assert(window.stop_page_audio === null);		
-		on_click = null;
-		stop_song(_ => {
-			assert(song_i === null);
-			on_click = click_page;
-			start_song(i);
-		});
-	} else {
-		song_i = i;
-		songs[song_i].start();
-		on_resize();
-	}
-};
-
-const stop_page_audio = (cb = null) => {
+const stop_page_audio = _ => {
 	assert(on_resize !== draw_page);
 	assert(song_i !== null);
 	window.stop_page_audio = null;
-	songs[song_i].stop(_ => {
-		song_i = null;
-		if (cb !== null) cb();
-	});
-};
+	songs[song_i].stop();
+	song_i = null;
+}; 
 
 const click_page = _ => {
 	if (back_button.click()) {
@@ -114,8 +72,24 @@ const click_page = _ => {
 	} else if (silence_button.click()) return on_resize();
 	else for (let i = 0; i < reds.length; ++i) {
 		if (click(reds[i])) {
-			if (song_i === i) stop_song();
-			else start_song(i);
+			if (window.stop_page_audio !== null) {
+				window.stop_page_audio();
+//				assert(window.stop_page_audio === null);
+//				assert(gain === null);
+			}
+			if (song_i === i) {
+				songs[song_i].stop();
+				song_i = null;
+//				stop_audio();
+			} else if (song_i !== null) {
+				songs[song_i].stop();
+				song_i = i;
+				songs[song_i].start();
+			} else {
+				song_i = i;
+				songs[song_i].start();
+			}
+			on_resize();
 		 	return;
 		}
 	}
@@ -124,7 +98,6 @@ const click_page = _ => {
 export default _ => {
 	if (song_i !== null) {
 		assert(window.stop_page_audio === stop_page_audio);
-		assert(gain !== null);
 		window.stop_page_audio = null;
 	}	
 	set_item('page', "./songs/index.js");

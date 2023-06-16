@@ -116,9 +116,18 @@ const click_buttons = _ => {
 	for (let c = 0; c < cols; ++c) {
 		for (let r = 0; r < rows; ++r) {
 			if (click(red, col_x(c), row_y(r))) {
-				next[r](c);
-				on_resize();
-				return true;
+				if (waves.length === 0) {
+					on_click = null;
+					start_waves(_ => {
+						on_click = page_click;
+						next[r](c);
+						on_resize();
+					});
+				} else {
+					next[r](c);
+					on_resize();
+				}
+				return;
 			}
 		}
 	}
@@ -148,23 +157,28 @@ const stop_waves = (cb = null) => {
 	stop_audio(cb);
 };
 
-const start_waves = _ => {
+const start_waves = cb => {
+	assert(cb !== undefined);
 	assert(waves.length === 0);
 	assert(on_resize = draw_page);
-	assert(on_click === click_page);
 	if (window.stop_page_audio !== null) {
 		on_click = null;
 		window.stop_page_audio(_ => {
 			assert(window.stop_page_audio === null);
+			assert(gain === null);
 			on_click = click_page;
-			start_waves();
+			start_waves(cb);
 		});
 	} else {
 		start_audio();
 		for (let col = 0; col < cols; ++col) {
+
+// HERE
+///////////////////////////////////////////////////////////////////////////////////////////	
 			waves.push(tone(120, 1, 3));
 		}
-		click_page();
+		cb();
+//		click_page();
 	}
 };
 

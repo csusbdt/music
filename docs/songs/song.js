@@ -9,6 +9,7 @@ function c_song(notes, ramp_up = 0, ramp_down = 0, binaural = 0) {
 	this.ramp_up   = ramp_up  ;
 	this.ramp_down = ramp_down;
 	this.binaural  = binaural ;
+	this.g         = null     ;
 	this.merger    = null     ;
 	this.o_left    = null     ;
 	this.o_right   = null     ;
@@ -29,10 +30,10 @@ c_song.prototype.play_notes = function() {
 		this.o_left .frequency.setValueAtTime(f                , audio.currentTime + t);
 		this.o_right.frequency.setValueAtTime(f + this.binaural, audio.currentTime + t);
         if (this.ramp_up > 0 || this.ramp_down > 0) {
-    		gain.gain.setTargetAtTime(v, audio.currentTime + t +     this.ramp_up  , .1);
-    		gain.gain.setTargetAtTime(0, audio.currentTime + t + d - this.ramp_down, .1);
+    		this.g.gain.setTargetAtTime(v, audio.currentTime + t +     this.ramp_up  , .1);
+    		this.g.gain.setTargetAtTime(0, audio.currentTime + t + d - this.ramp_down, .1);
         } else {
-    		gain.gain.setTargetAtTime(v, audio.currentTime + t, .1);
+    		this.g.gain.setTargetAtTime(v, audio.currentTime + t, .1);
         }
 		t += d;
 	}
@@ -40,9 +41,13 @@ c_song.prototype.play_notes = function() {
 
 c_song.prototype.start = function() {
 	assert(this.loop_id === null);
-	start_audio();
+	assert(gain !== null);
+	this.g = audio.createGain();
+	this.g.gain.value = 0;
+	this.g.gain.setTargetAtTime(1, audio.currentTime, .05);
+	this.g.connect(gain);
 	this.merger = new ChannelMergerNode(audio);
-	this.merger.connect(gain);
+	this.merger.connect(this.g);
 	this.o_left  = audio.createOscillator();
 	this.o_right = audio.createOscillator();
 	this.o_left.connect(this.merger, 0, 0);
@@ -55,18 +60,20 @@ c_song.prototype.start = function() {
 	this.play_notes();
 };
 
-c_song.prototype.stop = function(cb) {
+c_song.prototype.stop = function() {
 	assert(this.loop_id !== null);
-	assert(gain !== null);
 	this.o_left.frequency.cancelScheduledValues(audio.currentTime);
 	this.o_right.frequency.cancelScheduledValues(audio.currentTime);
-	gain.gain.cancelScheduledValues(audio.currentTime);	
+	this.g.gain.cancelScheduledValues(audio.currentTime);	
 	clearInterval(this.loop_id);
+	this.g.gain.setTargetAtTime(0, audio.currentTime, .05);
+	let g = this.g;
+	setTimeout(_ => g.disconnect(), 1000);
 	this.loop_id = null;
+	this.g       = null;
 	this.merger  = null;
 	this.o_left  = null;
 	this.o_right = null;
-	stop_audio(cb);
 };
 
 const song = (notes, ramp_up = 0, ramp_down = 0, binaural = 0) => {
