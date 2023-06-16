@@ -54,32 +54,6 @@ const draw_page = _ => {
 	back_button.draw();
 };
 
-// const stop_song = (cb = null) => {
-// 	assert(song_i !== null);
-// 	assert(on_click === click_page);
-// 	on_click = null
-// 	songs[song_i].stop(_ => {
-// 		song_i = null;
-// 		on_click = click_page;
-// 		if (cb !== null) cb();
-// 	});
-// };
-
-// const start_song = (cb = null) => {
-// 	assert(song_i !== null);
-// 	assert(on_click === click_page);
-// 	if (window.stop_page_audio !== null) {
-// 		on_click = null;
-// 		window.stop_page_audio(_ => {
-// 			assert(window.stop_page_audio === null);
-// 			on_click = click_page;
-// 			songs[song_i].start();
-// 		});
-// 	} else {
-// 		songs[song_i].start();
-// 	}
-// };
-
 const stop_song = (cb = null) => {
 	assert(song_i !== null);
 	assert(on_click === click_page);

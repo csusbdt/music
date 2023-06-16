@@ -26,6 +26,8 @@ const white  = img("white" );
 const black  = img("black" ); 
 const border = img("border"); 
 
+const colors = [ white, red, green, blue, yellow ];
+
 const cols = 7;
 const rows = 6;
 
@@ -34,31 +36,34 @@ const col_x = col => 0 + 122 * col;
 
 const waves = [];
 
-
 // const waver_tone_0 = tone(PHI, 1, 0);
 // const waver_tone_0 = tone(scale(6, 240, 0), 1, 3);
 
+const a = [];
 
-const click_buttons = _ => {
-	for (let col = 0; col < cols; ++col) {
-		for (let row = 0; row < rows; ++row) {
-			if (click(red, col_x(col), row_y(row))) {
-				waves[0].start();
+for (let c = 0; c < cols; ++c) {
+	const row = [];
+	for (let r = 0; r < rows; ++r) row.push(0);
+	a.push(row);
+};
+
+const click_buttons = _ => {	
+	for (let c = 0; c < cols; ++c) {
+		for (let r = 0; r < rows; ++r) {
+			if (click(red, col_x(c), row_y(r))) {
+				if (++a[c][r] === colors.length) a[c][r] = 0;
 				on_resize();
-				return;
+				return true;
 			}
 		}
 	}
+	return false;
 };
 
 const draw_colors = _ => {
-	for (let col = 0; col < cols; ++col) {
-		for (let row = 0; row < rows; ++row) {
-			if (waves.length === 0) {
-				white.draw(col_x(col), row_y(row));			
-			} else {
-				yellow.draw(col_x(col), row_y(row));
-			}
+	for (let c = 0; c < cols; ++c) {
+		for (let r = 0; r < rows; ++r) {
+			colors[a[c][r]].draw(col_x(c), row_y(r));			
 		}
 	}
 };
