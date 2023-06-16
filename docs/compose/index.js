@@ -26,32 +26,97 @@ const white  = img("white" );
 const black  = img("black" ); 
 const border = img("border"); 
 
-const colors = [ white, red, green, blue, yellow ];
+const volume_colors   = [ blue, white, green, red, yellow ];
+const octave_colors   = [ white, green, red, yellow ];
+const step_colors     = [ white, green, red, yellow ];
+const halfstep_colors = [ white, red ];
+const waver_colors    = [ white, green, red, yellow ];
+const binaural_colors = [ white, green, red, yellow ];
+const duration_colors = [ white, green, red, yellow ];
 
-const cols = 7;
-const rows = 6;
-
-const row_y = row => 14 + 130 * row;
-const col_x = col => 0 + 122 * col;
+const colors = [
+	volume_colors  ,
+	octave_colors  ,
+	step_colors    ,
+	halfstep_colors,
+	waver_colors   ,
+	binaural_colors,
+	duration_colors
+];
 
 const waves = [];
 
 // const waver_tone_0 = tone(PHI, 1, 0);
 // const waver_tone_0 = tone(scale(6, 240, 0), 1, 3);
 
-const a = [];
+const cols = 7;
 
-for (let c = 0; c < cols; ++c) {
-	const row = [];
-	for (let r = 0; r < rows; ++r) row.push(0);
-	a.push(row);
+const volume    = Array(cols).fill(0);
+const octave    = Array(cols).fill(0);
+const step      = Array(cols).fill(0);
+const halfstep  = Array(cols).fill(0);
+const waver     = Array(cols).fill(0);
+const binaural  = Array(cols).fill(0);
+const duration  = Array(cols).fill(0);
+
+const state = [
+	volume  , 
+	octave  , 
+	step    , 
+	halfstep, 
+	waver   , 
+	binaural, 
+	duration	
+];
+
+const rows = state.length;
+
+const next_volume = c => {
+	if (++volume[c] === volume_colors.length) volume[c] = 0;
 };
 
-const click_buttons = _ => {	
+const next_octave = c => {
+	if (++octave[c] === octave_colors.length) octave[c] = 0;
+};
+
+const next_step = c => {
+	if (++step[c] === step_colors.length) step[c] = 0;
+};
+
+const next_halfstep = c => {
+	if (++halfstep[c] === halfstep_colors.length) halfstep[c] = 0;
+};
+
+const next_waver = c => {
+	if (++waver[c] === waver_colors.length) waver[c] = 0;
+};
+
+const next_binaural = c => {
+	if (++binaural[c] === binaural_colors.length) binaural[c] = 0;
+};
+
+const next_duration = c => {
+	if (++duration[c] === duration_colors.length) duration[c] = 0;
+};
+
+const next = [
+	next_volume  , 
+	next_octave  , 
+	next_step    , 
+	next_halfstep, 
+	next_waver   , 
+	next_binaural, 
+	next_duration
+];
+
+const row_y = row => 0 + 110 * row;
+const col_x = col => 0 + 122 * col;
+
+const click_buttons = _ => {
 	for (let c = 0; c < cols; ++c) {
 		for (let r = 0; r < rows; ++r) {
 			if (click(red, col_x(c), row_y(r))) {
-				if (++a[c][r] === colors.length) a[c][r] = 0;
+				next[r](c);
 				on_resize();
 				return true;
 			}
@@ -63,7 +128,7 @@ const click_buttons = _ => {
 const draw_colors = _ => {
 	for (let c = 0; c < cols; ++c) {
 		for (let r = 0; r < rows; ++r) {
-			colors[a[c][r]].draw(col_x(c), row_y(r));			
+			colors[r][state[r][c]].draw(col_x(c), row_y(r));			
 		}
 	}
 };
