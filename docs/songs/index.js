@@ -56,7 +56,7 @@ const draw_page = _ => {
 
 const stop_song = (cb = null) => {
 	assert(song_i !== null);
-	assert(on_click === click_page);
+	assert(on_resize === draw_page);
 	assert(window.stop_page_audio === null);
 	on_click = null;
 	songs[song_i].stop(_ => {
