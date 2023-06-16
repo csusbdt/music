@@ -1,5 +1,46 @@
 import start_home from "../home/index.js";
 
+function c_wave(f, v, b = 0, w = 0) {
+	this.f = f   ;
+	this.v = v   ;
+	this.b = b   ;
+	this.w = w   ;
+	this.g = null;
+}
+
+c_wave.prototype.start = function() {
+	assert(this.g === null);
+	this.g = audio.createGain();
+	this.g.connect(gain);
+	this.g.gain.value = 0;
+	const merger = new ChannelMergerNode(audio);
+	merger.connect(this.g);
+	const o_left  = audio.createOscillator();
+	const o_right = audio.createOscillator();
+	o_left.connect(merger, 0, 0);
+	o_right.connect(merger, 0, 1);
+	o_left.frequency.value = this.f; 
+	o_right.frequency.value = this.f + this.b;
+	o_left.start();
+	o_right.start();
+	const o_w = audio.createOscillator();
+	o_w.frequency.value = this.w;
+	o_w.connect(this.g);
+	o_w.start();
+	this.g.gain.setTargetAtTime(1, audio.currentTime, .1);
+	return this;
+};
+
+c_wave.prototype.stop = function() {
+	assert(this.g !== null);
+	this.g.gain.setTargetAtTime(0, audio.currentTime, .05);
+	let g = this.g;
+	this.g = null;
+	setTimeout(_ => g.disconnect(), 1000);
+};
+
+const wave = (f, v, b = 0, w = 0) => new c_wave(f, v, b, w);
+
 function c_img(src, x = 0, y = 0) {
     this.image     = new Image();
     this.image.src = src;
@@ -45,9 +86,6 @@ const colors = [
 ];
 
 const waves = [];
-
-// const waver_tone_0 = tone(PHI, 1, 0);
-// const waver_tone_0 = tone(scale(6, 240, 0), 1, 3);
 
 const cols = 7;
 
@@ -150,50 +188,39 @@ const draw_borders = _ => {
 	}
 };
 
-const stop_waves = (cb = null) => {
+const stop_waves = _ => {
 	assert(waves.length !== 0);
-	assert(window.stop_page_audio === null);
+	waves.forEach(w => w.stop());
 	waves.length = 0;
-	stop_audio(cb);
 };
 
-const start_waves = cb => {
-	assert(cb !== undefined);
+const start_waves = _ => {
 	assert(waves.length === 0);
 	assert(on_resize = draw_page);
 	if (window.stop_page_audio !== null) {
-		on_click = null;
-		window.stop_page_audio(_ => {
-			assert(window.stop_page_audio === null);
-			assert(gain === null);
-			on_click = click_page;
-			start_waves(cb);
-		});
-	} else {
-		start_audio();
-		for (let col = 0; col < cols; ++col) {
-
-// HERE
-///////////////////////////////////////////////////////////////////////////////////////////	
-			waves.push(tone(120, 1, 3));
-		}
-		cb();
-//		click_page();
+		window.stop_page_audio();
+		assert(window.stop_page_audio === null);
+	}
+	for (let col = 0; col < cols; ++col) {
+		waves.push(wave(scale(6, 100, 0), 1, 3, 0).start());
 	}
 };
 
-const stop_page_audio = (cb = null) => {
+const stop_page_audio = _ => {
 	assert(on_resize !== draw_page); 
 	assert(waves.length !== 0);
 	window.stop_page_audio = null;
-	stop_waves(cb);
+	stop_waves();
 };
 
 const click_page = _ => {
 	if (back_button.click()) {
-		window.stop_page_audio = stop_page_audio;
+		if (waves.length !== 0) {
+			window.stop_page_audio = stop_page_audio;
+		}
 		start_home();
 	} 
+	else if (silence_button.click()) on_resize();
 	else if (waves.length === 0) start_waves();
 	else click_buttons();
 };
@@ -201,6 +228,7 @@ const click_page = _ => {
 const draw_page = _ => {
 	bg_blue.draw();
 	back_button.draw();
+	silence_button.draw();
 	draw_colors();
 	draw_borders();
 };
@@ -208,7 +236,6 @@ const draw_page = _ => {
 export default _ => {
 	if (waves.length !== 0) {
 		assert(window.stop_page_audio === stop_page_audio);
-		assert(gain !== null);
 		window.stop_page_audio = null;
 	}	
 	set_item('page', "./compose/index.js");

@@ -78,8 +78,7 @@ const happy_birthday_notes = [
 	[523.0375702878106,0.5,0.56],
 	[415.13519464688073,0.5,0.56],
 	[391.8354465173056,0.5,0.56],
-	[349.085697024215,0.5,1.12], // fixed
-//	[349.085697024215,0.5,0.56], //
+	[349.085697024215,0.5,1.12],
 	[554.1390026832913,0.5,0.84],
 	[554.1390026832913,0.5,0.28],
 	[523.0375702878106,0.5,0.56],
@@ -95,4 +94,8 @@ const song_2         = song(song_2_notes, 0, 0, 3);
 const song_3         = song(song_3_notes, 0, 0, 3);
 const happy_birthday = song(happy_birthday_notes, 0.02, 0.05, 3);
 
-export { song_0, song_1, song_2, song_3, happy_birthday };
+const songs = [ song_0, song_1, song_2, song_3 ];
+
+//export { song_0, song_1, song_2, song_3, happy_birthday };
+
+export default songs;

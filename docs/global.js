@@ -90,6 +90,9 @@ window.init_audio = _ => {
 };
 
 window.silence_on = _ => {
+	if (window.stop_page_audio !== null) {
+		window.stop_page_audio();
+	}
 	gain.gain.setTargetAtTime(0, audio.currentTime, .1);
 };
 

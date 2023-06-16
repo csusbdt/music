@@ -104,6 +104,8 @@ const click_page = _ => {
 			window.stop_page_audio = stop_page_audio;
 		} 
 		start_away();
+	} else if (silence_button.click()) { 
+		return on_resize();
 	} else for (let i = 0; i < state.length; ++i) {
 		if (click(colors[i][0])) {
 			if (!is_playing()) {

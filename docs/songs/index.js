@@ -1,10 +1,5 @@
 import start_home  from "../home/index.js";
-import { song_0 }  from "./songs.js"      ;
-import { song_1 }  from "./songs.js"      ;
-import { song_2 }  from "./songs.js"      ;
-import { song_3 }  from "./songs.js"      ;
-
-const songs = [ song_0, song_1, song_2, song_3 ];
+import songs       from "./songs.js"      ;
 
 function c_img(src) {
     this.image     = new Image();
@@ -74,13 +69,10 @@ const click_page = _ => {
 		if (click(reds[i])) {
 			if (window.stop_page_audio !== null) {
 				window.stop_page_audio();
-//				assert(window.stop_page_audio === null);
-//				assert(gain === null);
 			}
 			if (song_i === i) {
 				songs[song_i].stop();
 				song_i = null;
-//				stop_audio();
 			} else if (song_i !== null) {
 				songs[song_i].stop();
 				song_i = i;
