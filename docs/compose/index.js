@@ -1,45 +1,11 @@
 import start_home from "../home/index.js";
 
-function c_wave(f, v, b = 0, w = 0) {
-	this.f = f   ;
-	this.v = v   ;
-	this.b = b   ;
-	this.w = w   ;
-	this.g = null;
-}
+const cols = 7;
+const rows = 8;
+const waves = [];
 
-c_wave.prototype.start = function() {
-	assert(this.g === null);
-	this.g = audio.createGain();
-	this.g.connect(gain);
-	this.g.gain.value = 0;
-	const merger = new ChannelMergerNode(audio);
-	merger.connect(this.g);
-	const o_left  = audio.createOscillator();
-	const o_right = audio.createOscillator();
-	o_left.connect(merger, 0, 0);
-	o_right.connect(merger, 0, 1);
-	o_left.frequency.value = this.f; 
-	o_right.frequency.value = this.f + this.b;
-	o_left.start();
-	o_right.start();
-	const o_w = audio.createOscillator();
-	o_w.frequency.value = this.w;
-	o_w.connect(this.g);
-	o_w.start();
-	this.g.gain.setTargetAtTime(1, audio.currentTime, .1);
-	return this;
-};
-
-c_wave.prototype.stop = function() {
-	assert(this.g !== null);
-	this.g.gain.setTargetAtTime(0, audio.currentTime, .05);
-	let g = this.g;
-	this.g = null;
-	setTimeout(_ => g.disconnect(), 1000);
-};
-
-const wave = (f, v, b = 0, w = 0) => new c_wave(f, v, b, w);
+const row_y = row => -12 + 100 * row;
+const col_x = col => 0 + 122 * col;
 
 function c_img(src, x = 0, y = 0) {
     this.image     = new Image();
@@ -67,7 +33,8 @@ const white  = img("white" );
 const black  = img("black" ); 
 const border = img("border"); 
 
-const volume_colors   = [ blue, white, green, red, yellow ];
+const on_colors       = [ blue , green, red ];
+const volume_colors   = [ white, green, red, yellow ];
 const octave_colors   = [ white, green, red, yellow ];
 const step_colors     = [ white, green, red, yellow ];
 const halfstep_colors = [ white, red ];
@@ -76,6 +43,7 @@ const binaural_colors = [ white, green, red, yellow ];
 const duration_colors = [ white, green, red, yellow ];
 
 const colors = [
+	on_colors      ,
 	volume_colors  ,
 	octave_colors  ,
 	step_colors    ,
@@ -85,86 +53,107 @@ const colors = [
 	duration_colors
 ];
 
-const waves = [];
+function c_wave() {
+	this.on_i       = 0;
+	this.duration_i = 0;
+	this.volume_i   = 0;
+	this.octave_i   = 0;
+	this.step_i     = 0;
+	this.halfstep_i = 0;
+	this.waver_i    = 0;
+	this.binaural_i = 0;
+	this.g          = null;
+}
 
-const cols = 7;
-
-const volume    = Array(cols).fill(0);
-const octave    = Array(cols).fill(0);
-const step      = Array(cols).fill(0);
-const halfstep  = Array(cols).fill(0);
-const waver     = Array(cols).fill(0);
-const binaural  = Array(cols).fill(0);
-const duration  = Array(cols).fill(0);
-
-const state = [
-	volume  , 
-	octave  , 
-	step    , 
-	halfstep, 
-	waver   , 
-	binaural, 
-	duration	
-];
-
-const rows = state.length;
-
-const next_volume = c => {
-	if (++volume[c] === volume_colors.length) volume[c] = 0;
+c_wave.prototype.start = function() {
+	assert(this.g === null);
+	this.g = audio.createGain();
+	this.g.connect(gain);
+	this.g.gain.value = 0;
+	const merger = new ChannelMergerNode(audio);
+	merger.connect(this.g);
+	this.o_left  = audio.createOscillator();
+	this.o_right = audio.createOscillator();
+	this.o_left.connect(merger, 0, 0);
+	this.o_right.connect(merger, 0, 1);
+	this.o_left.frequency.value = 0; 
+	this.o_right.frequency.value = 0;
+	this.o_left.start();
+	this.o_right.start();
+	this.o_w = audio.createOscillator();
+	this.o_w.frequency.value = 0;
+	this.o_w.connect(this.g);
+	this.o_w.start();
+//	this.g.gain.setTargetAtTime(0, audio.currentTime, .1);
+	return this;
 };
 
-const next_octave = c => {
-	if (++octave[c] === octave_colors.length) octave[c] = 0;
+c_wave.prototype.stop = function() {
+	assert(this.g !== null);
+	this.g.gain.setTargetAtTime(0, audio.currentTime, .05);
+	let g = this.g;
+	this.g = null;
+	setTimeout(_ => g.disconnect(), 1000);
 };
 
-const next_step = c => {
-	if (++step[c] === step_colors.length) step[c] = 0;
+c_wave.prototype.draw = function(c) {
+	assert(c !== undefined);
+	on_colors      [this.on_i      ].draw(col_x(c), row_y(0));
+	volume_colors  [this.volume_i  ].draw(col_x(c), row_y(1));
+	octave_colors  [this.octave_i  ].draw(col_x(c), row_y(2));
+	step_colors    [this.step_i    ].draw(col_x(c), row_y(3));
+	halfstep_colors[this.halfstep_i].draw(col_x(c), row_y(4));
+	waver_colors   [this.waver_i   ].draw(col_x(c), row_y(5));
+	binaural_colors[this.binaural_i].draw(col_x(c), row_y(6));
+	duration_colors[this.duration_i].draw(col_x(c), row_y(7));
 };
 
-const next_halfstep = c => {
-	if (++halfstep[c] === halfstep_colors.length) halfstep[c] = 0;
+c_wave.prototype.duration = function() {
+	return [.25, .50, .75, 1][this.duration_i];
 };
 
-const next_waver = c => {
-	if (++waver[c] === waver_colors.length) waver[c] = 0;
+c_wave.prototype.update_frequency = function() {
+	const f_left = scale(4, Math.pow(2, this.octave_i) * 60, 2 * this.step_i + this.halfstep_i);
+	const f_right = f_left + [0, 2, 3, 5][this.binaural_i]; 
+	this.o_left.frequency.setTargetAtTime(f_left, audio.currentTime, .1);
+	this.o_right.frequency.setTargetAtTime(f_right, audio.currentTime, .1);
 };
 
-const next_binaural = c => {
-	if (++binaural[c] === binaural_colors.length) binaural[c] = 0;
+c_wave.prototype.next = function(r) {
+	if (r === 0) {
+		if (++this.on_i === 3) this.on_i = 0;
+	} else if (r === 1) {
+		if (++this.volume_i === 4) this.volume_i = 0;
+		const v = [0, 0.33, 0.66, 1][this.volume_i];
+		this.g.gain.setTargetAtTime(v, audio.currentTime, .1);
+	} else if (r === 2) {
+		if (++this.octave === 4) this.octave = 0;
+		this.update_frequency();
+	} else if (r === 3) {
+		if (++this.step_i === 4) this.step_i = 0;
+		this.update_frequency();
+	} else if (r === 4) {
+		if (++this.halfstep_i === 2) this.halfstep_i = 0;
+		this.update_frequency();
+	} else if (r === 5) {
+		if (++this.waver_i === 4) this.waver_i = 0;
+		const w = [0, 2, 3, 5][this.waver_i];
+		this.o_w.frequency.setTargetAtTime(w, audio.currentTime, .1);
+	} else if (r === 6) {
+		if (++this.binaural_i === 4) this.binaural_i = 0;
+		this.update_frequency();
+	} else if (r === 7) {
+		if (++this.duration_i === 4) this.duration_i = 0;
+	}
 };
-
-const next_duration = c => {
-	if (++duration[c] === duration_colors.length) duration[c] = 0;
-};
-
-const next = [
-	next_volume  , 
-	next_octave  , 
-	next_step    , 
-	next_halfstep, 
-	next_waver   , 
-	next_binaural, 
-	next_duration
-];
-
-const row_y = row => 0 + 110 * row;
-const col_x = col => 0 + 122 * col;
 
 const click_buttons = _ => {
 	for (let c = 0; c < cols; ++c) {
 		for (let r = 0; r < rows; ++r) {
 			if (click(red, col_x(c), row_y(r))) {
-				if (waves.length === 0) {
-					on_click = null;
-					start_waves(_ => {
-						on_click = page_click;
-						next[r](c);
-						on_resize();
-					});
-				} else {
-					next[r](c);
-					on_resize();
-				}
+				if (waves.length === 0) start_waves();
+				waves[c].next(r);
+				on_resize();
 				return;
 			}
 		}
@@ -173,9 +162,15 @@ const click_buttons = _ => {
 };
 
 const draw_colors = _ => {
-	for (let c = 0; c < cols; ++c) {
-		for (let r = 0; r < rows; ++r) {
-			colors[r][state[r][c]].draw(col_x(c), row_y(r));			
+	if (waves.length === 0) {
+		for (let c = 0; c < cols; ++c) {
+			for (let r = 0; r < rows; ++r) {
+				white.draw(col_x(c), row_y(r));
+			}
+		}
+	} else {
+		for (let c = 0; c < cols; ++c) {
+			waves[c].draw(c);
 		}
 	}
 };
@@ -202,7 +197,7 @@ const start_waves = _ => {
 		assert(window.stop_page_audio === null);
 	}
 	for (let col = 0; col < cols; ++col) {
-		waves.push(wave(scale(6, 100, 0), 1, 3, 0).start());
+		waves.push(new c_wave().start());
 	}
 };
 
