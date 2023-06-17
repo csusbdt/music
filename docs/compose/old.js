@@ -1,173 +1,5 @@
 import start_home from "../home/index.js";
 
-function c_img(src, cx = 0, cy = 0, cr = null) {
-    this.image     = new Image();
-    this.image.src = src;
-	this.cx         = cx; 
-	this.cy         = cy; 
-	this.cr         = cr;
-}
-
-c_img.prototype.draw = function(x = 0, y = 0) {	
-	if (this.image.complete) {
-		ctx.drawImage(this.image, x, y);
-	} else {
-		this.image.onload = on_resize;
-	}
-};
-
-c_img.prototype.click = function(draw_x = 0, draw_y = 0) {
-	if (!this.image.complete) return false;
-	if (this.r === null) {
-		return will_click(this.image, draw_x, draw_y);
-	} else {
-		const cx = this.cx + draw_x;
-		const cy = this.cy + draw_y;
-		const dx = cx - click_x;
-		const dy = cy - click_y;
-		return dx * dx + dy * dy < this.cr * this.cr;
-	}
-};
-
-const red    = new c_img("./compose/images/red.png"   , 120, 205, 36);
-const green  = new c_img("./compose/images/green.png" , 120, 205, 36);
-const blue   = new c_img("./compose/images/blue.png"  , 120, 205, 36);
-const yellow = new c_img("./compose/images/yellow.png", 120, 205, 36);
-const white  = new c_img("./compose/images/white.png" , 120, 205, 36);
-const border = new c_img("./compose/images/border.png", 120, 205, 36);
-
-function c_button(colors, border, actions, x = 0, y = 0) {
-	if (!Array.isArray(colors)) colors = [colors];
-	this.colors = colors;
-	this.border = border;
-	if (!Array.isArray(actions)) actions = [actions];
-	this.actions = actions;
-	this.x = x;
-	this.y = y;
-	this.i = 0;
-}
-
-c_button.prototype.draw = function() {
-	this.colors[this.i].draw(this.x, this.y);
-	this.border.draw(this.x, this.y);
-};
-
-c_button.prototype.click = function() {
-	if (this.colors[0].click(this.x, this.y)) {
-		if (++this.i === this.colors.length) this.i = 0;
-		this.actions[this.i].call(this);
-		return true;
-	} else {
-		return false;
-	}
-};
-
-function c_wave(v = 0, f = 0, b = 0, w = 0, d = null) {
-	this.v = v;
-	this.f = f;
-	this.b = b;
-	this.w = w;
-	this.d = d; // null=always playing, 0=not playing, otherwise seconds of duration
-	this.g       = null;
-	this.o_left  = null;
-	this.o_right = null;
-	this.o_w     = null;
-	this.id      = null;
-}
-
-c_wave.prototype.start = function() {
-	assert(this.g === null);
-	this.g = audio.createGain();
-	this.g.connect(gain);
-	this.g.gain.value = 0;
-	const merger = new ChannelMergerNode(audio);
-	merger.connect(this.g);
-	this.o_left  = audio.createOscillator();
-	this.o_right = audio.createOscillator();
-	this.o_left.connect(merger, 0, 0);
-	this.o_right.connect(merger, 0, 1);
-	this.o_left.frequency.value = 0; 
-	this.o_right.frequency.value = 0;
-	this.o_left.start();
-	this.o_right.start();
-	this.o_w = audio.createOscillator();
-	this.o_w.frequency.value = 0;
-	this.o_w.connect(this.g);
-	this.o_w.start();
-	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .05);
-	if (this.d !== null) {
-		this.id = setTimeout(function() {
-			this.id = null;
-			this.stop();
-		}.bind(this), this.d * 1000);
-	}
-	return this;
-};
-
-c_wave.prototype.stop = function() {
-	assert(this.g !== null);
-	if (this.id !== null) {
-		clearTimeout(this.id);
-		this.id = null;
-	}
-	this.g.gain.setTargetAtTime(0, audio.currentTime, .05);
-	let g = this.g;
-	this.g = null;
-	setTimeout(_ => g.disconnect(), 1000);
-};
-
-const wave = new c_wave(1, 100, 3, 3, null);
-
-const button = new c_button([blue, red], border, [
-	function() {
-		wave.stop();
-	},
-	function() { 
-		if (window.stop_page_audio !== null) {
-			window.stop_page_audio();
-			assert(window.stop_page_audio === null);
-		}
-		wave.start(); 
-	}
-], 300, 300);
-
-const is_playing = _ => {
-	return wave.g !== null;
-};
-
-const click_page = _ => {
-	if (button.click()) {
-		on_resize();
-	}
-};
-
-const draw_page = _ => {
-	bg_blue.draw();
-	button.draw();
-//	back_button.draw();
-//	silence_button.draw();
-};
-
-const stop_page_audio = _ => {
-	assert(is_playing());
-	window.stop_page_audio = null;
-	wave.stop();
-	assert(!is_playing());
-};
-
-export default _ => {
-	if (is_playing()) {
-		assert(window.stop_page_audio === stop_page_audio);
-		window.stop_page_audio = null;
-	}	
-	set_item('page', "./compose/index.js");
-	on_click = click_page;	
-	on_resize = draw_page;
-	on_resize();
-};
-
-
-/*
 const cols = 7;
 const rows = 8;
 const waves = [];
@@ -175,6 +7,31 @@ const waves = [];
 const row_y = row => -12 + 100 * row;
 const col_x = col => 0 + 122 * col;
 
+function c_img(src, x = 0, y = 0) {
+    this.image     = new Image();
+    this.image.src = src;
+	this.x         = x;
+	this.y         = y;
+}
+
+c_img.prototype.draw = function(x = 0, y = 0) {	
+	if (this.image.complete) {
+		ctx.drawImage(this.image, this.x + x, this.y + y);
+	} else {
+		this.image.onload = on_resize;
+	}
+};
+
+const img   = (  n, x = 0, y = 0) => new c_img("./compose/images/" + n + ".png", x, y);
+const click = (img, x = 0, y = 0) => click_test(img.image, img.x + x, img.y + y);
+
+const red    = img("red"   ); 
+const green  = img("green" ); 
+const blue   = img("blue"  ); 
+const yellow = img("yellow"); 
+const white  = img("white" ); 
+const black  = img("black" ); 
+const border = img("border"); 
 
 const on_colors       = [ blue , green, red ];
 const volume_colors   = [ white, green, red, yellow ];
@@ -359,30 +216,40 @@ const start_waves = _ => {
 		waves.push(new c_wave().start());
 	}
 };
-*/
 
+const stop_page_audio = _ => {
+	assert(on_resize !== draw_page); 
+	assert(waves.length !== 0);
+	window.stop_page_audio = null;
+	stop_waves();
+};
 
+const click_page = _ => {
+	if (back_button.click()) {
+		if (waves.length !== 0) {
+			window.stop_page_audio = stop_page_audio;
+		}
+		start_home();
+	} 
+	else if (silence_button.click()) on_resize();
+	else if (click_buttons()) on_resize();
+};
 
-// const start_page_audio = _ => {
-// 	assert(!playing);
-// 	if (window.stop_page_audio !== null) {
-// 		window.stop_page_audio();
-// 		window.stop_page_audio = stop_page_audio;
-// 	}
-// 	playing = true;
-// };
+const draw_page = _ => {
+	bg_blue.draw();
+	back_button.draw();
+	silence_button.draw();
+	draw_colors();
+	draw_borders();
+};
 
-
-// const click_buttons = _ => {
-// 	if (click_on()) {
-// 		if (window.stop_page_audio !== stop_page_audio && window.stop_page_audio !== null) {
-// 			window.stop_page_audio();
-// 			window.stop_page_audio = stop_page_audio;
-// 		}
-// 		++on_i < 3 || (on_i = 0);
-// 		return true;
-// 	}
-// };
-
-//const next = (i, n) => ++i < n || i = 0;
-
+export default _ => {
+	if (waves.length !== 0) {
+		assert(window.stop_page_audio === stop_page_audio);
+		window.stop_page_audio = null;
+	}	
+	set_item('page', "./compose/index.js");
+	on_click = click_page;	
+	on_resize = draw_page;
+	on_resize();
+};

@@ -65,9 +65,9 @@ window.get_item = (key, _default) => {
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-window.audio   = null;
-let main_gain  = null; // used by silence button
-window.gain    = null; // used by pages
+window.audio     = null;
+window.main_gain = null; // used by page_audio
+window.gain      = null; // used by pages
 
 window.init_audio = _ => {
 	// this function must run in click handler to work on apple hardware
@@ -77,30 +77,31 @@ window.init_audio = _ => {
 	if (audio.state === "suspended") {
 		audio.resume();
 	}
-	// if (main_gain === null) {
-	// 	main_gain = audio.createGain();
-	// 	main_gain.gain.value = 1;
-	// 	main_gain.connect(audio.destination);
-	// }
+	if (main_gain === null) {
+		main_gain = audio.createGain();
+		main_gain.gain.value = 1;
+		main_gain.connect(audio.destination);
+	}
 	if (gain === null) {
 		gain = audio.createGain();
 		gain.gain.value = 1;
-		gain.connect(audio.destination);
+		gain.connect(main_gain);
 	}
 };
 
 window.silence_on = _ => {
-	if (window.stop_page_audio !== null) {
-		window.stop_page_audio();
-	}
-	gain.gain.setTargetAtTime(0, audio.currentTime, .1);
+	// if (window.stop_page_audio !== null) {
+	// 	window.stop_page_audio();
+	// }
+	// gain.gain.setTargetAtTime(0, audio.currentTime, .1);
 };
 
  window.silence_off = _ => {
-	gain.gain.setTargetAtTime(1, audio.currentTime, .1);
+	// gain.gain.setTargetAtTime(1, audio.currentTime, .1);
 };
 
-window.stop_page_audio = null;
+window.stop_page_audio  = null;
+//window.start_page_audio = null;
 
 // window.start_audio = _ => {
 // 	assert(gain === null);
