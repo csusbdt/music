@@ -66,8 +66,8 @@ window.get_item = (key, _default) => {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 window.audio     = null;
-window.main_gain = null; // used by page_audio
-window.gain      = null; // used by pages
+window.main_gain = null; 
+window.gain      = null; 
 
 window.init_audio = _ => {
 	// this function must run in click handler to work on apple hardware
@@ -81,8 +81,6 @@ window.init_audio = _ => {
 		main_gain = audio.createGain();
 		main_gain.gain.value = 1;
 		main_gain.connect(audio.destination);
-	}
-	if (gain === null) {
 		gain = audio.createGain();
 		gain.gain.value = 1;
 		gain.connect(main_gain);

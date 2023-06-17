@@ -86,8 +86,8 @@ c_wave.prototype.start = function() {
 	this.o_right = audio.createOscillator();
 	this.o_left.connect(merger, 0, 0);
 	this.o_right.connect(merger, 0, 1);
-	this.o_left.frequency.value = 0; 
-	this.o_right.frequency.value = 0;
+	this.o_left.frequency.value = this.f; 
+	this.o_right.frequency.value = this.f + this.b;
 	this.o_left.start();
 	this.o_right.start();
 	this.o_w = audio.createOscillator();
