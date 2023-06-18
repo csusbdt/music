@@ -17,15 +17,31 @@ const stop_page_audio_button = new c_button(upper_right_green, upper_right_borde
 let comp_i = null;
 
 const units = [
-	new c_unit(260, 320)
+	new c_unit(260, 320),
+	new c_unit(360, 320),
+	new c_unit(460, 320)
 ];
+
+const is_playing = _ => {
+	return units.some(o => o.wave.g !== null);
+};
+
+const stop_page_audio = _ => {
+	units.forEach(o => o.stop());
+	window.stop_page_audio = null;
+};
 
 const click_page = _ => {
 	if (back_button.click()) {
 		start_select_comp();
 	} else if (stop_page_audio_button.click()) {
-		if (window.stop_page_audio !== null) window.stop_page_audio();
+		if (window.stop_page_audio !== null) {
+			window.stop_page_audio();
+			on_resize();
+		}
+		if (is_playing()) window.stop_page_audio = stop_page_audio;
 	} else if (units.some(o => o.click())) {
+		if (is_playing()) window.stop_page_audio = stop_page_audio;
 		on_resize();
 	}
 };
@@ -39,9 +55,13 @@ const draw_page = _ => {
 	draw(stop_page_audio_button);
 };
 
-export default _comp_i => {
+export default _ => {
+	if (is_playing()) {
+		window.stop_page_audio = stop_page_audio;
+	} else if (window.stop_page_audio !== null) {
+		window.stop_page_audio();
+	}
 	set_item('page', "./comp/comp/index.js");
-	comp_i = _comp_i;
 	on_click = click_page;	
 	on_resize = draw_page;
 	on_resize();
