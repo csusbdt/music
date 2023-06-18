@@ -34,6 +34,7 @@ const green  = new c_img("./compose/images/green.png" , 120, 205, 36);
 const blue   = new c_img("./compose/images/blue.png"  , 120, 205, 36);
 const yellow = new c_img("./compose/images/yellow.png", 120, 205, 36);
 const white  = new c_img("./compose/images/white.png" , 120, 205, 36);
+const black  = new c_img("./compose/images/black.png" , 120, 205, 36);
 const border = new c_img("./compose/images/border.png", 120, 205, 36);
 
 function c_button(colors, border, actions, x = 0, y = 0) {
@@ -74,6 +75,18 @@ function c_wave(v = 0, f = 0, b = 0, w = 0, d = null) {
 	this.o_w     = null;
 	this.id      = null;
 }
+
+c_wave.prototype.volume = function(v) {
+	this.v = v;
+	if (this.g === null) return;
+	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .05);
+};
+
+c_wave.prototype.binaural = function(b) {
+	this.b = b;
+	if (this.g === null) return;
+	this.o_right.frequency.setTargetAtTime(this.f + this.b, audio.currentTime, .05);
+};
 
 c_wave.prototype.start = function() {
 	assert(this.g === null);
@@ -116,34 +129,78 @@ c_wave.prototype.stop = function() {
 	setTimeout(_ => g.disconnect(), 1000);
 };
 
-const wave = new c_wave(1, 100, 3, 3, null);
+const waves = [
+	new c_wave(1, 100, 0, 0, null),
+	new c_wave(1, 100, 0, 0, null)
+];
 
-const button = new c_button([blue, red], border, [
-	function() {
-		wave.stop();
-	},
-	function() { 
-		if (window.stop_page_audio !== null) {
-			window.stop_page_audio();
-			assert(window.stop_page_audio === null);
-		}
-		wave.start(); 
-	}
-], 300, 300);
+function c_on_button(wave, x = 0, y = 0) {
+	this.button = new c_button([blue, green, red, yellow, white, black], border, [
+		_ => wave.stop(),
+		_ => {
+			wave.v = .2;
+			if (window.stop_page_audio !== null) {
+				window.stop_page_audio();
+				assert(window.stop_page_audio === null);
+			}
+			wave.start();
+		},
+		_ => wave.volume(.4),
+		_ => wave.volume(.6),
+		_ => wave.volume(.8),
+		_ => wave.volume(1)
+	], x, y);
+}
+
+c_on_button.prototype.draw = function() {
+	this.button.draw();
+};
+
+c_on_button.prototype.click = function() {
+	return this.button.click();
+};
+
+function c_binaural_button(wave, x = 0, y = 0) {
+	this.i = 0;
+	this.button = new c_button([blue, green, red, yellow, white, black], border, [
+		_ => wave.binaural(0),
+		_ => wave.binaural(2), // deep sleep (delta .5 - 4) 
+		_ => wave.binaural(4), // light sleep (theta 4 - 8)
+		_ => wave.binaural(8), // idle (alpha 8 - 12)
+		_ => wave.binaural(16), // attentiveness (beta 12 - 30)
+		_ => wave.binaural(32), // problem-solving (gamma 25 - 100)
+	], x, y);
+}
+
+c_binaural_button.prototype.draw = function() {
+	this.button.draw();
+};
+
+c_binaural_button.prototype.click = function() {
+	return this.button.click();
+};
+
+const buttons = [
+	new c_on_button      (waves[0], 300, 300),
+	new c_binaural_button(waves[0], 300, 400),
+	
+	new c_on_button      (waves[1], 400, 300),
+	new c_binaural_button(waves[1], 400, 400)
+];
 
 const is_playing = _ => {
-	return wave.g !== null;
+	return waves.some(wave => wave.g !== null);
 };
 
 const click_page = _ => {
-	if (button.click()) {
+	if (buttons.some(button => button.click())) {
 		on_resize();
 	}
 };
 
 const draw_page = _ => {
 	bg_blue.draw();
-	button.draw();
+	buttons.forEach(button => button.draw());
 //	back_button.draw();
 //	silence_button.draw();
 };
