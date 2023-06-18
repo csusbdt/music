@@ -3,12 +3,13 @@ function c_wave(v = 0, f = 0, b = 0, w = 0, d = null) {
 	this.f = f;
 	this.b = b;
 	this.w = w;
-	this.d = d; // null=always playing, 0=not playing, otherwise seconds of duration
 	this.g       = null;
 	this.o_left  = null;
 	this.o_right = null;
 	this.o_w     = null;
-	this.id      = null;
+	//this.id      = null;
+	// remove duration d from c_wave
+	this.d = d; // null=always playing, 0=not playing, otherwise seconds of duration
 }
 
 c_wave.prototype.volume = function(v) {
@@ -16,6 +17,17 @@ c_wave.prototype.volume = function(v) {
 	if (this.g === null) return;
 	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .05);
 };
+
+c_wave.prototype.frequency = function(f) {
+	this.f = f;
+	if (this.g === null) return;
+	this.o_left.frequency.setTargetAtTime(this.f, audio.currentTime, .05);
+	this.o_right.frequency.setTargetAtTime(this.f + this.b, audio.currentTime, .05);
+};
+
+// c_wave.prototype.duration = function(d) {
+// 	this.d = d;
+// };
 
 c_wave.prototype.binaural = function(b) {
 	this.b = b;
@@ -43,21 +55,21 @@ c_wave.prototype.start = function() {
 	this.o_w.connect(this.g);
 	this.o_w.start();
 	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .05);
-	if (this.d !== null) {
-		this.id = setTimeout(function() {
-			this.id = null;
-			this.stop();
-		}.bind(this), this.d * 1000);
-	}
+	// if (this.d !== null) {
+	// 	this.id = setTimeout(function() {
+	// 		this.id = null;
+	// 		this.stop();
+	// 	}.bind(this), this.d * 1000);
+	// }
 	return this;
 };
 
 c_wave.prototype.stop = function() {
 	assert(this.g !== null);
-	if (this.id !== null) {
-		clearTimeout(this.id);
-		this.id = null;
-	}
+	// if (this.id !== null) {
+	// 	clearTimeout(this.id);
+	// 	this.id = null;
+	// }
 	this.g.gain.setTargetAtTime(0, audio.currentTime, .05);
 	let g = this.g;
 	this.g = null;
