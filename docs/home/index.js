@@ -1,7 +1,7 @@
 import start_away           from "../away/index.js"          ;
 import start_songs          from "../songs/index.js"         ;
 import start_space_shooter  from "../space_shooter/index.js" ;
-import start_compose        from "../compose/index.js"       ;
+import start_compose        from "../comp/index.js"       ;
 
 // buttons
 
