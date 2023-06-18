@@ -1,33 +1,7 @@
 import start_home from "../home/index.js";
-
-function c_img(src, cx = 0, cy = 0, cr = null) {
-    this.image     = new Image();
-    this.image.src = src;
-	this.cx         = cx; 
-	this.cy         = cy; 
-	this.cr         = cr;
-}
-
-c_img.prototype.draw = function(x = 0, y = 0) {	
-	if (this.image.complete) {
-		ctx.drawImage(this.image, x, y);
-	} else {
-		this.image.onload = on_resize;
-	}
-};
-
-c_img.prototype.click = function(draw_x = 0, draw_y = 0) {
-	if (!this.image.complete) return false;
-	if (this.r === null) {
-		return will_click(this.image, draw_x, draw_y);
-	} else {
-		const cx = this.cx + draw_x;
-		const cy = this.cy + draw_y;
-		const dx = cx - click_x;
-		const dy = cy - click_y;
-		return dx * dx + dy * dy < this.cr * this.cr;
-	}
-};
+import c_img      from "./img.js";
+import c_wave     from "./wave.js";
+import c_button   from "./button.js";
 
 const red    = new c_img("./compose/images/red.png"   , 120, 205, 36);
 const green  = new c_img("./compose/images/green.png" , 120, 205, 36);
@@ -37,155 +11,76 @@ const white  = new c_img("./compose/images/white.png" , 120, 205, 36);
 const black  = new c_img("./compose/images/black.png" , 120, 205, 36);
 const border = new c_img("./compose/images/border.png", 120, 205, 36);
 
-function c_button(colors, border, actions, x = 0, y = 0) {
-	if (!Array.isArray(colors)) colors = [colors];
-	this.colors = colors;
-	this.border = border;
-	if (!Array.isArray(actions)) actions = [actions];
-	this.actions = actions;
-	this.x = x;
-	this.y = y;
-	this.i = 0;
-}
-
-c_button.prototype.draw = function() {
-	this.colors[this.i].draw(this.x, this.y);
-	this.border.draw(this.x, this.y);
-};
-
-c_button.prototype.click = function() {
-	if (this.colors[0].click(this.x, this.y)) {
-		if (++this.i === this.colors.length) this.i = 0;
-		this.actions[this.i].call(this);
-		return true;
-	} else {
-		return false;
-	}
-};
-
-function c_wave(v = 0, f = 0, b = 0, w = 0, d = null) {
-	this.v = v;
-	this.f = f;
-	this.b = b;
-	this.w = w;
-	this.d = d; // null=always playing, 0=not playing, otherwise seconds of duration
-	this.g       = null;
-	this.o_left  = null;
-	this.o_right = null;
-	this.o_w     = null;
-	this.id      = null;
-}
-
-c_wave.prototype.volume = function(v) {
-	this.v = v;
-	if (this.g === null) return;
-	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .05);
-};
-
-c_wave.prototype.binaural = function(b) {
-	this.b = b;
-	if (this.g === null) return;
-	this.o_right.frequency.setTargetAtTime(this.f + this.b, audio.currentTime, .05);
-};
-
-c_wave.prototype.start = function() {
-	assert(this.g === null);
-	this.g = audio.createGain();
-	this.g.connect(gain);
-	this.g.gain.value = 0;
-	const merger = new ChannelMergerNode(audio);
-	merger.connect(this.g);
-	this.o_left  = audio.createOscillator();
-	this.o_right = audio.createOscillator();
-	this.o_left.connect(merger, 0, 0);
-	this.o_right.connect(merger, 0, 1);
-	this.o_left.frequency.value = this.f; 
-	this.o_right.frequency.value = this.f + this.b;
-	this.o_left.start();
-	this.o_right.start();
-	this.o_w = audio.createOscillator();
-	this.o_w.frequency.value = 0;
-	this.o_w.connect(this.g);
-	this.o_w.start();
-	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .05);
-	if (this.d !== null) {
-		this.id = setTimeout(function() {
-			this.id = null;
-			this.stop();
-		}.bind(this), this.d * 1000);
-	}
-	return this;
-};
-
-c_wave.prototype.stop = function() {
-	assert(this.g !== null);
-	if (this.id !== null) {
-		clearTimeout(this.id);
-		this.id = null;
-	}
-	this.g.gain.setTargetAtTime(0, audio.currentTime, .05);
-	let g = this.g;
-	this.g = null;
-	setTimeout(_ => g.disconnect(), 1000);
-};
-
-const waves = [
-	new c_wave(1, 100, 0, 0, null),
-	new c_wave(1, 100, 0, 0, null)
-];
+Object.setPrototypeOf(c_on_button.prototype      , c_button.prototype);
+Object.setPrototypeOf(c_volume_button.prototype  , c_button.prototype);
+Object.setPrototypeOf(c_binaural_button.prototype, c_button.prototype);
 
 function c_on_button(wave, x = 0, y = 0) {
-	this.button = new c_button([blue, green, red, yellow, white, black], border, [
-		_ => wave.stop(),
-		_ => {
-			wave.v = .2;
-			if (window.stop_page_audio !== null) {
-				window.stop_page_audio();
-				assert(window.stop_page_audio === null);
-			}
-			wave.start();
-		},
-		_ => wave.volume(.4),
-		_ => wave.volume(.6),
-		_ => wave.volume(.8),
-		_ => wave.volume(1)
-	], x, y);
+	c_button.call(this, [blue, green], border, x, y);
+	this.wave = wave;
 }
 
-c_on_button.prototype.draw = function() {
-	this.button.draw();
+c_on_button.prototype.click = function() {
+	if (!c_button.prototype.click.call(this)) {
+		return false;
+	} else if (this.i === 0) {
+		this.wave.stop();
+	} else {
+		if (window.stop_page_audio !== null) {
+			window.stop_page_audio();
+			assert(window.stop_page_audio === null);
+		}
+		this.wave.start();
+	}
+	return true;
 };
 
-c_on_button.prototype.click = function() {
-	return this.button.click();
+function c_volume_button(wave, x = 0, y = 0) {
+	c_button.call(this, [white, green, red, yellow], border, x, y);
+	this.wave = wave;
+}
+
+c_volume_button.prototype.click = function() {
+	if (!c_button.prototype.click.call(this)) {
+		return false;
+	} else {
+		this.wave.volume([.4, .6, .8, 1][this.i]);
+	}
+	return true;
 };
 
 function c_binaural_button(wave, x = 0, y = 0) {
-	this.i = 0;
-	this.button = new c_button([blue, green, red, yellow, white, black], border, [
-		_ => wave.binaural(0),
-		_ => wave.binaural(2), // deep sleep (delta .5 - 4) 
-		_ => wave.binaural(4), // light sleep (theta 4 - 8)
-		_ => wave.binaural(8), // idle (alpha 8 - 12)
-		_ => wave.binaural(16), // attentiveness (beta 12 - 30)
-		_ => wave.binaural(32), // problem-solving (gamma 25 - 100)
-	], x, y);
+	c_button.call(this, [blue, green, red, yellow, white, black], border, x, y);
+	this.wave = wave;
 }
 
-c_binaural_button.prototype.draw = function() {
-	this.button.draw();
+// deep sleep      (delta .5 - 4) 
+// light sleep     (theta 4 - 8)
+// idle            (alpha 8 - 12)
+// attentiveness   (beta 12 - 30)
+// problem-solving (gamma 25 - 100)
+c_binaural_button.prototype.click = function() {
+	if (!c_button.prototype.click.call(this)) {
+		return false;
+	} else {
+		this.wave.binaural([0, 2, 4, 8, 16, 32][this.i]);
+		return true;
+	}
 };
 
-c_binaural_button.prototype.click = function() {
-	return this.button.click();
-};
+const waves = [
+	new c_wave(1, 80, 0, 0, null),
+	new c_wave(1, 80, 0, 0, null)
+];
 
 const buttons = [
 	new c_on_button      (waves[0], 300, 300),
-	new c_binaural_button(waves[0], 300, 400),
+	new c_volume_button  (waves[0], 300, 400),
+	new c_binaural_button(waves[0], 300, 500),
 	
 	new c_on_button      (waves[1], 400, 300),
-	new c_binaural_button(waves[1], 400, 400)
+	new c_volume_button  (waves[1], 400, 400),
+	new c_binaural_button(waves[1], 400, 500)
 ];
 
 const is_playing = _ => {
