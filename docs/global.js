@@ -87,16 +87,16 @@ window.init_audio = _ => {
 	}
 };
 
-window.silence_on = _ => {
+//window.silence_on = _ => {
 	// if (window.stop_page_audio !== null) {
 	// 	window.stop_page_audio();
 	// }
 	// gain.gain.setTargetAtTime(0, audio.currentTime, .1);
-};
+//};
 
- window.silence_off = _ => {
+// window.silence_off = _ => {
 	// gain.gain.setTargetAtTime(1, audio.currentTime, .1);
-};
+//};
 
 window.stop_page_audio  = null;
 //window.start_page_audio = null;
@@ -1238,17 +1238,15 @@ window.back_button = pair2(
     image("./global/images/upper_left_border.png")
 );
 
-window.silence_button = checkbox2(
-    pair2(
-		image("./global/images/upper_right_green.png" ),
-		image("./global/images/upper_right_border.png"), 
-		silence_on
-	),
-    pair2(
-		image("./global/images/upper_right_white.png" ),
-		image("./global/images/upper_right_border.png"), 
-		silence_off
-	)
+window.silence_button = pair2(
+	image("./global/images/upper_right_green.png" ),
+	image("./global/images/upper_right_border.png"),
+	_ => {
+		if (window.stop_page_audio !== null) {
+			window.stop_page_audio();
+			assert(window.stop_page_audio === null);
+		}
+	}
 );
 
 // window.on_click  = null; // set in page start func

@@ -40,6 +40,8 @@ const reds = [
 
 let song_i = null;
 
+const is_playing = _ => song_i !== null;
+
 const draw_page = _ => {
 	bg_blue.draw();
 	greens.forEach(o => o.draw());
@@ -50,8 +52,8 @@ const draw_page = _ => {
 };
 
 const stop_page_audio = _ => {
+	assert(is_playing());
 	assert(on_resize !== draw_page);
-	assert(song_i !== null);
 	window.stop_page_audio = null;
 	songs[song_i].stop();
 	song_i = null;
@@ -59,10 +61,7 @@ const stop_page_audio = _ => {
 
 const click_page = _ => {
 	if (back_button.click()) {
-		if (song_i !== null) {
-			assert(window.stop_page_audio === null);
-			window.stop_page_audio = stop_page_audio;
-		}
+		if (is_playing()) window.stop_page_audio = stop_page_audio;
 		start_home();
 	} else if (silence_button.click()) return on_resize();
 	else for (let i = 0; i < reds.length; ++i) {
@@ -88,10 +87,10 @@ const click_page = _ => {
 };
 
 export default _ => {
-	if (song_i !== null) {
+	if (is_playing()) {
 		assert(window.stop_page_audio === stop_page_audio);
 		window.stop_page_audio = null;
-	}	
+	}
 	set_item('page', "./songs/index.js");
 	on_click  = click_page;	
 	on_resize = draw_page ;
