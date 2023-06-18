@@ -1,5 +1,7 @@
 import start_select_comp from "../index.js";
-import { c_img, c_button } from "../button.js";
+import c_img      from "../img.js";
+import c_button   from "../button.js";
+import c_unit     from "../unit.js";
 
 const upper_left_green   = new c_img("./global/images/upper_left_green.png"  , 100, 70, 50);
 const upper_left_border  = new c_img("./global/images/upper_left_border.png" , 100, 70, 50);
@@ -11,28 +13,30 @@ const border = new c_img("./compose/images/border.png", 120, 205, 36);
 
 const back_button            = new c_button(upper_left_green , upper_left_border );
 const stop_page_audio_button = new c_button(upper_right_green, upper_right_border);
-const hi_button          = new c_button(red , border, 260, 320);
 
 let comp_i = null;
+
+const units = [
+	new c_unit(260, 320)
+];
 
 const click_page = _ => {
 	if (back_button.click()) {
 		start_select_comp();
 	} else if (stop_page_audio_button.click()) {
 		if (window.stop_page_audio !== null) window.stop_page_audio();
-	} else if (hi_button.click()) {
-		log("hi " + comp_i);
+	} else if (units.some(o => o.click())) {
 		on_resize();
 	}
 };
 
-const draw_page = _ => {
-	bg_blue.draw();
+const draw = o => { if (Array.isArray(o)) o.forEach(o => o.draw()); else o.draw(); };
 
-	hi_button.draw();
-	
-	back_button.draw();
-	stop_page_audio_button.draw();
+const draw_page = _ => {
+	draw(bg_blue);
+	draw(units);
+	draw(back_button);
+	draw(stop_page_audio_button);
 };
 
 export default _comp_i => {
