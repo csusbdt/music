@@ -9,7 +9,7 @@ function c_wave(f = 111, v = 1, b = 2, w = 0) {
 	this.o_w     = null;
 }
 
-c_wave.prototype.set_frequency = function(f) {
+c_wave.prototype.frequency = function(f) {
 	this.f = f;
 	if (this.g !== null) {
     	this.o_left.frequency.setTargetAtTime(this.f, audio.currentTime, .05);
@@ -18,7 +18,7 @@ c_wave.prototype.set_frequency = function(f) {
     return this;
 };
 
-c_wave.prototype.set_volume = function(v) {
+c_wave.prototype.volume = function(v) {
 	this.v = v;
 	if (this.g !== null) {
     	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .05);
@@ -26,7 +26,7 @@ c_wave.prototype.set_volume = function(v) {
     return this;
 };
 
-c_wave.prototype.set_binaural = function(b) {
+c_wave.prototype.binaural = function(b) {
 	this.b = b;
 	if (this.g !== null) {
     	this.o_right.frequency.setTargetAtTime(this.f + this.b, audio.currentTime, .05);
@@ -34,7 +34,7 @@ c_wave.prototype.set_binaural = function(b) {
     return this;
 };
 
-c_wave.prototype.set_waver = function(w) {
+c_wave.prototype.waver = function(w) {
 	this.w = w;
 	if (this.g !== null) {
     	this.o_w.frequency.setTargetAtTime(this.w, audio.currentTime, .05);
