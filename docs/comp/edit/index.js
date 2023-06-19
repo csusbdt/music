@@ -13,38 +13,63 @@ const green  = new c_img("./compose/images/green.png" , 120, 205, 36);
 const border = new c_img("./compose/images/border.png", 120, 205, 36);
 
 const back_button            = new c_button(upper_left_green, upper_left_border );
-const stop_page_audio_button = new c_button(upper_right_red , upper_right_border);
-
-stop_page_audio_button.action = _ => {
-	if (unit.is_playing()) stop_page_audio_button.color = red;
-	else stop_page_audio_button.color = green;
-};
 
 let unit = null;
-
-const is_playing = _ => unit.is_playing;
-
-const v_buttons = Array(6).fill(0).map((_, i) => new c_v_button(i));
-
-Object.setPrototypeOf(c_v_button.prototype, c_button.prototype);
-
-function c_v_button(i) {
-	c_button.call(this, green, border, 200 + 100 * i, 300,
-		_ => unit.volume((i + 1) / v_buttons.length)
-	);
-}
+//const is_playing = _ => unit.is_playing;
 
 const stop_page_audio = _ => {
-	if (unit.is_playing()) unit.stop(); else unit.start();
+	if (unit.is_playing()) {
+		unit.stop(); 
+		stop_page_audio_button.color = upper_right_green;
+	} else {
+		unit.start();
+		stop_page_audio_button.color = upper_right_red;
+	}
 };
+
+const stop_page_audio_button = new c_button(upper_right_red , upper_right_border, 0, 0, stop_page_audio);
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+const volume_controller = {
+	x: 100,
+	y: 200,
+	spacing: 100,
+	n: 3,
+	max_n: 6,
+	draw_x: function(i) { return this.x + this.spacing * i; },
+	draw_y: function(i) { return this.y; },
+	draw: function() {
+		for (let i = 0; i < this.max_n; ++i) {
+			if (i === this.n) {
+				red.draw(this.draw_x(i), this.draw_y(i));
+			} else {
+				green.draw(this.draw_x(i), this.draw_y(i));
+			}
+			border.draw(this.draw_x(i), this.draw_y(i));
+		}
+	},
+	click: function() {
+		for (let i = 0; i < this.max_n; ++i) {
+			if (red.click(this.draw_x(i), this.draw_y(i))) {
+				this.n = i;
+				unit.volume(this.n / this.max_n)
+				return true;
+			}
+		}
+		return false;
+	}
+};
+
+///////////////////////////////////////////////////////////////////////////////
 
 const click_page = _ => {
 	if (back_button.click()) {
 		start_comp();
-	} else if (stop_page_audio_button.click()) {
-		window.stop_page_audio();
-		on_resize();
-	}
+	} 
+	else if (stop_page_audio_button.click()) on_resize();
+	else if (volume_controller.click()) on_resize();
 };
 
 const draw = o => { if (Array.isArray(o)) o.forEach(o => o.draw()); else o.draw(); };
@@ -53,7 +78,7 @@ const draw_page = _ => {
 	draw(bg_blue);
 	draw(back_button);
 	draw(stop_page_audio_button);
-	draw(v_buttons);
+	draw(volume_controller);
 };
 
 export default u => {
