@@ -15,9 +15,7 @@ const stop_page_audio_button = new c_button(upper_right_green, upper_right_borde
 
 let unit = null;
 
-const is_playing = _ => {
-	return unit.wave.g !== null;
-};
+const is_playing = _ => unit.is_playing;
 
 const stop_page_audio = _ => {
 	unit.stop();
@@ -30,9 +28,9 @@ const click_page = _ => {
 	} else if (stop_page_audio_button.click()) {
 		if (window.stop_page_audio !== null) {
 			window.stop_page_audio();
-			on_resize();
 		}
 		if (is_playing()) window.stop_page_audio = stop_page_audio;
+		on_resize();
 	}
 };
 
@@ -46,11 +44,8 @@ const draw_page = _ => {
 
 export default u => {
 	unit = u;
-	if (is_playing()) {
-		window.stop_page_audio = stop_page_audio;
-	} else if (window.stop_page_audio !== null) {
-		window.stop_page_audio();
-	}
+	if (window.stop_page_audio !== null) window.stop_page_audio();
+	window.stop_page_audio = stop_page_audio;
 	on_click = click_page;	
 	on_resize = draw_page;
 	on_resize();
