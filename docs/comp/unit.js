@@ -11,8 +11,8 @@ function c_unit(octave, whole_notes, half_notes, volume, binaural, waver) {
     if (this.whole_notes === undefined) this.whole_notes = 0; 
     if (this.half_notes  === undefined) this.half_notes  = 0; 
     if (this.volume      === undefined) this.volume      = this.default_volume; 
-    if (this.binaural    === undefined) this.binaural    = this.default_binaural; 
-    if (this.waver       === undefined) this.waver       = this.default_waver;
+    if (this.binaural    === undefined) this.binaural    = 0; 
+    if (this.waver       === undefined) this.waver       = 0;
 
     const f = scale(
         this.octave_tones, 
@@ -21,7 +21,7 @@ function c_unit(octave, whole_notes, half_notes, volume, binaural, waver) {
     );
     this.wave = new c_wave(
         f, 
-        this.volume/this.volume_max, 
+        this.volume/this.max_volume,
         this.binaural_values[this.binaural], 
         this.waver_values[this.waver] 
     );
@@ -31,9 +31,9 @@ c_unit.prototype.binaural_values = [0, 2, 4, 8, 16, 32, 64];
 c_unit.prototype.waver_values    = [0, 2, 4, 8, 16, 32, 64];
 c_unit.prototype.base_frequency  = 60;
 c_unit.prototype.octave_tones    = 8;
-c_unit.prototype.volume_max      = 8;
-c_unit.prototype.binaural_max    = c_unit.prototype.binaural_values.length - 1;
-c_unit.prototype.waver_max       = c_unit.prototype.waver_values.length    - 1;
+c_unit.prototype.max_volume      = 8;
+c_unit.prototype.max_binaural    = c_unit.prototype.binaural_values.length - 1;
+c_unit.prototype.max_waver       = c_unit.prototype.waver_values.length    - 1;
 c_unit.prototype.default_octave  = 2;
 c_unit.prototype.default_volume  = 4;
 
@@ -75,13 +75,13 @@ c_unit.prototype.set_half_notes = function(i) {
 
 c_unit.prototype.set_volume = function(i) {
     this.volume = i;
-    this.wave.set_volume(i / this.volume_max);
+    this.wave.set_volume(i / this.max_volume);
     return this;
 };
 
 c_unit.prototype.set_binaural = function(i) {
     this.binaural = i;
-    this.wave.set_binaural(i / this.binaural_max);
+    this.wave.set_binaural(i / this.max_binaural);
     return this;
 };
 

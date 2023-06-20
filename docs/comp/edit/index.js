@@ -14,7 +14,7 @@ const red    = new c_img("./compose/images/red.png"   , 120, 205, 36);
 const green  = new c_img("./compose/images/green.png" , 120, 205, 36);
 const border = new c_img("./compose/images/border.png", 120, 205, 36);
 
-const back_button            = new c_button(upper_left_green, upper_left_border );
+const back_button = new c_button(upper_left_green, upper_left_border );
 
 let unit = null;
 
@@ -23,87 +23,14 @@ const stop_page_audio = _ => {
 		unit.stop(); 
 		stop_page_audio_button.color = upper_right_green;
 	} else {
-		unit.start();
 		stop_page_audio_button.color = upper_right_red;
 	}
 };
 
 const stop_page_audio_button = new c_button(upper_right_red , upper_right_border, 0, 0, stop_page_audio);
 
-//const volume_controller        = null;
-//const volume_controller_max    = 8;
-//const volume_controller_action = n => unit.set_volume(n);
-
-const volume_controller = new c_controller(
-	0, 200,
-	c_unit.prototype.default_volume,
-	c_unit.prototype.volume_max,
-	c_unit.prototype.volume_max, i => unit.set_volume(i));
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-// const volume_controller = {
-// 	x: 0,
-// 	y: 200,
-// 	spacing: 100,
-// 	n: 3,
-// 	max_n: 8,
-// 	draw_x: function(i) { return this.x + this.spacing * i; },
-// 	draw_y: function(i) { return this.y; },
-// 	draw: function() {
-// 		for (let i = 0; i < this.max_n; ++i) {
-// 			if (i === this.n) {
-// 				red.draw(this.draw_x(i), this.draw_y(i));
-// 			} else {
-// 				green.draw(this.draw_x(i), this.draw_y(i));
-// 			}
-// 			border.draw(this.draw_x(i), this.draw_y(i));
-// 		}
-// 	},
-// 	click: function() {
-// 		for (let i = 0; i < this.max_n; ++i) {
-// 			if (red.click(this.draw_x(i), this.draw_y(i))) {
-// 				this.n = i;
-// 				unit.set_volume(this.n / this.max_n)
-// 				return true;
-// 			}
-// 		}
-// 		return false;
-// 	}
-// };
-
-// ///////////////////////////////////////////////////////////////////////////////
-
-// const octave_controller = {
-// 	x: 0,
-// 	y: 300,
-// 	spacing: 100,
-// 	max_octaves: 5,
-// 	draw_x: function(i) { return this.x + this.spacing * i; },
-// 	draw_y: function(i) { return this.y; },
-// 	draw: function() {
-// 		for (let i = 0; i < this.max_octaves; ++i) {
-// 			if (i === unit.octave) {
-// 				red.draw(this.draw_x(i), this.draw_y(i));
-// 			} else {
-// 				green.draw(this.draw_x(i), this.draw_y(i));
-// 			}
-// 			border.draw(this.draw_x(i), this.draw_y(i));
-// 		}
-// 	},
-// 	click: function() {
-// 		for (let i = 0; i < this.max_octaves; ++i) {
-// 			if (red.click(this.draw_x(i), this.draw_y(i))) {
-// 				unit.set_octave(i);
-// 				return true;
-// 			}
-// 		}
-// 		return false;
-// 	}
-// };
-
-///////////////////////////////////////////////////////////////////////////////
+let volume_controller = null;
+let octave_controller = null;
 
 const click_page = _ => {
 	if (back_button.click()) {
@@ -121,11 +48,17 @@ const draw_page = _ => {
 	draw(back_button);
 	draw(stop_page_audio_button);
 	draw(volume_controller);
-	//draw(octave_controller);
+	draw(octave_controller);
 };
 
 export default u => {
 	unit = u;
+	volume_controller = new c_controller(
+		0, 200, unit.volume, c_unit.prototype.max_volume, i => unit.set_volume(i)
+	);
+	octave_controller = new c_controller(
+		0, 300, unit.octave, c_unit.prototype.max_octave, i => unit.set_octave(i)
+	);
 	if (window.stop_page_audio !== null) window.stop_page_audio();
 	window.stop_page_audio = stop_page_audio;
 	unit.start();

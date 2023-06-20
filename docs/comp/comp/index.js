@@ -89,6 +89,13 @@ const draw_page = _ => {
 export default _ => {
 	if (is_playing()) {
 		window.stop_page_audio = stop_page_audio;
+		for (let i = 0; i < units.length; ++i) {
+			if (units[i].is_playing()) {
+				play_buttons[i].color = red;
+			} else {
+				play_buttons[i].color = green;
+			}
+		}
 	} else if (window.stop_page_audio !== null) {
 		window.stop_page_audio();
 	}
