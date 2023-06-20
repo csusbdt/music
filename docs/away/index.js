@@ -1,32 +1,31 @@
 import start_home     from "../home/index.js"   ;
 import start_far_away from "./far_away/index.js";
+import c_img          from "../img.js";
+import c_button       from "../button.js";
 
-const far_away_button = pair(
-	image("./songs/images/play_big_border.png"),
-	image("./songs/images/play_big_red.png"   )
-);
+const red    = new c_img("./compose/images/red.png"   , 120, 205, 36);
+const green  = new c_img("./compose/images/green.png" , 120, 205, 36);
+const border = new c_img("./compose/images/border.png", 120, 205, 36);
 
-const a = [ bg_blue, silence_button, far_away_button ];
+const home     = new c_button(green, border, 10, -20, _ => start_home());
+const far_away = new c_button(green, border, 300, 300, _ => start_far_away());
 
 const draw = _ => {
-    a.forEach(o => { o.draw(); });
-	back_button.draw();
+	bg_blue.draw();
+	home.draw();
+	far_away.draw();
 };
 
 const click = _ => {
-	if (back_button.click()) {
-		start_home();
-	} else if (far_away_button.click()) {
-		start_far_away();
-	} else if (a.some(o => { return o.click(); })) {
-		draw();
+	if (home.click() || far_away.click()) {
+		// noop
 	}
 };
 
 const start = _ => {
     on_click  = click;
     on_resize = draw;
-    draw();
+    on_resize();
 };
 
 export default start;

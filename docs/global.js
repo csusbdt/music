@@ -60,17 +60,17 @@ window.get_item = (key, _default) => {
 //
 // audio
 //
-// init_audio is called with every click on the canvas with <canvas onclick="init_audio();"
-// This will run before all other click handlers. This may not be true. FIX clearInterval
+// This framework calls init_audio with every click on the canvas before all other 
+// click handlers.
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-window.audio     = null;
-window.main_gain = null; 
-window.gain      = null; 
+window.audio           = null;
+window.main_gain       = null; 
+window.gain            = null; 
+window.stop_page_audio = null;
 
 window.init_audio = _ => {
-	// this function must run in click handler to work on apple hardware
 	if (audio === null) {
 		audio = new (window.AudioContext || window.webkitAudioContext)();
 	}
@@ -86,85 +86,6 @@ window.init_audio = _ => {
 		gain.connect(main_gain);
 	}
 };
-
-//window.silence_on = _ => {
-	// if (window.stop_page_audio !== null) {
-	// 	window.stop_page_audio();
-	// }
-	// gain.gain.setTargetAtTime(0, audio.currentTime, .1);
-//};
-
-// window.silence_off = _ => {
-	// gain.gain.setTargetAtTime(1, audio.currentTime, .1);
-//};
-
-window.stop_page_audio  = null;
-//window.start_page_audio = null;
-
-// window.start_audio = _ => {
-// 	assert(gain === null);
-// 	gain = audio.createGain();
-// 	gain.connect(main_gain);
-// };
-
-// window.stop_audio = _ => {
-// 	assert(gain !== null);
-// 	gain.gain.setTargetAtTime(0, audio.currentTime, .1);
-// 	let g = gain;
-// 	gain = null;
-// 	setTimeout(_ => g.disconnect(), 120);
-// };
-
-// window.stop_audio = (cb = null) => {
-// 	assert(gain !== null);
-// 	gain.gain.setTargetAtTime(0, audio.currentTime, .05);
-// 	setTimeout(_ => {
-// 		gain.disconnect();
-// 		gain = null;
-// 		if (cb !== null) cb();
-// 	}, 60);
-// };
-
-// ///////////////////////////////////////////////////////////////////////////////////////////////
-// //
-// // c_tone
-// //
-// ///////////////////////////////////////////////////////////////////////////////////////////////
-
-// function c_tone(f, v = 1, b = 0) {
-// 	this.f = f;
-// 	this.v = v;
-// 	this.b = b;
-// 	this.g = null;
-// }
-
-// c_tone.prototype.start = function(cb) {
-// 	if (this.g === null) {
-// 		this.g = audio.createGain();
-// 		this.g.connect(gain);
-// 		this.g.gain.value = 0;
-// 		const merger = new ChannelMergerNode(audio);
-// 		merger.connect(this.g);
-// 		const o_left  = audio.createOscillator();
-// 		const o_right = audio.createOscillator();
-// 		o_left.connect(merger, 0, 0);
-// 		o_right.connect(merger, 0, 1);
-// 		o_left.frequency.value = this.f; 
-// 		o_right.frequency.value = this.f + this.b;
-// 		o_left.start();
-// 		o_right.start();
-// 	}
-// 	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .1);
-// };
-
-// c_tone.prototype.stop = function() {
-// 	if (this.g !== null) {
-// 		this.g.gain.setTargetAtTime(0, audio.currentTime, .1);
-// 		this.g = null;
-// 	}
-// };
-
-// window.tone = (f, v = 1, b = 0) => new c_tone(f, v, b);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -230,7 +151,7 @@ adjust_canvas();
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-window.on_click  = null; // should set when page starts
+window.on_click  = null;
 window.click_x   = null;
 window.click_y   = null;
 
@@ -241,7 +162,7 @@ canvas.addEventListener('click', e => {
 	if (on_click !== null) on_click();
 });
 
-// pixel perfect click detection
+// pixel-based click detection
 window.click_test = (images, x = 0, y = 0, s = 1) => {
 	if (!Array.isArray(images)) images = [images];
 	for (let i = 0; i < images.length; ++i) {
@@ -317,53 +238,105 @@ window.bg_white  = new c_bg(rgb_white );
 
 ////////////////////////////////////////////////////////////////////////////////////
 //
-// image 
+// images 
 //
 ////////////////////////////////////////////////////////////////////////////////////
 
-function c_image(src, x = 0, y = 0, s = 1, f = null) {
-    this.image     = new Image();
-    this.image.src = src;
-    this.x         = x;
-    this.y         = y;
-    this.s         = s;
-    this.f         = f;
+function c_img(src = null, cx = 0, cy = 0, cr = null, bottom = null) {
+	this.src = src;
+	if (src !== null) {
+	    this.image = new Image();
+	    this.image.src = src;
+	} else {
+		this.image = null;
+	}
+	this.cx        = cx; 
+	this.cy        = cy; 
+	this.cr        = cr;
+	this.bottom    = bottom;
 }
 
-c_image.prototype.clone = function(x = 0, y = 0, s = 1, f = null) {
-    return new c_image(this.image.src, x, y, s, f);
-};
-
-c_image.prototype.draw = function() {
-	if (this.image.complete) {
-		const dx      = this.x           ;
-		const dy      = this.y           ;
-		const sx      = 0                ;
-		const sy      = 0                ;
-	    const sWidth  = this.image.width ;
-	    const sHeight = this.image.height;
-	    const dWidth  = sWidth * this.s  ;
-	    const dHeight = sHeight * this.s ;
-		ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
+c_img.prototype.draw = function(x = 0, y = 0) {
+	if (this.image === null) {
+		return;
+	} else if (this.image.complete) {
+		ctx.drawImage(this.image, x, y);
 	} else {
-		if (this.image.onload === null) {
-			this.image.onload = on_resize;
-		}
+		this.image.onload = on_resize;
 	}
 };
 
-c_image.prototype.click = function() {
-	if (click_test(this.image, this.x, this.y, this.s)) {
-		if (this.f !== null) this.f();
-		return true;
+c_img.prototype.click = function(draw_x = 0, draw_y = 0) {
+	if (!this.image.complete) return false;
+	if (this.cr === null) {
+		return click_test(this.image, draw_x, draw_y);
+	} else if (this.bottom !== null) {
+		const left = this.cx;
+		const top = this.cy;
+		const right = this.cr;
+		return (
+			draw_x + left        < click_x && 
+			draw_y + top         < click_y &&
+			draw_x + right       > click_x &&
+			draw_y + this.bottom > click_y
+		);
 	} else {
-		return false;
+		const cx = this.cx + draw_x;
+		const cy = this.cy + draw_y;
+		const dx = cx - click_x;
+		const dy = cy - click_y;
+		return dx * dx + dy * dy < this.cr * this.cr;
 	}
 };
 
-window.image = (src, x = 0, y = 0, s = 1, f = null) => {
-    return new c_image(src, x, y, s, f);
+window.img = (src = null, cx = 0, cy = 0, cr = null, bottom = null) => {
+    return new c_img(src, cx, cy, cr, bottom);
 };
+
+
+// function c_image(src, x = 0, y = 0, s = 1, f = null) {
+//     this.image     = new Image();
+//     this.image.src = src;
+//     this.x         = x;
+//     this.y         = y;
+//     this.s         = s;
+//     this.f         = f;
+// }
+
+// c_image.prototype.clone = function(x = 0, y = 0, s = 1, f = null) {
+//     return new c_image(this.image.src, x, y, s, f);
+// };
+
+// c_image.prototype.draw = function() {
+// 	if (this.image.complete) {
+// 		const dx      = this.x           ;
+// 		const dy      = this.y           ;
+// 		const sx      = 0                ;
+// 		const sy      = 0                ;
+// 	    const sWidth  = this.image.width ;
+// 	    const sHeight = this.image.height;
+// 	    const dWidth  = sWidth * this.s  ;
+// 	    const dHeight = sHeight * this.s ;
+// 		ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
+// 	} else {
+// 		if (this.image.onload === null) {
+// 			this.image.onload = on_resize;
+// 		}
+// 	}
+// };
+
+// c_image.prototype.click = function() {
+// 	if (click_test(this.image, this.x, this.y, this.s)) {
+// 		if (this.f !== null) this.f();
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// };
+
+// window.image = (src, x = 0, y = 0, s = 1, f = null) => {
+//     return new c_image(src, x, y, s, f);
+// };
 
 ////////////////////////////////////////////////////////////////////////////////////
 //
@@ -371,64 +344,64 @@ window.image = (src, x = 0, y = 0, s = 1, f = null) => {
 //
 ////////////////////////////////////////////////////////////////////////////////////
 
-function c_img(src, x = 0, y = 0, s = 1, on_click = null) {
-	assert(typeof src === 'string');
-    this.image     = new Image();
-    this.image.src = src;
-    this.x         = x;
-    this.y         = y;
-    this.s         = s;
-	this.on_click  = on_click;
-	this.started   = false;
-}
+// function c_img(src, x = 0, y = 0, s = 1, on_click = null) {
+// 	assert(typeof src === 'string');
+//     this.image     = new Image();
+//     this.image.src = src;
+//     this.x         = x;
+//     this.y         = y;
+//     this.s         = s;
+// 	this.on_click  = on_click;
+// 	this.started   = false;
+// }
 
-c_img.prototype.clone = function(x = 0, y = 0, s = 1, on_click = null) {
-    return new c_img(this.image.src, x, y, s, on_click);
-};
+// c_img.prototype.clone = function(x = 0, y = 0, s = 1, on_click = null) {
+//     return new c_img(this.image.src, x, y, s, on_click);
+// };
 
-c_img.prototype.start = function() {
-	if (this.started) return;
-	this.started = true;
-	return this;
-};
+// c_img.prototype.start = function() {
+// 	if (this.started) return;
+// 	this.started = true;
+// 	return this;
+// };
 
-c_img.prototype.stop = function() {
-	if (!this.started) return;
-	this.started = false;
-	return this;
-};
+// c_img.prototype.stop = function() {
+// 	if (!this.started) return;
+// 	this.started = false;
+// 	return this;
+// };
 
-c_img.prototype.draw = function() {
-	if (!this.started) return;
-	if (this.image.complete) {
-		const dx      = this.x           ;
-		const dy      = this.y           ;
-		const sx      = 0                ;
-		const sy      = 0                ;
-	    const sWidth  = this.image.width ;
-	    const sHeight = this.image.height;
-	    const dWidth  = sWidth * this.s  ;
-	    const dHeight = sHeight * this.s ;
-		ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
-	} else {
-		if (this.image.onload === null) {
-			this.image.onload = on_resize;
-		}
-	}
-};
+// c_img.prototype.draw = function() {
+// 	if (!this.started) return;
+// 	if (this.image.complete) {
+// 		const dx      = this.x           ;
+// 		const dy      = this.y           ;
+// 		const sx      = 0                ;
+// 		const sy      = 0                ;
+// 	    const sWidth  = this.image.width ;
+// 	    const sHeight = this.image.height;
+// 	    const dWidth  = sWidth * this.s  ;
+// 	    const dHeight = sHeight * this.s ;
+// 		ctx.drawImage(this.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);		
+// 	} else {
+// 		if (this.image.onload === null) {
+// 			this.image.onload = on_resize;
+// 		}
+// 	}
+// };
 
-c_img.prototype.click = function() {
-	if (this.started && click_test(this.image, this.x, this.y, this.s)) {
-		if (this.on_click !== null) this.on_click(this);
-		return true;
-	} else {
-		return false;
-	}
-};
+// c_img.prototype.click = function() {
+// 	if (this.started && click_test(this.image, this.x, this.y, this.s)) {
+// 		if (this.on_click !== null) this.on_click(this);
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// };
 
-window.img = (src, x = 0, y = 0, s = 1, on_click = null) => {
-    return new c_img(src, x, y, s, on_click);
-};
+// window.img = (src, x = 0, y = 0, s = 1, on_click = null) => {
+//     return new c_img(src, x, y, s, on_click);
+// };
 
 ////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1234,20 +1207,22 @@ window.radio_buttons = (...radio_buttons) => {
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 window.back_button = pair2(
-    image("./global/images/upper_left_green.png"   ),
-    image("./global/images/upper_left_border.png")
+    img("./global/images/upper_left_green.png"   ),
+    img("./global/images/upper_left_border.png")
 );
 
 window.silence_button = pair2(
-	image("./global/images/upper_right_green.png" ),
-	image("./global/images/upper_right_border.png"),
-	_ => {
-		if (window.stop_page_audio !== null) {
-			window.stop_page_audio();
-			assert(window.stop_page_audio === null);
-		}
-	}
-);
+	img("./global/images/upper_right_green.png" ),
+	img("./global/images/upper_right_border.png")
+);	
+// 	,
+// 	_ => {
+// 		if (window.stop_page_audio !== null) {
+// 			window.stop_page_audio();
+// 			assert(window.stop_page_audio === null);
+// 		}
+// 	}
+// );
 
 // window.on_click  = null; // set in page start func
 // window.click_x   = null;
