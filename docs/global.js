@@ -1211,10 +1211,10 @@ window.back_button = pair2(
     img("./global/images/upper_left_border.png")
 );
 
-window.silence_button = pair2(
-	img("./global/images/upper_right_green.png" ),
-	img("./global/images/upper_right_border.png")
-);	
+// window.silence_button = pair2(
+// 	img("./global/images/upper_right_green.png" ),
+// 	img("./global/images/upper_right_border.png")
+// );	
 // 	,
 // 	_ => {
 // 		if (window.stop_page_audio !== null) {
