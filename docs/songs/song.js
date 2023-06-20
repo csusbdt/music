@@ -40,7 +40,7 @@ c_song.prototype.play_notes = function() {
 };
 
 c_song.prototype.start = function() {
-	assert(this.loop_id === null);
+	if (this.loop_id !== null) return;
 	assert(gain !== null);
 	this.g = audio.createGain();
 	this.g.gain.value = 0;
@@ -61,7 +61,7 @@ c_song.prototype.start = function() {
 };
 
 c_song.prototype.stop = function() {
-	assert(this.loop_id !== null);
+	if (this.loop_id === null) return;
 	this.o_left.frequency.cancelScheduledValues(audio.currentTime);
 	this.o_right.frequency.cancelScheduledValues(audio.currentTime);
 	this.g.gain.cancelScheduledValues(audio.currentTime);	

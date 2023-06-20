@@ -1,94 +1,65 @@
 import start_home  from "../home/index.js";
-import songs       from "./songs.js"      ;
-import c_toggle    from "../toggle.js"    ;
 import c_img       from "../img.js"       ;
+import c_button    from "../button.js"    ;
+import c_toggle    from "../toggle.js"    ;
+import songs       from "./songs.js"      ;
 
-// function c_img(src) {
-//     this.image     = new Image();
-//     this.image.src = src;
-// }
+let song_i = 0; 
 
-// c_img.prototype.draw = function() {	
-// 	if (this.image.complete) {
-// 		ctx.drawImage(this.image, 0, 0);
-// 	} else {
-// 		this.image.onload = on_resize;
-// 	}
-// };
+let img = n => new c_img("./global/images/" + n + ".png");
+const stop_audio_red    = img("upper_right_red");
+const stop_audio_green  = img("upper_right_green");
+const stop_audio_border = img("upper_right_border");
 
-const img = n => new c_img("./songs/images/" + n + ".png");
-const click = img => img.click();
+img = n => new c_img("./songs/images/" + n + ".png");
+const big_green         = img("play_big_green");
+const big_red           = img("play_big_red");
+const big_border        = img("play_big_border");
+const medium_1_green    = img("medium_1_green");
+const medium_1_red      = img("medium_1_red");
+const medium_1_border   = img("medium_1_border");
+const medium_2_green    = img("medium_2_green");
+const medium_2_red      = img("medium_2_red");
+const medium_2_border   = img("medium_2_border");
+const small_1_green     = img("small_1_green");
+const small_1_red       = img("small_1_red");
+const small_1_border    = img("small_1_border");
 
-//const click = img => click_test(img.image);
+let create_song_button = (green, red, border, song) => {
+	return new c_toggle(green, red, border, song.start, song.stop);
+};
 
-const borders = [
-	img("play_big_border"     ),
-	img("play_medium_1_border"),
-	img("play_medium_2_border"),
-	img("play_small_1_border" )
+const song_buttons = [
+	create_song_button(big_green     , big_red     , big_border     , songs[0]),
+	create_song_button(medium_1_green, medium_1_red, medium_1_border, songs[1]),
+	create_song_button(medium_2_green, medium_2_red, medium_2_border, songs[2]),
+	create_song_button(small_1_green , small_1_red , small_1_border , songs[3])
 ];
 
-const greens = [
-	img("play_big_green"     ),
-	img("play_medium_1_green"),
-	img("play_medium_2_green"),
-	img("play_small_1_green" )
-];
+const start_audio = _ => {
+	if (window.stop_page_audio !== null) window.stop_page_audio();
+	songs[song_i].start();
+	window.stop_page_audio = stop_audio;
+}; 
 
-const reds = [
-	img("play_big_red"       ),
-	img("play_medium_1_red"  ),
-	img("play_medium_2_red"  ),
-	img("play_small_1_red"   )
-];
+const stop_audio = _ => {
+	song_buttons.forEach(o => o.color = o.color_0 && o.song.stop());
+}; 
 
-let song_i = null;
-
-const is_playing = _ => song_i !== null;
-
-const stop_audio_red    = new c_img("./global/images/upper_right_red.png"   );
-const stop_audio_green  = new c_img("./global/images/upper_right_green.png" );
-const stop_audio_border = new c_img("./global/images/upper_right_border.png");
-
-const stop_audio = new c_toggle(stop_audio_green, stop_audio_red, stop_audio_border);
-
+const stop_audio_button = new c_toggle(
+	stop_audio_green, stop_audio_red, stop_audio_border, start_audio, stop_audio
+);
 
 const draw_page = _ => {
 	bg_blue.draw();
-	greens.forEach(o => o.draw());
-	if (song_i !== null) reds[song_i].draw();
-	borders.forEach(o => o.draw());
-	stop_audio.draw();
-//	silence_button.draw();
 	back_button.draw();
+	stop_audio_button.draw();
+	song_buttons.forEach(o => o.draw());
 };
 
-const stop_page_audio = _ => {
-	if (window.stop_page_audio !== stop_page_audio) {
-		window.stop_page_audio();
-	} else {
-		songs[song_i].stop();
-		song_i = null;
-	}
-	window.stop_page_audio = null;
-	stop_audio.color = stop_audio.color_0;
-}; 
-
 const click_page = _ => {
-	if (stop_audio.click()) {
-		if (window.stop_page_audio !== null) {
-			window.stop_page_audio();
-			stop_audio.color = stop_audio.color_0;
-			on_resize();
-		}
-		return;
-	}
-	
-	if (back_button.click()) {
-		if (is_playing()) window.stop_page_audio = stop_page_audio;
-		start_home();
-	}
-//	} else if (silence_button.click()) return on_resize();
+	if (stop_audio_button.click()) on_resize();
+	else if (back_button.click()) start_home();
 	else for (let i = 0; i < reds.length; ++i) {
 		if (click(reds[i])) {
 			if (window.stop_page_audio !== null) {
@@ -113,9 +84,9 @@ const click_page = _ => {
 
 export default _ => {
 	if (window.stop_page_audio === null) {		
-		stop_audio.color = stop_audio.color_0;
+		stop_audio_button.color = stop_audio_button.color_0;
 	} else {
-		stop_audio.color = stop_audio.color_1;
+		stop_audio_button.color = stop_audio_button.color_1;
 	}
 	set_item('page', "./songs/index.js");
 	on_click  = click_page;	
