@@ -22,12 +22,12 @@ const play_buttons = [];
 const edit_buttons = [];
 
 const play_button_action = function(unit) {
-	if (unit.g === null) {
-		unit.start();
-		this.color = red;
-	} else {
+	if (unit.is_playing()) {
 		unit.stop();
 		this.color = green;
+	} else {
+		unit.start();
+		this.color = red;
 	}
 };
 
@@ -37,7 +37,7 @@ const edit_button_action = function(unit) {
 
 const add_unit = _ => {
 	const i = units.length;
-	const unit = new c_unit();	
+	const unit = new c_unit();
 	const play_button = new c_button(green, border, 200 + 100 * i, 200);
 	play_button.action = play_button_action.bind(play_button, unit);
 	const edit_button = new c_button(yellow, border, 200 + 100 * i, 300);
