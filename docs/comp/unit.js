@@ -49,6 +49,10 @@ c_unit.prototype.stop = function() {
     if (this.wave.g !== null) this.wave.stop();
 };
 
+c_unit.prototype.schedule = function(start_time, duration) {
+    this.wave.schedule(start_time, duration);
+};
+
 c_unit.prototype.get_frequency = function() {
     const base_frequency = Math.pow(2, this.octave) * this.base_frequency;
     const half_notes_away_from_base = this.whole_notes * 2 + this.half_notes;

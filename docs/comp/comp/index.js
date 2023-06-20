@@ -4,6 +4,7 @@ import c_img      from "../img.js";
 import c_button   from "../button.js";
 import c_unit     from "../unit.js";
 
+const upper_left_red     = new c_img("./global/images/upper_left_red.png"    , 100, 70, 50);
 const upper_left_green   = new c_img("./global/images/upper_left_green.png"  , 100, 70, 50);
 const upper_left_border  = new c_img("./global/images/upper_left_border.png" , 100, 70, 50);
 const upper_right_green  = new c_img("./global/images/upper_right_green.png" , 900, 60, 50);
@@ -15,6 +16,7 @@ const yellow = new c_img("./compose/images/yellow.png", 120, 205, 36);
 const border = new c_img("./compose/images/border.png", 120, 205, 36);
 
 const back_button            = new c_button(upper_left_green , upper_left_border );
+const play_seq_button        = new c_button(upper_left_green , upper_left_border , 400, 0);
 const stop_page_audio_button = new c_button(upper_right_green, upper_right_border);
 
 const units        = [];
@@ -33,6 +35,31 @@ const play_button_action = function(unit) {
 
 const edit_button_action = function(unit) {
 	start_edit.call(null, unit);
+};
+
+let timeout_id = null;
+
+const schedule = _ => {
+	let t = 0;
+	for (let i = 0; i < units.length; ++i) {
+		units[i].schedule(t, 1);
+		t += 1;
+	}
+	timeout_id = setTimeout(schedule, t * 1000);
+}
+
+play_seq_button.action = _ => {
+	if (play_seq_button.color === upper_left_green) {
+		units.forEach(o => o.stop());
+		play_buttons.forEach(o => o.color = green);
+		schedule();
+		play_seq_button.color = upper_left_red;
+	} else {
+		play_seq_button.color = upper_left_green;
+		clearInterval(timeout_id);
+		timeout_id = null;
+		units.forEach(o => o.stop());
+	}
 };
 
 const add_unit = _ => {
@@ -60,6 +87,12 @@ const stop_page_audio = _ => {
 };
 
 const click_page = _ => {
+	if (play_seq_button.click()) {
+		on_resize();
+		return;
+	}
+	if (timeout_id !== null) return;
+	
 	if (back_button.click()) {
 		start_select_comp();
 	} else if (stop_page_audio_button.click()) {
@@ -84,6 +117,7 @@ const draw_page = _ => {
 	draw(edit_buttons);
 	draw(back_button);
 	draw(stop_page_audio_button);
+	draw(play_seq_button);
 };
 
 export default _ => {

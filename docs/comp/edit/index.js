@@ -57,7 +57,7 @@ export default u => {
 		0, 200, unit.volume, c_unit.prototype.max_volume, i => unit.set_volume(i)
 	);
 	octave_controller = new c_controller(
-		0, 300, unit.octave, c_unit.prototype.max_octave, i => unit.set_octave(i)
+		0, 300, unit.octave, 5, i => unit.set_octave(i)
 	);
 	if (window.stop_page_audio !== null) window.stop_page_audio();
 	window.stop_page_audio = stop_page_audio;

@@ -76,4 +76,10 @@ c_wave.prototype.stop = function() {
 	return this;
 };
 
+c_wave.prototype.schedule = function(start_time, duration) {
+	this.start();
+	this.g.gain.setTargetAtTime(this.v, audio.currentTime + start_time, .05);
+	this.g.gain.setTargetAtTime(0, audio.currentTime + start_time + duration, .05);
+};
+
 export default c_wave;
