@@ -5,11 +5,11 @@ import c_button   from "../button.js"    ;
 
 let img = n => new c_img("./global/images/" + n + ".png");
 
-const upper_left_green  = img("upper_left_green"      , 100, 70, 50);
-const upper_left_border = img("upper_left_border.png" , 100, 70, 50);
-const audio_red         = img("upper_right_red.png"   , 900, 60, 50);
-const audio_green       = img("upper_right_green.png" , 900, 60, 50);
-const audio_border      = img("upper_right_border.png", 900, 60, 50);
+const upper_left_green  = img("upper_left_green"  , 100, 70, 50);
+const upper_left_border = img("upper_left_border" , 100, 70, 50);
+const audio_red         = img("upper_right_red"   , 900, 60, 50);
+const audio_green       = img("upper_right_green" , 900, 60, 50);
+const audio_border      = img("upper_right_border", 900, 60, 50);
 
 const back_button  = new c_button(upper_left_green ,upper_left_border);
 const audio_toggle = new c_toggle(audio_green, audio_red, audio_border);
@@ -39,7 +39,10 @@ const bullet = [
 	]
 ];
 
-const gun_red  = [ img("gun_left_red" ), img("gun_right_red") ];
+const gun_red  = [ 
+	img("gun_left_red" , 235, 740, 300, 830), 
+	img("gun_right_red", 585, 750, 792, 850) 
+];
 
 const explosion = [
 	[
@@ -77,7 +80,6 @@ let gun_i        = null;
 let bullet_i     = null;
 let explosion_i  = null;
 let ship_speed_i = null;
-
 let ship_id      = null;
 
 const start_ship = _ => {
@@ -92,28 +94,32 @@ const next_ship = _ => {
 	ship_id = setTimeout(next_ship, ship_speed[ship_speed_i]);
 };
 
-const start_bullet = _ => {
-	bullet_i  = 0;
+const fire_gun = i => {
+	gun_i    = i;
+	bullet_i = 0;
 	setTimeout(next_bullet, 100);
+	on_click = null;
 };
 
 const next_bullet = _ => {
-	assert(bullet_i !== null);
 	if (++bullet_i === 5) {
 		bullet_i  = null;
+		gun_i     = null;
+		on_click = click;
 	} else if (bullet_i === 4) {
 		if (gun_i === 0 && ship_i === 0 || gun_i === 1 && ship_i === 2) {
 			if (++ship_speed_i === ship_speed.length) ship_speed_i = 0;
-			bullet_id   = null;
-			bullet_i    = null;
+			clearTimeout(ship_id);
 			ship_id     = null;
 			ship_i      = null;
+			bullet_i    = null;
 			explosion_i = 0   ;
-			clearTimeout(ship_id);
 			setTimeout(next_explosion, 100);
 		} else {
 			setTimeout(next_bullet, 100);
 		}
+	} else {
+		setTimeout(next_bullet, 100);
 	}
 	on_resize();
 };
@@ -122,9 +128,8 @@ const next_explosion = _ => {
 	if (++explosion_i === 4) {
 		gun_i        = null;
 		explosion_i  = null;
-		explosion_id = null;
-		explosion_i  = null;
 		start_ship();
+		on_click = click;
 	} else {
 		setTimeout(next_explosion, 100);
 	}
@@ -146,12 +151,6 @@ const draw = _ => {
 	audio_toggle.draw();
 };
 
-////////////////////////////////////////////////////////////////////////////
-//
-// TODO: use rect for gun, set on_click = null when ship not visible
-//
-////////////////////////////////////////////////////////////////////////////
-
 const click = _ => {
 	if (audio_toggle.click()) {
 		if (window.stop_audio !== null) {
@@ -161,29 +160,26 @@ const click = _ => {
 			window.start_audio();
 			audio_toggle.color = audio_toggle.color_1;
 		}
-		on_resize();
 	}
-	else if (back_button.click()) return exit();
-	else if (gun_i !== null) return;
-	else if (gun_red[0].click()) gun_i = 0;
-	else if (gun_red[1].click()) gun_i = 1;
-	else return;
-	bullet_i = 0;
-	setTimeout(next_bullet, 100);
+	else if (back_button.click()) {
+		clearTimeout(ship_id);
+		start_home();
+		return;
+	}
+	else if (gun_red[0].click()) {
+		fire_gun(0);
+	}
+	else if (gun_red[1].click()) {
+		fire_gun(1);
+	}
 	on_resize();
-};
-
-const exit = _ => {
-	start_home();
 };
 
 const start = _ => {
 	gun_i        = null;
 	bullet_i     = null;
 	explosion_i  = null;
-	ship_speed_i = 0   ; // 150, 200, 300, 500, 1000
-	bullet_id    = null;
-	explosion_id = null;
+	ship_speed_i = 0   ;
 	start_ship();
 };
 
