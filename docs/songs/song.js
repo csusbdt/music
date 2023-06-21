@@ -20,6 +20,10 @@ function c_song(notes, ramp_up = 0, ramp_down = 0, binaural = 0) {
 	});
 }
 
+c_song.prototype.is_playing = function() {
+	return this.g !== null;
+};
+
 c_song.prototype.play_notes = function() {
 	let t = 0;
 	for (let i = 0; i < this.notes.length; ++i) {
@@ -41,7 +45,6 @@ c_song.prototype.play_notes = function() {
 
 c_song.prototype.start = function() {
 	if (this.loop_id !== null) return;
-	assert(gain !== null);
 	this.g = audio.createGain();
 	this.g.gain.value = 0;
 	this.g.gain.setTargetAtTime(1, audio.currentTime, .05);

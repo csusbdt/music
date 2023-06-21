@@ -65,10 +65,11 @@ window.get_item = (key, _default) => {
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-window.audio           = null;
-window.main_gain       = null; 
-window.gain            = null; 
-window.stop_page_audio = null;
+window.audio       = null;
+let main_gain      = null;
+window.gain        = null; 
+window.stop_audio  = null; 
+window.start_audio = null; 
 
 window.init_audio = _ => {
 	if (audio === null) {
