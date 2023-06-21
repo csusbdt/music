@@ -1,4 +1,4 @@
-import c_img       from "../img.js";
+import c_img       from "./img.js";
 
 let img = n => new c_img("./global/images/" + n + ".png");
 

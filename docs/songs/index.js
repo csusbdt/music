@@ -1,8 +1,8 @@
-import start_home  from "../home/index.js";
-import c_img       from "../img.js"       ;
-import c_button    from "../button.js"    ;
-import c_toggle    from "../toggle.js"    ;
-import songs       from "./songs.js"      ;
+import start_home  from "../home/index.js"   ;
+import c_img       from "../global/img.js"   ;
+import c_button    from "../global/button.js";
+import c_toggle    from "../global/toggle.js";
+import songs       from "./songs.js"         ;
 
 let img = n => new c_img("./global/images/" + n + ".png");
 const upper_left_green  = img("upper_left_green"  , 100, 70, 50);

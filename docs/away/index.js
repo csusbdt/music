@@ -1,7 +1,7 @@
 import start_home     from "../home/index.js"   ;
 import start_far_away from "./far_away/index.js";
-import c_img          from "../img.js";
-import c_button       from "../button.js";
+import c_img          from "../global/img.js";
+import c_button       from "../global/button.js";
 
 const red    = new c_img("./compose/images/red.png"   , 120, 205, 36);
 const green  = new c_img("./compose/images/green.png" , 120, 205, 36);

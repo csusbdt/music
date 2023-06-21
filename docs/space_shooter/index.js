@@ -1,7 +1,7 @@
-import start_home from "../home/index.js";
-import c_img      from "../img.js"       ;
-import c_toggle   from "../toggle.js"    ;
-import c_button   from "../button.js"    ;
+import start_home from "../home/index.js"   ;
+import c_img      from "../global/img.js"   ;
+import c_toggle   from "../global/toggle.js";
+import c_button   from "../global/button.js";
 
 let img = n => new c_img("./global/images/" + n + ".png");
 

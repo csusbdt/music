@@ -1,7 +1,7 @@
-import start_home from "../home/index.js";
-import c_img      from "./img.js";
-import c_wave     from "./wave.js";
-import c_button   from "./button.js";
+import start_home from "../home/index.js"   ;
+import c_img      from "../global/img.js"   ;
+import c_button   from "../global/button.js";
+import c_wave     from "./wave.js"          ;
 
 const upper_right_green  = new c_img("./global/images/upper_right_green.png" );
 const upper_right_border = new c_img("./global/images/upper_right_border.png");

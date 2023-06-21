@@ -1,6 +1,6 @@
 import start_away from "../index.js";
-import c_img      from "./img.js";
-import c_button   from "./button.js";
+import c_img      from "../global/img.js";
+import c_button   from "../global/button.js";
 
 const upper_left_green   = new c_img("./global/images/upper_left_green.png"  , 100, 70, 50);
 const upper_left_border  = new c_img("./global/images/upper_left_border.png" , 100, 70, 50);
