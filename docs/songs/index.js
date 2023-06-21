@@ -39,6 +39,7 @@ const start_audio = _ => {
 	song_toggles[song_i].color = song_toggles[song_i].color_1;
 	audio_toggle.color = audio_toggle.color_1;
 	window.start_audio = null;
+	window.stop_audio = stop_audio;
 };
 
 const stop_audio = _ => {
@@ -46,6 +47,7 @@ const stop_audio = _ => {
 	song_toggles[song_i].color = song_toggles[song_i].color_0;
 	audio_toggle.color = audio_toggle.color_0;
 	window.stop_audio = null;
+	window.start_audio = start_audio;
 }; 
 
 const draw_page = _ => {
@@ -76,7 +78,7 @@ const click_page = _ => {
 		}
 		on_resize(); 
 	} else if (back_button.click()) {
-		if (is_playing()) {
+		if (songs[song_i].is_playing()) {
 			window.start_audio = null;
 			window.stop_audio = stop_audio;
 		} else if (window.start_audio === null && window.stop_audio === null) {
@@ -115,14 +117,14 @@ const click_page = _ => {
 export default _ => {
 	if (songs[song_i].is_playing()) {
 		assert(window.stop_audio === stop_audio);
-		audio_button.color = audio_button.color_1;
+		audio_toggle.color = audio_toggle.color_1;
 		song_toggles[song_i].color = song_toggles[song_i].color_1;
 	} else if (window.stop_audio !== null) {
 		assert(window.start_audio === null);
-		audio_button.color = audio_button.color_1;
+		audio_toggle.color = audio_toggle.color_1;
 		song_toggles[song_i].color = song_toggles[song_i].color_0;
 	} else if (window.start_audio !== null) {
-		audio_button.color = audio_button.color_0;
+		audio_toggle.color = audio_toggle.color_0;
 		song_toggles[song_i].color = song_toggles[song_i].color_0;		
 	} else {
 		// no audio has yet been played
