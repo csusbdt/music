@@ -1,40 +1,19 @@
+import c_img       from "../img.js";
 
+let img = n => new c_img("./global/images/" + n + ".png");
 
-const upper_left_yellow  = image("./global/images/upper_left_yellow.png" );
-const lower_left_yellow  = image("./global/images/lower_left_yellow.png" );
-const upper_right_yellow = image("./global/images/upper_right_yellow.png");
-const lower_right_yellow = image("./global/images/lower_right_yellow.png");
-const upper_left_border  = image("./global/images/upper_left_border.png" );
-const lower_left_border  = image("./global/images/lower_left_border.png" );
-const upper_right_border = image("./global/images/upper_right_border.png");
-const lower_right_border = image("./global/images/lower_right_border.png");
+export const upper_left_green   = img("upper_left_green"  , 100, 70, 50);
+export const upper_left_yellow  = img("upper_left_yellow" , 100, 70, 50);
+export const upper_left_border  = img("upper_left_border" , 100, 70, 50);
 
-const click = _ => {
-    if (upper_left_yellow.click()) { // back
-		return true;
-	}
-    if (lower_left_yellow .click() { // silence
-		return true;
-	}
-    if (upper_right_yellow.click() { // menu
-		return true;
-	}
-    if (lower_right_yellow.click() { // hide other buttons
-		return true;
-	}
-};
+export const upper_right_green  = img("upper_right_green" , 900, 60, 50);
+export const upper_right_yellow = img("upper_right_yellow", 900, 60, 50);
+export const upper_right_border = img("upper_right_border", 900, 60, 50);
 
-const draw = _ => {
-    upper_left_yellow .draw();
-    lower_left_yellow .draw();
-    upper_right_yellow.draw();
-    lower_right_yellow.draw();
-    upper_left_border .draw();
-    lower_left_border .draw();
-    upper_right_border.draw();
-    lower_right_border.draw();
-};
+// export const lower_left_green   = img("lower_left_green"  , 87, 920, 50);
+// export const lower_left_yellow  = img("lower_left_yellow" , 87, 920, 50);
+// export const lower_left_border  = img("lower_left_border" , 87, 920, 50);
 
-const o = overlay(draw, click);
-
-export default o;
+// export const lower_right_green  = img("lower_right_green" , 922, 922, 50);
+// export const lower_right_yellow = img("lower_right_yellow", 922, 922, 50);
+// export const lower_right_border = img("lower_right_border", 922, 922, 50);
