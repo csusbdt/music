@@ -96,6 +96,7 @@ const click_page = _ => {
 					songs[song_i].stop();
 					song_toggles[song_i].color = song_toggles[song_i].color_0;
 					song_i = i;
+					set_item("song_i", song_i);
 					songs[song_i].start();
 					song_toggles[song_i].color = song_toggles[song_i].color_1;
 					audio_toggle.color = audio_toggle.color_1;

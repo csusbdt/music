@@ -88,11 +88,11 @@ window.init_audio = _ => {
 	}
 };
 
-const stop_audio  = _ => { window.stop_audio = null       ; window.start_audio = start_audio }; 
-const start_audio = _ => { window.stop_audio = stop_audio ; window.start_audio = null        }; 
+//const stop_audio  = _ => { window.stop_audio = null       ; window.start_audio = start_audio }; 
+//const start_audio = _ => { window.stop_audio = stop_audio ; window.start_audio = null        }; 
 
 window.stop_audio  = null; 
-window.start_audio = start_audio; 
+window.start_audio = null; 
 
 ///////////////////////////////////////////////////////////////////////////////
 //
