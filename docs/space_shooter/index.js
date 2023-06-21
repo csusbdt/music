@@ -1,80 +1,72 @@
-import start_home from "../home/index.js" ;
+import start_home from "../home/index.js";
+import c_img      from "../img.js"       ;
+import c_toggle   from "../toggle.js"    ;
+import c_button   from "../button.js"    ;
 
-function c_image(src, x = 0, y = 0) {
-    this.image     = new Image();
-    this.image.src = src;
-	this.x         = x;
-	this.y         = y;
-}
+let img = n => new c_img("./global/images/" + n + ".png");
 
-c_image.prototype.draw = function() {	
-	if (this.image.complete) {
-		ctx.drawImage(this.image, this.x, this.y);
-	} else {
-		this.image.onload = on_resize;
-	}
-};
+const upper_left_green  = img("upper_left_green"      , 100, 70, 50);
+const upper_left_border = img("upper_left_border.png" , 100, 70, 50);
+const audio_red         = img("upper_right_red.png"   , 900, 60, 50);
+const audio_green       = img("upper_right_green.png" , 900, 60, 50);
+const audio_border      = img("upper_right_border.png", 900, 60, 50);
 
-const image = (n, x = 0, y = 0) => new c_image("./space_shooter/images/" + n + ".png", x, y);
+const back_button  = new c_button(upper_left_green ,upper_left_border);
+const audio_toggle = new c_toggle(audio_green, audio_red, audio_border);
 
-const ship_border = [ 
-	image("ship_left_border"  ), 
-	image("ship_middle_border"), 
-	image("ship_right_border" ), 
-	image("ship_middle_border") 
+img = n => new c_img("./space_shooter/images/" + n + ".png");
+
+const ship = [
+	new c_button(img("ship_left_yellow")  , img("ship_left_border"  )),
+	new c_button(img("ship_middle_yellow"), img("ship_middle_border")),
+	new c_button(img("ship_right_yellow") , img("ship_right_border" )),
+	new c_button(img("ship_middle_yellow"), img("ship_middle_border"))
 ];
 
-const ship_yellow = [ 
-	image("ship_left_yellow"  ), 
-	image("ship_middle_yellow"), 
-	image("ship_right_yellow" ), 
-	image("ship_middle_yellow") 
-];
-
-const bullet_red = [
+const bullet = [
 	[
-		image("bullet_left_red_0" ), 
-		image("bullet_left_red_1" ), 
-		image("bullet_left_red_2" ), 
-		image("bullet_left_red_3" ), 
-		image("bullet_left_red_4" )
+		new c_button(img("bullet_red_0"), img("bullet_border_0")),
+		new c_button(img("bullet_red_1"), img("bullet_border_1")),
+		new c_button(img("bullet_red_2"), img("bullet_border_2")),
+		new c_button(img("bullet_red_3"), img("bullet_border_3")),
+		new c_button(img("bullet_red_4"), img("bullet_border_4"))
 	], [
-		image("bullet_left_red_0", 350, 0), 
-		image("bullet_left_red_1", 350, 0), 
-		image("bullet_left_red_2", 350, 0), 
-		image("bullet_left_red_3", 350, 0), 
-		image("bullet_left_red_4", 350, 0)
+		new c_button(img("bullet_red_0"), img("bullet_border_0"), 350, 0),
+		new c_button(img("bullet_red_1"), img("bullet_border_1"), 350, 0),
+		new c_button(img("bullet_red_2"), img("bullet_border_2"), 350, 0),
+		new c_button(img("bullet_red_3"), img("bullet_border_3"), 350, 0),
+		new c_button(img("bullet_red_4"), img("bullet_border_4"), 350, 0)
 	]
 ];
 
-const bullet_border = [
-	[
-		image("bullet_left_border_0"), 
-		image("bullet_left_border_1"), 
-		image("bullet_left_border_2"), 
-		image("bullet_left_border_3"), 
-		image("bullet_left_border_4")
-	], [
-		image("bullet_left_border_0", 350, 0), 
-		image("bullet_left_border_1", 350, 0), 
-		image("bullet_left_border_2", 350, 0), 
-		image("bullet_left_border_3", 350, 0), 
-		image("bullet_left_border_4", 350, 0)
-	]
-];
+const gun_red  = [ img("gun_left_red" ), img("gun_right_red") ];
 
 const explosion = [
 	[
-		image("left_explosion_0"),
-		image("left_explosion_1"),
-		image("left_explosion_2"),
-		image("left_explosion_3")
+		img("left_explosion_0"),
+		img("left_explosion_1"),
+		img("left_explosion_2"),
+		img("left_explosion_3")
 	], [
-		image("right_explosion_0"),
-		image("right_explosion_1"),
-		image("right_explosion_2"),
-		image("right_explosion_3")
+		img("right_explosion_0"),
+		img("right_explosion_1"),
+		img("right_explosion_2"),
+		img("right_explosion_3")
 	]
+];
+
+const draw_0 = [
+	img("window_exterior"),
+	img("window_interior"),
+	img("gun_left_white"), 
+	img("gun_right_white")
+];
+
+const draw_1 = [
+	img("gun_left_border"), 
+	img("gun_right_border"),
+	img("window_border"),
+	back_button
 ];
 
 const ship_speed = [ 1000, 500, 300, 200, 150 ];
@@ -87,124 +79,103 @@ let explosion_i  = null;
 let ship_speed_i = null;
 
 let ship_id      = null;
-let bullet_id    = null;
-let explosion_id = null;
 
 const start_ship = _ => {
 	ship_i = Math.floor(4 * Math.random());
-	ship_id = setInterval(next_ship, ship_speed[ship_speed_i]);
+	ship_id = setTimeout(next_ship, ship_speed[ship_speed_i]);
 };
 
 const next_ship = _ => {
 	assert(ship_i !== null);
 	if (++ship_i === 4) ship_i = 0;
 	on_resize();
-};
-
-const stop_ship = _ => {
-	clearInterval(ship_id);
-	ship_id = null;
-	ship_i  = null;
+	ship_id = setTimeout(next_ship, ship_speed[ship_speed_i]);
 };
 
 const start_bullet = _ => {
 	bullet_i  = 0;
-	bullet_id = setInterval(next_bullet, 100);
+	setTimeout(next_bullet, 100);
 };
 
 const next_bullet = _ => {
 	assert(bullet_i !== null);
 	if (++bullet_i === 5) {
-		gun_i = null;
-		stop_bullet();
+		bullet_i  = null;
 	} else if (bullet_i === 4) {
 		if (gun_i === 0 && ship_i === 0 || gun_i === 1 && ship_i === 2) {
-			stop_ship();
-			stop_bullet();
-			start_explosion();
 			if (++ship_speed_i === ship_speed.length) ship_speed_i = 0;
+			bullet_id   = null;
+			bullet_i    = null;
+			ship_id     = null;
+			ship_i      = null;
+			explosion_i = 0   ;
+			clearTimeout(ship_id);
+			setTimeout(next_explosion, 100);
+		} else {
+			setTimeout(next_bullet, 100);
 		}
 	}
 	on_resize();
 };
 
-const stop_bullet = _ => {
-	clearInterval(bullet_id);
-	bullet_id = null;
-	bullet_i  = null;
-};
-
-const start_explosion = _ => {
-	explosion_i  = 0;
-	explosion_id = setInterval(next_explosion, 100);
-};
-
 const next_explosion = _ => {
 	if (++explosion_i === 4) {
-		gun_i = null;
-		stop_explosion();
+		gun_i        = null;
+		explosion_i  = null;
+		explosion_id = null;
+		explosion_i  = null;
 		start_ship();
+	} else {
+		setTimeout(next_explosion, 100);
 	}
 	on_resize();
 };
 
-const stop_explosion = _ => {
-	clearInterval(explosion_id);
-	explosion_id = null;
-	explosion_i  = null;
-};
-
-const gun_red  = [ image("gun_left_red" ), image("gun_right_red") ];
-
-const draw_0 = [
-	image("window_exterior"),
-	image("window_interior"),
-	image("gun_left_white"), 
-	image("gun_right_white")
-];
-
-const draw_1 = [
-	image("gun_left_border"), 
-	image("gun_right_border"),
-	image("window_border"),
-	back_button
-];
-
 const draw = _ => {
 	draw_0.forEach(o => o.draw());
-	if (ship_i !== null) {
-		ship_border[ship_i].draw();
-		ship_yellow[ship_i].draw();
-	}
+	if (ship_i !== null) ship[ship_i].draw();
 	if (gun_i !== null) {
 		if (bullet_i === 0) gun_red[gun_i].draw();
 		if (bullet_i !== null) {
-			bullet_red[gun_i][bullet_i].draw();
-			bullet_border[gun_i][bullet_i].draw();
+			bullet[gun_i][bullet_i].draw();
 		} else {
 			explosion[gun_i][explosion_i].draw();
 		}
 	}
 	draw_1.forEach(o => o.draw());
+	audio_toggle.draw();
 };
 
+////////////////////////////////////////////////////////////////////////////
+//
+// TODO: use rect for gun, set on_click = null when ship not visible
+//
+////////////////////////////////////////////////////////////////////////////
+
 const click = _ => {
-	if (back_button.click()) return exit();
-	if (gun_i !== null) return;
-	if (click_test(gun_red[0].image)) gun_i = 0;
-	else if (click_test(gun_red[1].image)) gun_i = 1;
+	if (audio_toggle.click()) {
+		if (window.stop_audio !== null) {
+			window.stop_audio();
+			audio_toggle.color = audio_toggle.color_0;
+		} else {
+			window.start_audio();
+			audio_toggle.color = audio_toggle.color_1;
+		}
+		on_resize();
+	}
+	else if (back_button.click()) return exit();
+	else if (gun_i !== null) return;
+	else if (gun_red[0].click()) gun_i = 0;
+	else if (gun_red[1].click()) gun_i = 1;
 	else return;
 	bullet_i = 0;
-	bullet_id = setInterval(next_bullet, 100);
+	setTimeout(next_bullet, 100);
 	on_resize();
 };
 
 const exit = _ => {
-	if (ship_id      !== null) clearInterval(ship_id     );
-	if (bullet_id    !== null) clearInterval(bullet_id   );
-	if (explosion_id !== null) clearInterval(explosion_id);
 	start_home();
-}
+};
 
 const start = _ => {
 	gun_i        = null;
@@ -217,6 +188,11 @@ const start = _ => {
 };
 
 export default _ => {
+	if (window.stop_audio === null) {
+			audio_toggle.color = audio_toggle.color_0;
+	} else {
+			audio_toggle.color = audio_toggle.color_1;
+	}
 	set_item('page', "./space_shooter/index.js");	
 	on_resize = draw;
 	on_click  = click;

@@ -7,7 +7,7 @@
 window.assert = function(condition, msg) {
 	if (!condition) {
 		if (msg === undefined) msg = "assertion failed";
-		document.body.innerHTML = "<h1>" + msg + "</h1>";
+		log(msg);
 		throw new Error(msg);
 	}
 };
@@ -17,6 +17,7 @@ let error_caught = false;
 window.addEventListener("error", e => {
     // report first error only
     if (error_caught) return;
+	error_caught = true;
 	let i = e.filename.indexOf("//") + 2;
 	i += e.filename.substring(i).indexOf("/") + 1;
 	const filename = e.filename.substring(i);
@@ -24,7 +25,8 @@ window.addEventListener("error", e => {
 });
 
 window.addEventListener('unhandledrejection', e => {
-    if (error_caught) return;
+    if (error_caught) return; 
+	error_caught = true;
 	if (typeof(e.reason.stack) !== 'undefined') {
 	    document.body.innerHTML = `<h1>${e.reason}<br>${e.reason.message}<br>${e.reason.stack}</h1>`;
 	} else {
@@ -68,8 +70,6 @@ window.get_item = (key, _default) => {
 window.audio       = null;
 let main_gain      = null;
 window.gain        = null; 
-window.stop_audio  = null; 
-window.start_audio = null; 
 
 window.init_audio = _ => {
 	if (audio === null) {
@@ -87,6 +87,12 @@ window.init_audio = _ => {
 		gain.connect(main_gain);
 	}
 };
+
+const stop_audio  = _ => { window.stop_audio = null       ; window.start_audio = start_audio }; 
+const start_audio = _ => { window.stop_audio = stop_audio ; window.start_audio = null        }; 
+
+window.stop_audio  = null; 
+window.start_audio = start_audio; 
 
 ///////////////////////////////////////////////////////////////////////////////
 //

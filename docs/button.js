@@ -1,4 +1,4 @@
-function c_button(color, border, x, y, action = null) {
+function c_button(color, border, x = 0, y = 0, action = null) {
 	this.color = color;
 	this.border = border;
 	this.x = x;
@@ -16,6 +16,10 @@ c_button.prototype.click = function() {
 		if (this.action !== null) this.action(this);
 		return true;
 	} else return false;
+};
+
+c_button.prototype.clone = function(x = 0, y = 0, action = null) {
+	return new c_button(this.color, this.border, x, y, action);
 };
 
 export default c_button;
