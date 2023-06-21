@@ -104,6 +104,7 @@ const click_page = _ => {
 				window.start_audio = null; 
 				window.stop_audio  = null;
 				song_i = i;
+				set_item("song_i", song_i);
 				songs[song_i].start();
 				song_toggles[song_i].color = song_toggles[song_i].color_1;
 				audio_toggle.color = audio_toggle.color_1;
@@ -114,7 +115,12 @@ const click_page = _ => {
 	}
 };
 
-export default _ => {
+export default i => {
+	if (i !== undefined) {
+		song_i = i;
+		window.start_audio = start_audio;
+		return;
+	}
 	if (songs[song_i].is_playing()) {
 		assert(window.stop_audio === stop_audio);
 		audio_toggle.color = audio_toggle.color_1;

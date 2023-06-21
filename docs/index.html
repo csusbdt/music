@@ -9,6 +9,9 @@
     
     <script type="module">
         import "./global.js";
+        import set_song from "./songs/index.js";
+        const song_i = get_item('song_i', 0);
+        set_song(song_i);
         import(get_item('page', "./home/index.js")).then(o => { 
             o.default(); 
         });
