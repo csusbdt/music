@@ -88,9 +88,6 @@ window.init_audio = _ => {
 	}
 };
 
-//const stop_audio  = _ => { window.stop_audio = null       ; window.start_audio = start_audio }; 
-//const start_audio = _ => { window.stop_audio = stop_audio ; window.start_audio = null        }; 
-
 window.stop_audio  = null; 
 window.start_audio = null; 
 
@@ -249,56 +246,56 @@ window.bg_white  = new c_bg(rgb_white );
 //
 ////////////////////////////////////////////////////////////////////////////////////
 
-function c_img(src = null, cx = 0, cy = 0, cr = null, bottom = null) {
-	this.src = src;
-	if (src !== null) {
-	    this.image = new Image();
-	    this.image.src = src;
-	} else {
-		this.image = null;
-	}
-	this.cx        = cx; 
-	this.cy        = cy; 
-	this.cr        = cr;
-	this.bottom    = bottom;
-}
+// function c_img(src = null, cx = 0, cy = 0, cr = null, bottom = null) {
+// 	this.src = src;
+// 	if (src !== null) {
+// 	    this.image = new Image();
+// 	    this.image.src = src;
+// 	} else {
+// 		this.image = null;
+// 	}
+// 	this.cx        = cx; 
+// 	this.cy        = cy; 
+// 	this.cr        = cr;
+// 	this.bottom    = bottom;
+// }
 
-c_img.prototype.draw = function(x = 0, y = 0) {
-	if (this.image === null) {
-		return;
-	} else if (this.image.complete) {
-		ctx.drawImage(this.image, x, y);
-	} else {
-		this.image.onload = on_resize;
-	}
-};
+// c_img.prototype.draw = function(x = 0, y = 0) {
+// 	if (this.image === null) {
+// 		return;
+// 	} else if (this.image.complete) {
+// 		ctx.drawImage(this.image, x, y);
+// 	} else {
+// 		this.image.onload = on_resize;
+// 	}
+// };
 
-c_img.prototype.click = function(draw_x = 0, draw_y = 0) {
-	if (!this.image.complete) return false;
-	if (this.cr === null) {
-		return click_test(this.image, draw_x, draw_y);
-	} else if (this.bottom !== null) {
-		const left = this.cx;
-		const top = this.cy;
-		const right = this.cr;
-		return (
-			draw_x + left        < click_x && 
-			draw_y + top         < click_y &&
-			draw_x + right       > click_x &&
-			draw_y + this.bottom > click_y
-		);
-	} else {
-		const cx = this.cx + draw_x;
-		const cy = this.cy + draw_y;
-		const dx = cx - click_x;
-		const dy = cy - click_y;
-		return dx * dx + dy * dy < this.cr * this.cr;
-	}
-};
+// c_img.prototype.click = function(draw_x = 0, draw_y = 0) {
+// 	if (!this.image.complete) return false;
+// 	if (this.cr === null) {
+// 		return click_test(this.image, draw_x, draw_y);
+// 	} else if (this.bottom !== null) {
+// 		const left = this.cx;
+// 		const top = this.cy;
+// 		const right = this.cr;
+// 		return (
+// 			draw_x + left        < click_x && 
+// 			draw_y + top         < click_y &&
+// 			draw_x + right       > click_x &&
+// 			draw_y + this.bottom > click_y
+// 		);
+// 	} else {
+// 		const cx = this.cx + draw_x;
+// 		const cy = this.cy + draw_y;
+// 		const dx = cx - click_x;
+// 		const dy = cy - click_y;
+// 		return dx * dx + dy * dy < this.cr * this.cr;
+// 	}
+// };
 
-window.img = (src = null, cx = 0, cy = 0, cr = null, bottom = null) => {
-    return new c_img(src, cx, cy, cr, bottom);
-};
+// window.img = (src = null, cx = 0, cy = 0, cr = null, bottom = null) => {
+//     return new c_img(src, cx, cy, cr, bottom);
+// };
 
 
 // function c_image(src, x = 0, y = 0, s = 1, f = null) {
@@ -469,43 +466,43 @@ window.img = (src = null, cx = 0, cy = 0, cr = null, bottom = null) => {
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function c_objs(objs, on_click = null) {
-	assert(Array.isArray(objs));
-	this.objs    = objs     ;
-	this.on_click = on_click;
-	this.started = false    ;
-}
+// function c_objs(objs, on_click = null) {
+// 	assert(Array.isArray(objs));
+// 	this.objs    = objs     ;
+// 	this.on_click = on_click;
+// 	this.started = false    ;
+// }
 
-c_objs.prototype.stop = function() {
-	if (this.started) {
-		this.started = false;
-		this.objs.forEach(o => o.stop());
-	}
-	return this;
-};
+// c_objs.prototype.stop = function() {
+// 	if (this.started) {
+// 		this.started = false;
+// 		this.objs.forEach(o => o.stop());
+// 	}
+// 	return this;
+// };
 
-c_objs.prototype.start = function() {
-	if (!this.started) {
-		this.started = true;
-		this.objs.forEach(o => o.start());
-	}
-	return this;
-};
+// c_objs.prototype.start = function() {
+// 	if (!this.started) {
+// 		this.started = true;
+// 		this.objs.forEach(o => o.start());
+// 	}
+// 	return this;
+// };
 
-c_objs.prototype.draw = function() {
-	if (this.started) this.objs.forEach(o => o.draw());
-};
+// c_objs.prototype.draw = function() {
+// 	if (this.started) this.objs.forEach(o => o.draw());
+// };
 
-c_objs.prototype.click = function() {
-	if (this.started && this.objs.some(o => o.click())) {
-		if (this.on_click !== null) this.on_click(this);
-		return true;
-	} else {
-		return false;
-	}
-};
+// c_objs.prototype.click = function() {
+// 	if (this.started && this.objs.some(o => o.click())) {
+// 		if (this.on_click !== null) this.on_click(this);
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// };
 
-window.objs = (objs, on_click = null) => new c_objs(objs, on_click);
+// window.objs = (objs, on_click = null) => new c_objs(objs, on_click);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -516,47 +513,47 @@ window.objs = (objs, on_click = null) => new c_objs(objs, on_click);
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function c_obj_list(objs, on_click = null) {
-	assert(Array.isArray(objs));
-	this.objs     = objs    ;
-	this.on_click = on_click;
-	this.i        = 0       ;
-	this.started  = false   ;
-}
+// function c_obj_list(objs, on_click = null) {
+// 	assert(Array.isArray(objs));
+// 	this.objs     = objs    ;
+// 	this.on_click = on_click;
+// 	this.i        = 0       ;
+// 	this.started  = false   ;
+// }
 
-c_click_seq.prototype.stop = function() {
-	assert(this.started);
-	this.started = false;
-	this.obj(this.i).stop(this);
-	this.i = 0;
-	return this;
-};
+// c_click_seq.prototype.stop = function() {
+// 	assert(this.started);
+// 	this.started = false;
+// 	this.obj(this.i).stop(this);
+// 	this.i = 0;
+// 	return this;
+// };
 
-c_click_seq.prototype.start = function() {
-	assert(!this.started); 
-	this.started = true;
-	this.i = 0;
-	this.objs[0].start(this);
-	return this;
-};
+// c_click_seq.prototype.start = function() {
+// 	assert(!this.started); 
+// 	this.started = true;
+// 	this.i = 0;
+// 	this.objs[0].start(this);
+// 	return this;
+// };
 
-c_click_seq.prototype.draw = function() {
-	if (this.started) this.objs[this.i].draw();
-};
+// c_click_seq.prototype.draw = function() {
+// 	if (this.started) this.objs[this.i].draw();
+// };
 
-c_click_seq.prototype.click = function() {
-	if (this.started && this.objs[this.i].click()) {
-		if (++this.i === this.objs.length) {
-			this.i = 0;
-		}
-		if (this.on_click !== null) this.on_click(this);
-		return true;
-	} else {
-		return false;
-	}
-};
+// c_click_seq.prototype.click = function() {
+// 	if (this.started && this.objs[this.i].click()) {
+// 		if (++this.i === this.objs.length) {
+// 			this.i = 0;
+// 		}
+// 		if (this.on_click !== null) this.on_click(this);
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// };
 
-window.obj_list = (objs, on_click = null) => new c_obj_list(objs, on_click);
+// window.obj_list = (objs, on_click = null) => new c_obj_list(objs, on_click);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -567,50 +564,50 @@ window.obj_list = (objs, on_click = null) => new c_obj_list(objs, on_click);
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function c_click_seq(objs, on_click = null) {
-	assert(Array.isArray(objs));
-	this.objs     = objs    ;
-	this.on_click = on_click;
-	this.i        = 0       ;
-	this.started  = false   ;
-}
+// function c_click_seq(objs, on_click = null) {
+// 	assert(Array.isArray(objs));
+// 	this.objs     = objs    ;
+// 	this.on_click = on_click;
+// 	this.i        = 0       ;
+// 	this.started  = false   ;
+// }
 
-c_click_seq.prototype.stop = function() {
-	if (this.started) {
-		this.i = 0;
-		this.started = false;
-		this.objs.forEach(o => o.stop(this));
-	}
-	return this;
-};
+// c_click_seq.prototype.stop = function() {
+// 	if (this.started) {
+// 		this.i = 0;
+// 		this.started = false;
+// 		this.objs.forEach(o => o.stop(this));
+// 	}
+// 	return this;
+// };
 
-c_click_seq.prototype.start = function() {
-	if (!this.started) {
-		this.i = 0;
-		this.started = true;
-		//this.objs(this.i).start(this);
-		this.objs.forEach(o => o.start(this));
-	}
-	return this;
-};
+// c_click_seq.prototype.start = function() {
+// 	if (!this.started) {
+// 		this.i = 0;
+// 		this.started = true;
+// 		//this.objs(this.i).start(this);
+// 		this.objs.forEach(o => o.start(this));
+// 	}
+// 	return this;
+// };
 
-c_click_seq.prototype.draw = function() {
-	if (this.started) this.objs[this.i].draw();
-};
+// c_click_seq.prototype.draw = function() {
+// 	if (this.started) this.objs[this.i].draw();
+// };
 
-c_click_seq.prototype.click = function() {
-	if (this.started && this.objs[this.i].click()) {
-		if (++this.i === this.objs.length) {
-			this.i = 0;
-		}
-		if (this.on_click !== null) this.on_click(this);
-		return true;
-	} else {
-		return false;
-	}
-};
+// c_click_seq.prototype.click = function() {
+// 	if (this.started && this.objs[this.i].click()) {
+// 		if (++this.i === this.objs.length) {
+// 			this.i = 0;
+// 		}
+// 		if (this.on_click !== null) this.on_click(this);
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// };
 
-window.click_seq = (objs, on_click = null) => new c_click_seq(objs, on_click);
+// window.click_seq = (objs, on_click = null) => new c_click_seq(objs, on_click);
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -620,57 +617,57 @@ window.click_seq = (objs, on_click = null) => new c_click_seq(objs, on_click);
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_obj_seq(objs, t, on_end = null) {
-	assert(Array.isArray(objs));
-	this.objs = objs;
-	this.t = t;
-	this.on_end = on_end;
-	this.i = 0;
-	this.started  = false;
-	this.id = null;
-}
+// function c_obj_seq(objs, t, on_end = null) {
+// 	assert(Array.isArray(objs));
+// 	this.objs = objs;
+// 	this.t = t;
+// 	this.on_end = on_end;
+// 	this.i = 0;
+// 	this.started  = false;
+// 	this.id = null;
+// }
 
-function c_obj_seq_next() {
-	if (!this.started) return;
-	if (++this.i === this.objs.length) {
-		this.i = 0;
-		this.started = false;
-		clearInterval(this.id);
-		this.id = null;
-		if (this.on_end !== null) this.on_end(this);
-	}
-	on_resize();
-}
+// function c_obj_seq_next() {
+// 	if (!this.started) return;
+// 	if (++this.i === this.objs.length) {
+// 		this.i = 0;
+// 		this.started = false;
+// 		clearInterval(this.id);
+// 		this.id = null;
+// 		if (this.on_end !== null) this.on_end(this);
+// 	}
+// 	on_resize();
+// }
 
-c_obj_seq.prototype.start = function() {
-	if (this.started) return;
-	this.started = true;
-	this.objs.forEach(o => o.start(this));
-	this.i = 0;
-	this.id = setInterval(c_obj_seq_next.bind(this), this.t);
-	return this;
-};
+// c_obj_seq.prototype.start = function() {
+// 	if (this.started) return;
+// 	this.started = true;
+// 	this.objs.forEach(o => o.start(this));
+// 	this.i = 0;
+// 	this.id = setInterval(c_obj_seq_next.bind(this), this.t);
+// 	return this;
+// };
 
-c_obj_seq.prototype.stop = function() {
-	if (!this.started) return;
-	this.started = false;
-	this.objs.forEach(o => o.stop(this));
-	this.i = 0;
-	return this;
-};
+// c_obj_seq.prototype.stop = function() {
+// 	if (!this.started) return;
+// 	this.started = false;
+// 	this.objs.forEach(o => o.stop(this));
+// 	this.i = 0;
+// 	return this;
+// };
 
-c_obj_seq.prototype.draw = function() {
-	if (!this.started) return;
-	this.objs[this.i].draw();
-};
+// c_obj_seq.prototype.draw = function() {
+// 	if (!this.started) return;
+// 	this.objs[this.i].draw();
+// };
 
-c_obj_seq.prototype.click = function() {
-	return false;
-};
+// c_obj_seq.prototype.click = function() {
+// 	return false;
+// };
 
-window.obj_seq = (objs, t, on_end = null) => {
-	return new c_obj_seq(objs, t, on_end);
-}
+// window.obj_seq = (objs, t, on_end = null) => {
+// 	return new c_obj_seq(objs, t, on_end);
+// }
 
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -679,29 +676,29 @@ window.obj_seq = (objs, t, on_end = null) => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_pair2(first, second, on_click = null) {
-	this.first    = first;
-	this.second   = second;
-	this.on_click = on_click;
-}
+// function c_pair2(first, second, on_click = null) {
+// 	this.first    = first;
+// 	this.second   = second;
+// 	this.on_click = on_click;
+// }
 
-c_pair2.prototype.draw = function() {
-	this.first.draw();
-	this.second.draw();
-};
+// c_pair2.prototype.draw = function() {
+// 	this.first.draw();
+// 	this.second.draw();
+// };
 
-c_pair2.prototype.click = function() {
-	if (this.first.click() || this.second.click()) {
-		if (this.on_click !== null) this.on_click(this);
-		return true;
-	} else {
-		return false;
-	}
-};
+// c_pair2.prototype.click = function() {
+// 	if (this.first.click() || this.second.click()) {
+// 		if (this.on_click !== null) this.on_click(this);
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// };
 
-window.pair2 = (first, second, on_click = null) => {
-	return new c_pair2(first, second, on_click);
-};
+// window.pair2 = (first, second, on_click = null) => {
+// 	return new c_pair2(first, second, on_click);
+// };
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -709,32 +706,32 @@ window.pair2 = (first, second, on_click = null) => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_pair(first_image, second_image, f = null) {
-	this.first_image  = first_image;
-	this.second_image = second_image;
-	this.f            = f;
-}
+// function c_pair(first_image, second_image, f = null) {
+// 	this.first_image  = first_image;
+// 	this.second_image = second_image;
+// 	this.f            = f;
+// }
 
-c_pair.prototype.draw = function() {
-	this.first_image.draw();
-	this.second_image.draw();
-};
+// c_pair.prototype.draw = function() {
+// 	this.first_image.draw();
+// 	this.second_image.draw();
+// };
 
-c_pair.prototype.click = function() {
-	const images = [this.first_image.image, this.second_image.image];
-	if (click_test(images, this.x, this.y, this.s)) {
-		if (this.first_image.f  !== null) this.first_image.f() ;
-		if (this.second_image.f !== null) this.second_image.f();
-		if (this.f              !== null) this.f()             ;
-		return true;
-	} else {
-		return false;
-	}
-};
+// c_pair.prototype.click = function() {
+// 	const images = [this.first_image.image, this.second_image.image];
+// 	if (click_test(images, this.x, this.y, this.s)) {
+// 		if (this.first_image.f  !== null) this.first_image.f() ;
+// 		if (this.second_image.f !== null) this.second_image.f();
+// 		if (this.f              !== null) this.f()             ;
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// };
 
-window.pair = (first_image, second_image, f = null) => {
-	return new c_pair(first_image, second_image, f);
-};
+// window.pair = (first_image, second_image, f = null) => {
+// 	return new c_pair(first_image, second_image, f);
+// };
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -742,47 +739,47 @@ window.pair = (first_image, second_image, f = null) => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_loop(objs, t) {
-	assert(Array.isArray(objs));
-    this.objs    = objs;
-    this.t       = t;
-    this.i       = 0;
-    this.id      = null;
-	this.started = false;
-}
+// function c_loop(objs, t) {
+// 	assert(Array.isArray(objs));
+//     this.objs    = objs;
+//     this.t       = t;
+//     this.i       = 0;
+//     this.id      = null;
+// 	this.started = false;
+// }
 
-c_loop.prototype.start = function() {
-	if (this.started) return;
-	this.started = true;
-	this.id = setTimeout(this.next.bind(this), this.t);
-	on_resize();
-};
+// c_loop.prototype.start = function() {
+// 	if (this.started) return;
+// 	this.started = true;
+// 	this.id = setTimeout(this.next.bind(this), this.t);
+// 	on_resize();
+// };
 
-c_loop.prototype.stop = function() {
-	if (!this.started) return;
-	this.started = false;
-	if (this.id !== null) {
-		clearTimeout(this.id);
-		this.id = null;
-	}
-	on_resize();
-};
+// c_loop.prototype.stop = function() {
+// 	if (!this.started) return;
+// 	this.started = false;
+// 	if (this.id !== null) {
+// 		clearTimeout(this.id);
+// 		this.id = null;
+// 	}
+// 	on_resize();
+// };
 
-c_loop.prototype.draw = function() {
-	if (!this.started) return;
-    this.objs[this.i].draw();
-};
+// c_loop.prototype.draw = function() {
+// 	if (!this.started) return;
+//     this.objs[this.i].draw();
+// };
 
-c_loop.prototype.next = function() {
-	if (!this.started) return;
-	if (++this.i === this.objs.length) this.i = 0;
-    this.id = setTimeout(this.next.bind(this), this.t);
-	on_resize();
-};
+// c_loop.prototype.next = function() {
+// 	if (!this.started) return;
+// 	if (++this.i === this.objs.length) this.i = 0;
+//     this.id = setTimeout(this.next.bind(this), this.t);
+// 	on_resize();
+// };
 
-window.loop = (objs, t = 300) => {
-    return new c_loop(objs, t);
-};
+// window.loop = (objs, t = 300) => {
+//     return new c_loop(objs, t);
+// };
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -790,31 +787,31 @@ window.loop = (objs, t = 300) => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_array(images, f = null) {
-	this.images = images;
-	this.f      = f;
-}
+// function c_array(images, f = null) {
+// 	this.images = images;
+// 	this.f      = f;
+// }
 
-c_array.prototype.draw = function() {
-	this.images.forEach(image => image.draw());
-};
+// c_array.prototype.draw = function() {
+// 	this.images.forEach(image => image.draw());
+// };
 
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// call to click_test needs to be fixed
-//
-c_array.prototype.click = function() {
-	if (click_test(this.images.map(i => i.image), this.x, this.y, this.s)) {
-		this.images.forEach(image => { if (image.f !== null) image.f(); });
-		if (this.f !== null) this.f();
-		return true;
-	} else {
-		return false;
-	}
-};
+// // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// // call to click_test needs to be fixed
+// //
+// c_array.prototype.click = function() {
+// 	if (click_test(this.images.map(i => i.image), this.x, this.y, this.s)) {
+// 		this.images.forEach(image => { if (image.f !== null) image.f(); });
+// 		if (this.f !== null) this.f();
+// 		return true;
+// 	} else {
+// 		return false;
+// 	}
+// };
 
-window.array = (images, f = null) => {
-	return new c_array(images, f);
-};
+// window.array = (images, f = null) => {
+// 	return new c_array(images, f);
+// };
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -822,63 +819,63 @@ window.array = (images, f = null) => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_checkbox2(o_off, o_on, f_on = null, f_off = null) {
-	this.o_off = o_off;
-	this.o_on  = o_on ;
-	this.f_on  = f_on ;
-	this.f_off = f_off;
-	this.on    = false;
-}
+// function c_checkbox2(o_off, o_on, f_on = null, f_off = null) {
+// 	this.o_off = o_off;
+// 	this.o_on  = o_on ;
+// 	this.f_on  = f_on ;
+// 	this.f_off = f_off;
+// 	this.on    = false;
+// }
 
-c_checkbox2.prototype.draw = function() {
-	if (this.on) {
-		if (this.o_on !== null) this.o_on.draw();
-	} else {
-		this.o_off.draw();	
-	}
-};
+// c_checkbox2.prototype.draw = function() {
+// 	if (this.on) {
+// 		if (this.o_on !== null) this.o_on.draw();
+// 	} else {
+// 		this.o_off.draw();	
+// 	}
+// };
 
-c_checkbox2.prototype.set_off = function() {
-	if (this.on) {
-		this.on = false;
-		on_resize();
-	}
-};
+// c_checkbox2.prototype.set_off = function() {
+// 	if (this.on) {
+// 		this.on = false;
+// 		on_resize();
+// 	}
+// };
 
-c_checkbox2.prototype.set_on = function() {
-	if (!this.on) {
-		this.on = true;
-		on_resize();
-	}
-};
+// c_checkbox2.prototype.set_on = function() {
+// 	if (!this.on) {
+// 		this.on = true;
+// 		on_resize();
+// 	}
+// };
 
-c_checkbox2.prototype.click = function() {
-	if (this.on) {
-		if (this.o_on === null) {
-			return false;
-		} else {
-			if (this.o_on.click()) {
-				this.on = false;
-				if (this.f_off !== null) this.f_off();
-				return true;
-			} else {
-				return false;
-			}
-		}
-	} else {
-		if (this.o_off.click()) {
-			this.on = true;
-			if (this.f_on !== null) this.f_on();
-			return true;
-		} else {
-			return false;
-		}
-	}
-};
+// c_checkbox2.prototype.click = function() {
+// 	if (this.on) {
+// 		if (this.o_on === null) {
+// 			return false;
+// 		} else {
+// 			if (this.o_on.click()) {
+// 				this.on = false;
+// 				if (this.f_off !== null) this.f_off();
+// 				return true;
+// 			} else {
+// 				return false;
+// 			}
+// 		}
+// 	} else {
+// 		if (this.o_off.click()) {
+// 			this.on = true;
+// 			if (this.f_on !== null) this.f_on();
+// 			return true;
+// 		} else {
+// 			return false;
+// 		}
+// 	}
+// };
 
-window.checkbox2 = (o_off, o_on = null, f_on = null, f_off = null) => {
-	return new c_checkbox2(o_off, o_on, f_on, f_off);r
-};
+// window.checkbox2 = (o_off, o_on = null, f_on = null, f_off = null) => {
+// 	return new c_checkbox2(o_off, o_on, f_on, f_off);r
+// };
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -886,43 +883,43 @@ window.checkbox2 = (o_off, o_on = null, f_on = null, f_off = null) => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_checkbox(off_array, on_array) {
-	this.off_array = off_array;
-	this.on_array  = on_array ;
-	this.on        = false    ;
-}
+// function c_checkbox(off_array, on_array) {
+// 	this.off_array = off_array;
+// 	this.on_array  = on_array ;
+// 	this.on        = false    ;
+// }
 
-c_checkbox.prototype.draw = function() {
-	if (this.on) {
-		if (this.on_array !== null) this.on_array.draw();
-	} else {
-		this.off_array.draw();	
-	}
-};
+// c_checkbox.prototype.draw = function() {
+// 	if (this.on) {
+// 		if (this.on_array !== null) this.on_array.draw();
+// 	} else {
+// 		this.off_array.draw();	
+// 	}
+// };
 
-c_checkbox.prototype.click = function() {
-	if (this.on) {
-		if (this.on_array === null) {
-			return false;
-		} else {
-			if (this.on_array.click()) {
-				this.on = false;
-				return true;
-			} else return false;
-		}
-	} else {
-		if (this.off_array.click()) {
-			this.on = true;
-			return true;
-		} else {
-			return false;
-		}
-	}
-};
+// c_checkbox.prototype.click = function() {
+// 	if (this.on) {
+// 		if (this.on_array === null) {
+// 			return false;
+// 		} else {
+// 			if (this.on_array.click()) {
+// 				this.on = false;
+// 				return true;
+// 			} else return false;
+// 		}
+// 	} else {
+// 		if (this.off_array.click()) {
+// 			this.on = true;
+// 			return true;
+// 		} else {
+// 			return false;
+// 		}
+// 	}
+// };
 
-window.checkbox = (off_array, on_array = null) => {
-	return new c_checkbox(off_array, on_array);
-};
+// window.checkbox = (off_array, on_array = null) => {
+// 	return new c_checkbox(off_array, on_array);
+// };
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -930,56 +927,56 @@ window.checkbox = (off_array, on_array = null) => {
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-function c_once2(objs, t = 100, on_end = null) {
-	assert(Array.isArray(objs));
-    this.objs    = objs;
-    this.on_end  = on_end;
-    this.t       = t;
-    this.i       = 0;
-	this.id      = null;
-	this.started = false;
-}
+// function c_once2(objs, t = 100, on_end = null) {
+// 	assert(Array.isArray(objs));
+//     this.objs    = objs;
+//     this.on_end  = on_end;
+//     this.t       = t;
+//     this.i       = 0;
+// 	this.id      = null;
+// 	this.started = false;
+// }
 
-c_once2.prototype.start = function() {
-	if (this.started) return;
-	this.started = true;
-	this.i  = 0;
-	this.id = setTimeout(this.next.bind(this), this.t);
-	on_resize();
-};
+// c_once2.prototype.start = function() {
+// 	if (this.started) return;
+// 	this.started = true;
+// 	this.i  = 0;
+// 	this.id = setTimeout(this.next.bind(this), this.t);
+// 	on_resize();
+// };
 
-c_once2.prototype.stop = function() {
-	if (!this.started) return;
-	this.started = false;
-	this.i = 0;
-	if (this.id !== null) {
-		cancelTimeout(this.id);
-		this.id = null;
-	}
-	on_resize();
-};
+// c_once2.prototype.stop = function() {
+// 	if (!this.started) return;
+// 	this.started = false;
+// 	this.i = 0;
+// 	if (this.id !== null) {
+// 		cancelTimeout(this.id);
+// 		this.id = null;
+// 	}
+// 	on_resize();
+// };
 
-c_once2.prototype.draw = function() {
-	if (!this.started) return;
-    this.objs[this.i].draw();
-};
+// c_once2.prototype.draw = function() {
+// 	if (!this.started) return;
+//     this.objs[this.i].draw();
+// };
 
-c_once2.prototype.next = function() {
-	if (!this.started) return;
-	if (++this.i === this.objs.length) {
-		this.i = 0;
-		this.id = null;
-		this.started = false;
-        if (this.on_end !== null) this.on_end();
-    } else {
-        setTimeout(this.next.bind(this), this.t);
-    }
-	on_resize();
-};
+// c_once2.prototype.next = function() {
+// 	if (!this.started) return;
+// 	if (++this.i === this.objs.length) {
+// 		this.i = 0;
+// 		this.id = null;
+// 		this.started = false;
+//         if (this.on_end !== null) this.on_end();
+//     } else {
+//         setTimeout(this.next.bind(this), this.t);
+//     }
+// 	on_resize();
+// };
 
-window.once2 = (objs, t = 100, on_end = null) => {
-    return new c_once2(objs, t, on_end);
-};
+// window.once2 = (objs, t = 100, on_end = null) => {
+//     return new c_once2(objs, t, on_end);
+// };
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -987,50 +984,50 @@ window.once2 = (objs, t = 100, on_end = null) => {
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-function c_once(t, f, objs) {
-    this.t     = t;
-    this.f     = f;
-    this.objs  = objs;
-    this.i     = null;
-}
+// function c_once(t, f, objs) {
+//     this.t     = t;
+//     this.f     = f;
+//     this.objs  = objs;
+//     this.i     = null;
+// }
 
-c_once.prototype.draw = function() {
-	if (this.i === null) return;
-    this.objs[this.i].draw();
-};
+// c_once.prototype.draw = function() {
+// 	if (this.i === null) return;
+//     this.objs[this.i].draw();
+// };
 
-c_once.prototype.next = function() {
-	if (this.i === null) return;
-	++this.i;
-	if (this.i === this.objs.length) {
-		this.i = null;
-        if (this.f !== null) this.f();
-    } else {
-        setTimeout(this.next.bind(this), this.t);
-    }
-	on_resize();
-};
+// c_once.prototype.next = function() {
+// 	if (this.i === null) return;
+// 	++this.i;
+// 	if (this.i === this.objs.length) {
+// 		this.i = null;
+//         if (this.f !== null) this.f();
+//     } else {
+//         setTimeout(this.next.bind(this), this.t);
+//     }
+// 	on_resize();
+// };
 
-c_once.prototype.start = function() {
-	if (this.i !== null) return;
-	this.i = 0;
-	setTimeout(this.next.bind(this), this.t);
-	on_resize();
-};
+// c_once.prototype.start = function() {
+// 	if (this.i !== null) return;
+// 	this.i = 0;
+// 	setTimeout(this.next.bind(this), this.t);
+// 	on_resize();
+// };
 
-c_once.prototype.click = function() {
-	if (this.i === 0) {
-		if (this.objs[0].click()) {
-			this.next();
-			return true;
-		}
-	}
-    return false;
-};
+// c_once.prototype.click = function() {
+// 	if (this.i === 0) {
+// 		if (this.objs[0].click()) {
+// 			this.next();
+// 			return true;
+// 		}
+// 	}
+//     return false;
+// };
 
-window.once = (t, f, objs) => {
-    return new c_once(t, f, objs);
-};
+// window.once = (t, f, objs) => {
+//     return new c_once(t, f, objs);
+// };
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1038,29 +1035,29 @@ window.once = (t, f, objs) => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-const c_anim_button_action = function(f) {
-	this.checkbox.on = false;
-	if (f !== null) f();
-}
+// const c_anim_button_action = function(f) {
+// 	this.checkbox.on = false;
+// 	if (f !== null) f();
+// }
 
-function c_anim_button(objs, t, f) {
-	assert(objs.length > 1);
-	this.checkbox = checkbox(objs[0], null);
-	this.once     = once(t, c_anim_button_action.bind(this, f), objs.slice(1));
-}
+// function c_anim_button(objs, t, f) {
+// 	assert(objs.length > 1);
+// 	this.checkbox = checkbox(objs[0], null);
+// 	this.once     = once(t, c_anim_button_action.bind(this, f), objs.slice(1));
+// }
 
-c_anim_button.prototype.draw = function() {
-	this.checkbox.draw();
-	this.once.draw();
-};
+// c_anim_button.prototype.draw = function() {
+// 	this.checkbox.draw();
+// 	this.once.draw();
+// };
 
-c_anim_button.prototype.click = function() {
-	if (this.checkbox.click()) {
-		this.once.start();
-	}
-};
+// c_anim_button.prototype.click = function() {
+// 	if (this.checkbox.click()) {
+// 		this.once.start();
+// 	}
+// };
 
-window.anim_button = (objs, t, f = null) => new c_anim_button(objs, t, f);
+// window.anim_button = (objs, t, f = null) => new c_anim_button(objs, t, f);
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1122,90 +1119,90 @@ window.anim_button = (objs, t, f = null) => new c_anim_button(objs, t, f);
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-function c_radio_button(border_image, off_image, on_image, off_func, on_func) {
-	this.border_image = border_image;
-	this.off_image    = off_image   ;
-	this.on_image     = on_image    ;
-	this.off_func     = off_func    ;
-	this.on_func      = on_func     ;
-	this.on           = false       ;
-}
+// function c_radio_button(border_image, off_image, on_image, off_func, on_func) {
+// 	this.border_image = border_image;
+// 	this.off_image    = off_image   ;
+// 	this.on_image     = on_image    ;
+// 	this.off_func     = off_func    ;
+// 	this.on_func      = on_func     ;
+// 	this.on           = false       ;
+// }
 
-c_radio_button.prototype.draw = function() {
-	if (this.on) {
-		this.on_image.draw();
-	} else {
-		this.off_image.draw();
-	}
-	this.border_image.draw();
-};
+// c_radio_button.prototype.draw = function() {
+// 	if (this.on) {
+// 		this.on_image.draw();
+// 	} else {
+// 		this.off_image.draw();
+// 	}
+// 	this.border_image.draw();
+// };
 
-c_radio_button.prototype.click = function() {
-	return this.off_image.click();
-};
+// c_radio_button.prototype.click = function() {
+// 	return this.off_image.click();
+// };
 
-c_radio_button.prototype.set_off = function() {
-	assert(this.on);
-	if (this.on) {
-		if (this.off_func !== null) {
-			this.off_func();
-		}
-		this.on = false;
-	}
-};
+// c_radio_button.prototype.set_off = function() {
+// 	assert(this.on);
+// 	if (this.on) {
+// 		if (this.off_func !== null) {
+// 			this.off_func();
+// 		}
+// 		this.on = false;
+// 	}
+// };
 
-c_radio_button.prototype.set_on = function() {
-	assert(!this.on);
-	if (!this.on) {
-		if (this.on_func !== null) {
-			this.on_func();
-		}
-		this.on = true;
-	}
-};
+// c_radio_button.prototype.set_on = function() {
+// 	assert(!this.on);
+// 	if (!this.on) {
+// 		if (this.on_func !== null) {
+// 			this.on_func();
+// 		}
+// 		this.on = true;
+// 	}
+// };
 
-window.radio_button = (border_image, off_image, on_image, off_func = null, on_func = null) => {
-	return new c_radio_button(border_image, off_image, on_image, off_func, on_func);
-};
+// window.radio_button = (border_image, off_image, on_image, off_func = null, on_func = null) => {
+// 	return new c_radio_button(border_image, off_image, on_image, off_func, on_func);
+// };
 
-function c_radio_buttons(radio_buttons) {
-	this.radio_buttons = radio_buttons;
-	this.on_button = null;
-}
+// function c_radio_buttons(radio_buttons) {
+// 	this.radio_buttons = radio_buttons;
+// 	this.on_button = null;
+// }
 
-c_radio_buttons.prototype.draw = function() {
-	this.radio_buttons.forEach(b => { b.draw(); });
-}
+// c_radio_buttons.prototype.draw = function() {
+// 	this.radio_buttons.forEach(b => { b.draw(); });
+// }
 
-c_radio_buttons.prototype.click = function() {
-	for (let i = 0; i < this.radio_buttons.length; ++i) {
-		if (this.radio_buttons[i].click()) {
-			if (this.radio_buttons[i] === this.on_button) {
-				this.radio_buttons[i].set_off();
-				this.on_button = null;
-			} else {
-				if (this.on_button !== null) {
-					this.on_button.set_off();
-				}
-				this.radio_buttons[i].set_on();				
-				this.on_button = this.radio_buttons[i];
-			}
-			return true;
-		}
-	}
-	return false;
-};
+// c_radio_buttons.prototype.click = function() {
+// 	for (let i = 0; i < this.radio_buttons.length; ++i) {
+// 		if (this.radio_buttons[i].click()) {
+// 			if (this.radio_buttons[i] === this.on_button) {
+// 				this.radio_buttons[i].set_off();
+// 				this.on_button = null;
+// 			} else {
+// 				if (this.on_button !== null) {
+// 					this.on_button.set_off();
+// 				}
+// 				this.radio_buttons[i].set_on();				
+// 				this.on_button = this.radio_buttons[i];
+// 			}
+// 			return true;
+// 		}
+// 	}
+// 	return false;
+// };
 
-c_radio_buttons.prototype.clear = function() {
-	if (this.on_button !== null) {
-		this.on_button.set_off();
-		this.on_button = null;
-	}
-};
+// c_radio_buttons.prototype.clear = function() {
+// 	if (this.on_button !== null) {
+// 		this.on_button.set_off();
+// 		this.on_button = null;
+// 	}
+// };
 
-window.radio_buttons = (...radio_buttons) => {
-	return new c_radio_buttons(radio_buttons);
-};
+// window.radio_buttons = (...radio_buttons) => {
+// 	return new c_radio_buttons(radio_buttons);
+// };
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1213,10 +1210,10 @@ window.radio_buttons = (...radio_buttons) => {
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-window.back_button = pair2(
-    img("./global/images/upper_left_green.png"   ),
-    img("./global/images/upper_left_border.png")
-);
+// window.back_button = pair2(
+//     img("./global/images/upper_left_green.png"   ),
+//     img("./global/images/upper_left_border.png")
+// );
 
 // window.silence_button = pair2(
 // 	img("./global/images/upper_right_green.png" ),

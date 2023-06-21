@@ -5,9 +5,11 @@ import c_toggle    from "../toggle.js"    ;
 import songs       from "./songs.js"      ;
 
 let img = n => new c_img("./global/images/" + n + ".png");
-const audio_red    = img("upper_right_red");
-const audio_green  = img("upper_right_green");
-const audio_border = img("upper_right_border");
+const upper_left_green  = img("upper_left_green"  , 100, 70, 50);
+const upper_left_border = img("upper_left_border" , 100, 70, 50);
+const audio_red         = img("upper_right_red", 900, 60, 50);
+const audio_green       = img("upper_right_green", 900, 60, 50);
+const audio_border      = img("upper_right_border", 900, 60, 50);
 
 img = n => new c_img("./songs/images/" + n + ".png");
 const big_green         = img("big_green");
@@ -23,6 +25,7 @@ const small_1_green     = img("small_1_green");
 const small_1_red       = img("small_1_red");
 const small_1_border    = img("small_1_border");
 
+const back_button  = new c_button(upper_left_green ,upper_left_border);
 const audio_toggle = new c_toggle(audio_green, audio_red, audio_border);
 
 const song_toggles = [

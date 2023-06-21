@@ -6,24 +6,28 @@ import c_img                from "../img.js"                 ;
 import c_button             from "../button.js"              ;
 import c_toggle             from "../toggle.js"              ;
 
-const inner_border = img("./home/images/inner_ring_border.png");
-const inner_red    = img("./home/images/inner_ring_red.png"   );
-const inner_green  = img("./home/images/inner_ring_green.png" );
+let img = n => new c_img("./home/images/" + n + ".png");
 
-const outer_border = img("./home/images/outer_ring_border.png");
-const outer_red    = img("./home/images/outer_ring_red.png"   );
-const outer_green  = img("./home/images/outer_ring_green.png" );
+const inner_border = img("inner_ring_border"  );
+const inner_red    = img("inner_ring_red"     );
+const inner_green  = img("inner_ring_green"   );
 
-const big_border   = img("./home/images/big_button_border.png"  );
-const big_border_1 = img("./home/images/big_button_border_1.png");
-const big_border_2 = img("./home/images/big_button_border_2.png");
-const big_red      = img("./home/images/big_button_red.png"     );
-const big_red_1    = img("./home/images/big_button_red_1.png"   );
-const big_red_2    = img("./home/images/big_button_red_2.png"   );
+const outer_border = img("outer_ring_border"  );
+const outer_red    = img("outer_ring_red"     );
+const outer_green  = img("outer_ring_green"   );
 
-const audio_red    = img("./global/images/upper_right_red.png"   );
-const audio_green  = img("./global/images/upper_right_green.png" );
-const audio_border = img("./global/images/upper_right_border.png");
+const big_border   = img("big_button_border"  );
+const big_border_1 = img("big_button_border_1");
+const big_border_2 = img("big_button_border_2");
+const big_red      = img("big_button_red"     );
+const big_red_1    = img("big_button_red_1"   );
+const big_red_2    = img("big_button_red_2"   );
+
+img = n => new c_img("./global/images/" + n + ".png");
+
+const audio_red    = img("upper_right_red"   );
+const audio_green  = img("upper_right_green" );
+const audio_border = img("upper_right_border");
 
 const audio_toggle = new c_toggle(audio_green, audio_red, audio_border);
 const inner_ring   = new c_toggle(inner_red, inner_green, inner_border);
