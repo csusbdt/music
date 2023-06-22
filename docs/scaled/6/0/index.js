@@ -70,19 +70,6 @@ const stop_audio = _ => {
 	window.stop_audio = null;
 };
 
-
-// audio_toggle.action_0 = _ => {
-// 	unit_i = 0;
-// 	units[unit_i].start();
-// 	unit_id = setTimeout(next_unit, units[unit_i].d);
-// };
-
-// audio_toggle.action_1 = _ => {
-// 	units[unit_i].stop();
-// 	unit_i = null;
-// 	clearTimeout(unit_id);
-// };
-
 let saved_audio_start = null;
 
 const ot = 6;
@@ -107,12 +94,12 @@ units.push(new c_unit([
 
 const click = _ => {
 	if (back_button.click()) {
-		// window.start_audio = saved_audio_start;
-		// window.stop_audio = null;
+		if (saved_audio_start !== null) saved_audio_start();
 		start_scaled_6();
 		return;
 	}
 	else if (click_audio_toggle()) {
+		saved_audio_start = null;
 		on_resize();
 	}
 };
@@ -126,10 +113,8 @@ const draw = _ => {
 
 const start = _ => {
 	if (window.stop_audio !== null) window.stop_audio();
-//	saved_audio_start = window.start_audio;
+	saved_audio_start = window.start_audio;
 	window.start_audio = start_audio;
-//	window.stop_audio  = null;
-
 	set_item('page', "./scaled/6/0/index.js");
     on_click  = click;
     on_resize = draw;

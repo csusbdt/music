@@ -135,12 +135,12 @@ units.push(new c_unit([
 
 const click = _ => {
 	if (back_button.click()) {
-		// window.start_audio = saved_audio_start;
-		// window.stop_audio = null;
+		if (saved_audio_start !== null) saved_audio_start();
 		start_scaled_6();
 		return;
 	}
 	else if (click_audio_toggle()) {
+		saved_audio_start = null;
 		on_resize();
 	}
 };
@@ -154,10 +154,8 @@ const draw = _ => {
 
 const start = _ => {
 	if (window.stop_audio !== null) window.stop_audio();
-//	saved_audio_start = window.start_audio;
+	saved_audio_start = window.start_audio;
 	window.start_audio = start_audio;
-//	window.stop_audio  = null;
-	
 	set_item('page', "./scaled/6/1/index.js");
     on_click  = click;
     on_resize = draw;

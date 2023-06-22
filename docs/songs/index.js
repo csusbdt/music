@@ -43,7 +43,6 @@ const start_audio = _ => {
 	if (window.stop_audio !== null) window.stop_audio();
 	window.start_audio = null;
 	window.stop_audio = stop_audio;
-	
 	songs[song_i].start();
 	song_toggles[song_i].color = song_toggles[song_i].color_1;
 };
