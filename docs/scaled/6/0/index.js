@@ -112,9 +112,11 @@ const draw = _ => {
 };
 
 const start = _ => {
-	if (window.stop_audio !== null) window.stop_audio();
-	saved_audio_start = window.start_audio;
-	window.start_audio = start_audio;
+	if (window.stop_audio !== stop_audio) {
+		if (window.stop_audio !== null) window.stop_audio();
+		saved_audio_start = window.start_audio;
+		window.start_audio = start_audio;
+	}
 	set_item('page', "./scaled/6/0/index.js");
     on_click  = click;
     on_resize = draw;

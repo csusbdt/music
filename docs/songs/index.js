@@ -28,7 +28,6 @@ const small_1_red       = img("small_1_red");
 const small_1_border    = img("small_1_border");
 
 const back_button  = new c_button(upper_left_green ,upper_left_border);
-const audio_toggle = new c_toggle(audio_green, audio_red, audio_border);
 
 const song_toggles = [
 	new c_toggle(big_green     , big_red     , big_border     ),
@@ -87,7 +86,6 @@ export default i => {
 		window.start_audio = start_audio;
 		return;
 	}
-
 	if (window.start_audio !== null) window.start_audio = start_audio;
 	set_item('page', "./songs/index.js");
 	on_click  = click_page;	

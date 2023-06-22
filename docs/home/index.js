@@ -1,10 +1,10 @@
-//import start_away           from "../away/index.js"          ;
-import start_songs          from "../songs/index.js"         ;
-import start_space_shooter  from "../space_shooter/index.js" ;
-import start_scaled         from "../scaled/index.js"        ;
-import c_img                from "../global/img.js"          ;
-import c_button             from "../global/button.js"       ;
-import c_toggle             from "../global/toggle.js"       ;
+import start_far_away       from "../away/far_away/index.js";
+import start_songs          from "../songs/index.js"        ;
+import start_space_shooter  from "../space_shooter/index.js";
+import start_scaled         from "../scaled/index.js"       ;
+import c_img                from "../global/img.js"         ;
+import c_button             from "../global/button.js"      ;
+import c_toggle             from "../global/toggle.js"      ;
 
 let img = n => new c_img("./home/images/" + n + ".png");
 
@@ -39,9 +39,9 @@ const big_action = _ => {
 	} else if (inner_ring.color === inner_ring.color_1 && outer_ring.color === outer_ring.color_0) {
         start_scaled();
 	} else if (inner_ring.color === inner_ring.color_0 && outer_ring.color === outer_ring.color_1) {
-        start_space_shooter();
+		start_far_away();
 	} else if (inner_ring.color === inner_ring.color_1 && outer_ring.color === outer_ring.color_1) {
-		start_songs();
+        start_space_shooter();
 	}
 };
 
