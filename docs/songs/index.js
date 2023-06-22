@@ -3,6 +3,8 @@ import c_img       from "../global/img.js"   ;
 import c_button    from "../global/button.js";
 import c_toggle    from "../global/toggle.js";
 import songs       from "./songs.js"         ;
+import { draw_audio_toggle  } from "../global/index.js" ;
+import { click_audio_toggle } from "../global/index.js" ;
 
 let img = n => new c_img("./global/images/" + n + ".png");
 const upper_left_green  = img("upper_left_green"  , 100, 70, 50);
@@ -38,17 +40,17 @@ const song_toggles = [
 let song_i = 0;
 
 const start_audio = _ => {
-	songs[song_i].start();
-	song_toggles[song_i].color = song_toggles[song_i].color_1;
-	audio_toggle.color = audio_toggle.color_1;
+	if (window.stop_audio !== null) window.stop_audio();
 	window.start_audio = null;
 	window.stop_audio = stop_audio;
+	
+	songs[song_i].start();
+	song_toggles[song_i].color = song_toggles[song_i].color_1;
 };
 
 const stop_audio = _ => {
 	songs[song_i].stop();
 	song_toggles[song_i].color = song_toggles[song_i].color_0;
-	audio_toggle.color = audio_toggle.color_0;
 	window.start_audio = start_audio;
 	window.stop_audio = null;
 }; 
@@ -56,62 +58,23 @@ const stop_audio = _ => {
 const draw_page = _ => {
 	bg_blue.draw();
 	back_button.draw();
-	audio_toggle.draw();
+	draw_audio_toggle();
 	song_toggles.forEach(o => o.draw());
 };
 
 const click_page = _ => {
-	if (audio_toggle.click()) {
-		if (audio_toggle.color === audio_toggle.color_0) {
-			if (window.stop_audio !== null) {
-				window.stop_audio();
-				window.stop_audio = null;
-			} else {
-				songs[song_i].stop();
-				song_toggles[song_i].color = song_toggles[song_i].color_0;
-			}
-		} else {
-			if (window.start_audio !== null) {
-				window.start_audio();
-				window.start_audio = null;
-			} else {
-				songs[song_i].start();
-				song_toggles[song_i].color = song_toggles[song_i].color_1;
-			}			
-		}
+	if (click_audio_toggle()) {
 		on_resize(); 
 	} else if (back_button.click()) {
-		if (songs[song_i].is_playing()) {
-			window.start_audio = null;
-			window.stop_audio = stop_audio;
-		} else if (window.start_audio === null && window.stop_audio === null) {
-			window.start_audio = start_audio;
-		}
 		start_home();
 	} else for (let i = 0; i < song_toggles.length; ++i) {
 		if (song_toggles[i].click()) {
-			if (songs[song_i].is_playing()) {
-				if (song_i === i) {
-					songs[song_i].stop();
-					song_toggles[song_i].color = song_toggles[song_i].color_0;
-					audio_toggle.color = audio_toggle.color_0;
-				} else {
-					songs[song_i].stop();
-					song_toggles[song_i].color = song_toggles[song_i].color_0;
-					song_i = i;
-					set_item("song_i", song_i);
-					songs[song_i].start();
-					song_toggles[song_i].color = song_toggles[song_i].color_1;
-					audio_toggle.color = audio_toggle.color_1;
-				}
+			if (songs[i].is_playing()) {
+				stop_audio();
 			} else {
-				window.start_audio = null; 
-				window.stop_audio  = null;
+				if (window.stop_audio !== null) window.stop_audio();
 				song_i = i;
-				set_item("song_i", song_i);
-				songs[song_i].start();
-				song_toggles[song_i].color = song_toggles[song_i].color_1;
-				audio_toggle.color = audio_toggle.color_1;
+				start_audio();
 			}
 			on_resize();
 		 	return;
@@ -125,22 +88,8 @@ export default i => {
 		window.start_audio = start_audio;
 		return;
 	}
-	if (songs[song_i].is_playing()) {
-		assert(window.stop_audio === stop_audio);
-		audio_toggle.color = audio_toggle.color_1;
-		song_toggles[song_i].color = song_toggles[song_i].color_1;
-	} else if (window.stop_audio !== null) {
-		assert(window.start_audio === null);
-		audio_toggle.color = audio_toggle.color_1;
-		song_toggles[song_i].color = song_toggles[song_i].color_0;
-	} else if (window.start_audio !== null) {
-		audio_toggle.color = audio_toggle.color_0;
-		song_toggles[song_i].color = song_toggles[song_i].color_0;		
-	} //else {
-		// no audio has yet been played
-	// 	audio_toggle.color = audio_toggle.color_0;
-	// 	song_toggles[song_i].color = song_toggles[song_i].color_0;				
-	// }
+
+	if (window.start_audio !== null) window.start_audio = start_audio;
 	set_item('page', "./songs/index.js");
 	on_click  = click_page;	
 	on_resize = draw_page ;
