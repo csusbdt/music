@@ -1,4 +1,4 @@
-function c_button(color, border, x = 0, y = 0, action = null) {
+function c_button(color, border = null, x = 0, y = 0, action = null) {
 	this.color = color;
 	this.border = border;
 	this.x = x;
@@ -8,7 +8,7 @@ function c_button(color, border, x = 0, y = 0, action = null) {
 
 c_button.prototype.draw = function() {
 	this.color.draw(this.x, this.y);
-	this.border.draw(this.x, this.y);
+	if (this.border !== null) this.border.draw(this.x, this.y);
 };
 
 c_button.prototype.click = function() {

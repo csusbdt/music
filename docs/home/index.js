@@ -1,7 +1,7 @@
 import start_away           from "../away/index.js"          ;
 import start_songs          from "../songs/index.js"         ;
 import start_space_shooter  from "../space_shooter/index.js" ;
-import start_compose        from "../comp/index.js"          ;
+import start_scaled_6       from "../scaled/6/index.js"      ;
 import c_img                from "../global/img.js"          ;
 import c_button             from "../global/button.js"       ;
 import c_toggle             from "../global/toggle.js"       ;
@@ -37,7 +37,7 @@ const big_action = _ => {
     if (inner_ring.color === inner_ring.color_0 && outer_ring.color === outer_ring.color_0) {
         start_songs();
 	} else if (inner_ring.color === inner_ring.color_1 && outer_ring.color === outer_ring.color_0) {
-        start_compose();
+        start_scaled_6();
 	} else if (inner_ring.color === inner_ring.color_0 && outer_ring.color === outer_ring.color_1) {
         start_space_shooter();
 	} else if (inner_ring.color === inner_ring.color_1 && outer_ring.color === outer_ring.color_1) {

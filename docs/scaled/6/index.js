@@ -1,10 +1,10 @@
-import c_tone           from "./tone.js"          ;
-import start_home       from "../home/index.js"   ;
-import c_img            from "../global/img.js"   ;
-import c_button         from "../global/button.js";
-import c_toggle         from "../global/toggle.js";
-import { back_button  } from "../global/index.js" ;
-import { audio_toggle } from "../global/index.js" ;
+import c_tone           from "../../global/tone.js"  ;
+import start_home       from "../../home/index.js"   ;
+import c_img            from "../../global/img.js"   ;
+import c_button         from "../../global/button.js";
+import c_toggle         from "../../global/toggle.js";
+import { back_button  } from "../../global/index.js" ;
+import { audio_toggle } from "../../global/index.js" ;
 
 const green  = new c_img("./compose/images/green.png" , 120, 205, 36);
 const red    = new c_img("./compose/images/red.png"   , 120, 205, 36);

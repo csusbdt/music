@@ -49,8 +49,8 @@ const stop_audio = _ => {
 	songs[song_i].stop();
 	song_toggles[song_i].color = song_toggles[song_i].color_0;
 	audio_toggle.color = audio_toggle.color_0;
-	window.stop_audio = null;
 	window.start_audio = start_audio;
+	window.stop_audio = null;
 }; 
 
 const draw_page = _ => {
@@ -136,11 +136,11 @@ export default i => {
 	} else if (window.start_audio !== null) {
 		audio_toggle.color = audio_toggle.color_0;
 		song_toggles[song_i].color = song_toggles[song_i].color_0;		
-	} else {
+	} //else {
 		// no audio has yet been played
-		audio_toggle.color = audio_toggle.color_0;
-		song_toggles[song_i].color = song_toggles[song_i].color_0;				
-	}
+	// 	audio_toggle.color = audio_toggle.color_0;
+	// 	song_toggles[song_i].color = song_toggles[song_i].color_0;				
+	// }
 	set_item('page', "./songs/index.js");
 	on_click  = click_page;	
 	on_resize = draw_page ;
