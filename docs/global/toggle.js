@@ -7,6 +7,13 @@ function c_toggle(color_0, color_1, border = null, action_0 = null, action_1 = n
 	this.color    = color_0;
 }
 
+c_toggle.prototype.set = function() {
+	if (this.color === this.color_0) {
+		this.color = this.color_1;
+		if (this.action_0 !== null) this.action_0(this);
+	}
+};
+
 c_toggle.prototype.reset = function() {
 	if (this.color === this.color_1) {
 		this.color = this.color_0;
