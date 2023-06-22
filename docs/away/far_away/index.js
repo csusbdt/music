@@ -25,18 +25,11 @@ function c_unit(f, b, green, white, border) {
 	);
 }
 
-c_unit.prototype.is_playing  = function() { return this.tone.is_playing(); }
+c_unit.prototype.is_playing = function() { return this.tone.is_playing(); }
+
+c_unit.prototype.can_play = function() { return this.toggle.color === this.toggle.color_1; }
 
 // -120, -205
-
-// c_unit.prototype.start = function() {
-// 	this.tone.start();
-// };
-
-// c_unit.prototype.stop = function() {
-// 	this.toggle.color = this.toggle.color_0;
-// 	this.tones.forEach(o => o.stop());
-// };
 
 //c_unit.prototype.draw  = function() { this.toggle.draw(-120, -205); }
 c_unit.prototype.draw  = function() { this.toggle.draw(-120, -205); }
@@ -53,39 +46,66 @@ units.push(new c_unit(scale(6, 100, 3), 3, "white_4", "green_4", "border_4"));
 units.push(new c_unit(scale(6, 100, 4), 3, "white_5", "green_5", "border_5"));
 units.push(new c_unit(scale(6, 100, 5), 3, "white_6", "green_6", "border_6"));
 
-//const state = Array(units.length).fill(0);
-//const is_playing = _ => state.some(i => i === 1);
-const is_playing = _ => units.some(o => o.is_playing());
+//const state = Array(units.length).fill(false);
 
-// const start_audio = _ => {
-// 	if (window.stop_audio !== null) window.stop_audio();
-// 	window.start_audio = null;
-// 	window.stop_audio = stop_audio;
-	
-// 	for (let i = 0; i < state.length; ++i) {
-// 		if (state[i] === 1) {
-// 			tones[i].start();
-// 		}
-// 	}
-// };
+const is_playing = _ => units.some(o => o.is_playing()); // needed ???????????????????
 
-// const stop_audio = _ => {
-// 	for (let i = 0; i < state.length; ++i) {
-// 		if (state[i] === 1) {
-// 			tones[i].stop();
-// 		}
-// 	}
-// 	window.start_audio = start_audio;
-// 	window.stop_audio = null;
-// };
+//const can_play = _ => state.some(o => o);
+const can_play = _ => units.some(o => o.can_play());
+
+let saved_start_audio = null;
+
+const start_audio = _ => {
+	assert(
+		window.start_audio === start_audio && 
+		window.stop_audio === null &&
+		!is_playing()
+	);
+	if (can_play()) {
+		state.forEach((is_on, i) => is_on && units[i].start());
+		saved_start_audio = null;
+		window.start_audio = null;
+		window.stop_audio = stop_audio;
+	} else {
+		assert(saved_start_audio !== null);
+		saved_start_audio();
+		assert(
+			window.start_audio === null && 
+			window.stop_audio !== null &&
+			window.stop_audio !== stop_audio
+		);
+	}
+};
+
+const stop_audio = _ => {
+	assert(
+		window.start_audio === null && 
+		window.stop_audio === stop_audio &&
+		saved_start_audio === null &&
+		can_play() &&
+		is_playing() 
+	);
+	units.forEach(o => o.stop());
+	window.start_audio = start_audio;
+	window.stop_audio  = null;
+	assert(
+		window.start_audio === start_audio && 
+		window.stop_audio === null &&
+		saved_start_audio === null &&
+		can_play() &&
+		!is_playing() 
+	);	
+};
 
 const click_page = _ => {
 	if (click_audio_toggle()) {
 		on_resize(); 
 	}
 	else if (back_button.click()) {
+		if (saved_start_audio !== null) window.start_audio = saved_start_audio;
 		start_home();
 	} 
+	else if (click_audio_toggle()) on_resize();
 	else if (units.some(o => o.click())) on_resize();
 	
 	// else for (let i = 0; i < state.length; ++i) {
@@ -116,7 +136,53 @@ const draw_page = _ => {
 };
 
 export default _ => {
-//	if (window.start_audio !== null) window.start_audio = start_audio;	
+	// check that other pages follow protocol
+	assert(
+		window.stop_audio === null && window.start_audio !== null || 
+		window.stop_audio !== null && window.start_audio === null
+	);
+	// an alternative approach. need to decide if i like this
+	// note: short circuiting not possible with exclusive_or
+	assert(exclusive_or(window.stop_audio === null, window.start_audio === null));
+	if (window.stop_audio !== null) {
+		// something is playing
+		if (window.stop_audio === stop_audio) {
+			// it's playing from this page
+			// user left page with this page playing, so don't allow reset to earlier other page
+			saved_start_audio = null;
+		} else {
+			// it's playing from other page
+			window.stop_audio();
+			// check that other page follows protocol
+			assert(window.stop_audio === null && window.start_audio !== null); 
+			saved_start_audio = window.start_audio;
+			if (can_play()) {
+				start_audio();
+				// make sure i didn't overwrite saved_start_audio
+				assert(saved_start_audio !== null);
+				// check that start_audio follows protocol
+				assert(window.stop_audio === null && window.start_audio !== null); 
+			} else {
+				// allow other page to continue playing and
+				// give user ability to stop other page music and hear nothing
+			}
+		}
+	} else if (window.stop_audio !== stop_audio) {
+		// nothing is playing
+		saved_start_audio = window.start_audio;
+		if (can_play()) {
+			// start playing this page but allow return to previous page audio
+			start_audio();
+			assert(
+				saved_start_audio !== null &&
+				window.stop_audio === stop_audio && 
+				window.start_audio === null
+			);
+		} else {
+			// not sure the following is needed but just on case ...
+			saved_start_audio = window.start_audio;
+		}
+	}		
 	set_item('page', "./away/far_away/index.js");
 	on_resize = draw_page;
 	on_click = click_page;

@@ -36,6 +36,10 @@ window.addEventListener('unhandledrejection', e => {
 
 window.log = m => console.log(m);
 
+window.exclusive_or = (a, b) => {
+	return a && !b || !a && b;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
 // local storage
