@@ -1,5 +1,5 @@
 //import start_far_away       from "../away/far_away/index.js";
-import start_composer_template from "../composer/template/index.js";
+import start_composer          from "../composer/index.js"     ;
 import start_songs             from "../songs/index.js"        ;
 import start_space_shooter     from "../space_shooter/index.js";
 import start_scaled            from "../scaled/index.js"       ;
@@ -37,7 +37,7 @@ const big_action = _ => {
         start_scaled();
 	} else if (inner_ring.color === inner_ring.color_0 && outer_ring.color === outer_ring.color_1) {
 //		start_far_away();
-		start_composer_template();
+		start_composer();
 	} else if (inner_ring.color === inner_ring.color_1 && outer_ring.color === outer_ring.color_1) {
         start_space_shooter();
 	}
