@@ -2,7 +2,7 @@ import c_img       from "./img.js"   ;
 import c_button    from "./button.js";
 import c_toggle    from "./toggle.js";
 
-let img = n => new c_img("./global/images/" + n + ".png");
+const img = n => new c_img("./global/images/" + n + ".png");
 
 export const upper_left_green   = img("upper_left_green"  , 100, 70, 50);
 //export const upper_left_yellow  = img("upper_left_yellow" , 100, 70, 50);
@@ -29,6 +29,7 @@ export const small_white  = img("small_white" , 120, 200, 40);
 export const small_border = img("small_border", 120, 200, 40);
 
 export const medium_green    = img("medium_green"   , 160, 240,  80);
+export const medium_yellow   = img("medium_yellow"  , 160, 240,  80);
 export const medium_border   = img("medium_border"  , 160, 240,  80);
 export const large_green     = img("large_green"    , 220, 260, 150);
 export const large_border    = img("large_border"   , 220, 260, 150);
@@ -43,8 +44,31 @@ export const small_blue_button   = new c_button(small_blue  , small_border);
 export const small_white_button  = new c_button(small_white , small_border);
 
 export const medium_green_button   = new c_button(medium_green  , medium_border  );
+export const medium_yellow_button  = new c_button(medium_yellow , medium_border  );
 export const large_green_button    = new c_button(large_green   , large_border   );
 export const gigantic_green_button = new c_button(gigantic_green, gigantic_border);
+
+/////////////////////////////////////////////////////////////////////////////////////
+//
+// add buttons as needed
+//
+/////////////////////////////////////////////////////////////////////////////////////
+
+const colors = new Map();
+colors.set("medium_green" , medium_green );
+colors.set("medium_yellow", medium_yellow);
+
+const borders = new Map();
+borders.set("medium_green" , medium_border);
+borders.set("medium_yellow", medium_border);
+
+export const button = (color_name, x = 0, y = 0) => {
+	assert(colors.has(color_name) && borders.has(color_name));
+	return new c_button(colors.get(color_name), borders.get(color_name), x, y);
+};
+
+
+
 
 const back_button = new c_button(upper_left_green, upper_left_border);
 

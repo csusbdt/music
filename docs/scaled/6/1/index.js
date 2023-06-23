@@ -75,64 +75,58 @@ const ot = 6;
 const f  = 100;
 const b  = 0;
 const d  = 2000;
-let x    = 100;
+let x    = 300;
 const dx = 100;
 
 const tone = half_steps => new c_tone(ot, scale(ot, f, half_steps), b);
 const phi  = new c_tone(PHI, b);
 
-units.push(new c_unit([
-	new c_tone(scale(6, 100, 0), 3),
-	phi
-], d, x +=  0, 400));
+units.push(new c_unit([ new c_tone(scale(6, 100, 0), 3), phi 
+], d, 300, 400));
 
-units.push(new c_unit([
+units.push(new c_unit([ 
 	new c_tone(scale(6, 100, 2), 3),
 	new c_tone(scale(6, 100, 4), 3)
-], d, x += dx, 400));
+], d, 400, 400));
 
-units.push(new c_unit([
-	new c_tone(scale(6, 100, 0), 3),
-	phi
-], d, x += dx, 400));
+units.push(new c_unit([ new c_tone(scale(6, 100, 0), 3), phi 
+], d, 500, 400));
 
-units.push(new c_unit([
-	new c_tone(scale(6, 100, 2), 3),
+units.push(new c_unit([ 
+	new c_tone(scale(6, 100, 2), 3), 
 	new c_tone(scale(6, 100, 4), 3)
-], d, x += dx, 400));
+], d, 600, 400));
 
-units.push(new c_unit([
-	new c_tone(scale(6, 100, 0), 3),
-	phi
-], d, x += dx, 400));
+units.push(new c_unit([ new c_tone(scale(6, 100, 0), 3), phi 
+], d, 700, 400));
 
-units.push(new c_unit([
-	new c_tone(scale(6, 100, 2), 3),
+units.push(new c_unit([ 
+	new c_tone(scale(6, 100, 2), 3), 
 	new c_tone(scale(6, 100, 5), 3)
-], d/4, x += dx, 400));
+], d/4, 500, 600));
 
 units.push(new c_unit([
 	new c_tone(scale(6, 100, 2), 3),
 	new c_tone(scale(6, 100, 6), 3)
-], d/4, x += dx, 400));
+], d/4, 600, 600));
 
 units.push(new c_unit([
 	new c_tone(scale(6, 100, 2), 0),
 	new c_tone(scale(6, 100, 7), 0),
 	phi
-], d/4, x += dx, 400));
+], d/4, 600, 500));
 
 units.push(new c_unit([
 	new c_tone(scale(6, 100, 2), 0),
 	new c_tone(scale(6, 100, 7), 0),
 	phi
-], d/8, x += dx, 400));
+], d/8, 330, 700));
 
 units.push(new c_unit([
 	new c_tone(scale(6, 100, 2), 0),
 	new c_tone(scale(6, 100, 6), 0),
 	phi
-], d/8, x += dx, 400));
+], d/8, 560, 800));
 
 const click = _ => {
 	if (click_back_button()) {

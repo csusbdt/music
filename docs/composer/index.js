@@ -1,14 +1,14 @@
 import start_home              from "../home/index.js"             ;
 import start_composer_template from "../composer/template/index.js";
 import start_composer_grid     from "../composer/grid/index.js"    ;
-import { medium_green_button } from "../global/index.js"           ;
 import { draw_back_button    } from "../global/index.js"           ;
 import { click_back_button   } from "../global/index.js"           ;
 import { draw_audio_toggle   } from "../global/index.js"           ;
 import { click_audio_toggle  } from "../global/index.js"           ;
+import { button              } from "../global/index.js"           ;
 
-const template_button  = medium_green_button.clone(100, 500);
-const grid_button      = medium_green_button.clone(480, 500);
+const template_button = button("medium_yellow", 100, 500);
+const grid_button     = button("medium_green" , 480, 500);
 
 const click = _ => {
 	if (click_back_button()) {

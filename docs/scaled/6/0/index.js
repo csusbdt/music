@@ -76,7 +76,7 @@ let saved_audio_start = null;
 const ot = 6;
 const f  = 100;
 const b  = 0;
-const d  = 2000;
+const d  = 1000;
 let x    = 100;
 const dx = 100;
 
@@ -86,7 +86,7 @@ const phi  = new c_tone(PHI, b);
 units.push(new c_unit([
 	new c_tone(scale(6, 100, 0), 3),
 	phi
-], d, x +=  0, 400));
+], d * 3, x +=  0, 400));
 
 units.push(new c_unit([
 	new c_tone(scale(6, 100, 2), 3),
