@@ -1,18 +1,22 @@
-import start_home from "../home/index.js"   ;
-import c_img      from "../global/img.js"   ;
-import c_toggle   from "../global/toggle.js";
-import c_button   from "../global/button.js";
+import start_home             from "../home/index.js"   ;
+import c_img                  from "../global/img.js"   ;
+import c_toggle               from "../global/toggle.js";
+import c_button               from "../global/button.js";
+import { draw_back_button   } from "../../../global/index.js" ;
+import { click_back_button  } from "../../../global/index.js" ;
+import { draw_audio_toggle  } from "../../../global/index.js" ;
+import { click_audio_toggle } from "../../../global/index.js" ;
 
 let img = n => new c_img("./global/images/" + n + ".png");
 
-const upper_left_green  = img("upper_left_green"  , 100, 70, 50);
-const upper_left_border = img("upper_left_border" , 100, 70, 50);
-const audio_red         = img("upper_right_red"   , 900, 60, 50);
-const audio_green       = img("upper_right_green" , 900, 60, 50);
-const audio_border      = img("upper_right_border", 900, 60, 50);
+// const upper_left_green  = img("upper_left_green"  , 100, 70, 50);
+// const upper_left_border = img("upper_left_border" , 100, 70, 50);
+// const audio_red         = img("upper_right_red"   , 900, 60, 50);
+// const audio_green       = img("upper_right_green" , 900, 60, 50);
+// const audio_border      = img("upper_right_border", 900, 60, 50);
 
-const back_button  = new c_button(upper_left_green ,upper_left_border);
-const audio_toggle = new c_toggle(audio_green, audio_red, audio_border);
+// const back_button  = new c_button(upper_left_green ,upper_left_border);
+// const audio_toggle = new c_toggle(audio_green, audio_red, audio_border);
 
 img = n => new c_img("./space_shooter/images/" + n + ".png");
 
@@ -68,8 +72,7 @@ const draw_0 = [
 const draw_1 = [
 	img("gun_left_border"), 
 	img("gun_right_border"),
-	img("window_border"),
-	back_button
+	img("window_border")
 ];
 
 const ship_speed = [ 1000, 500, 300, 200, 150 ];
@@ -148,20 +151,15 @@ const draw = _ => {
 		}
 	}
 	draw_1.forEach(o => o.draw());
-	audio_toggle.draw();
+	draw_back_button();
+	draw_audio_toggle();
 };
 
 const click = _ => {
-	if (audio_toggle.click()) {
-		if (window.stop_audio !== null) {
-			window.stop_audio();
-			audio_toggle.color = audio_toggle.color_0;
-		} else {
-			window.start_audio();
-			audio_toggle.color = audio_toggle.color_1;
-		}
+	if (click_audio_toggle()) {
+		// noop
 	}
-	else if (back_button.click()) {
+	else if (click_back_button()) {
 		clearTimeout(ship_id);
 		start_home();
 		return;
@@ -184,11 +182,6 @@ const start = _ => {
 };
 
 export default _ => {
-	if (window.stop_audio === null) {
-			audio_toggle.color = audio_toggle.color_0;
-	} else {
-			audio_toggle.color = audio_toggle.color_1;
-	}
 	set_item('page', "./space_shooter/index.js");	
 	on_resize = draw;
 	on_click  = click;

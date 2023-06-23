@@ -4,8 +4,9 @@ import start_songs             from "../songs/index.js"        ;
 import start_space_shooter     from "../space_shooter/index.js";
 import start_scaled            from "../scaled/index.js"       ;
 import c_img                   from "../global/img.js"         ;
-import c_button                from "../global/button.js"      ;
 import c_toggle                from "../global/toggle.js"      ;
+import { draw_audio_toggle   } from "../../../global/index.js" ;
+import { click_audio_toggle  } from "../../../global/index.js" ;
 
 let img = n => new c_img("./home/images/" + n + ".png");
 
@@ -26,11 +27,6 @@ const big_red_2    = img("big_button_red_2"   );
 
 img = n => new c_img("./global/images/" + n + ".png");
 
-const audio_red    = img("upper_right_red"   );
-const audio_green  = img("upper_right_green" );
-const audio_border = img("upper_right_border");
-
-const audio_toggle = new c_toggle(audio_green, audio_red, audio_border);
 const inner_ring   = new c_toggle(inner_red, inner_green, inner_border);
 const outer_ring   = new c_toggle(outer_red, outer_green, outer_border);
 
@@ -65,14 +61,7 @@ const big_button = {
 };
 
 const click = _ => {
-	if (audio_toggle.click()) {
-		if (window.stop_audio !== null) {
-			window.stop_audio();
-			audio_toggle.color = audio_toggle.color_0;
-		} else {
-			window.start_audio();
-			audio_toggle.color = audio_toggle.color_1;
-		}
+	if (click_audio_toggle()) {
 		on_resize();
 	}
 	else if (inner_ring.click() || outer_ring.click()) on_resize();
@@ -81,18 +70,13 @@ const click = _ => {
 
 const draw = _ => {
 	bg_blue.draw();
-	audio_toggle.draw();
+	draw_audio_toggle();
 	inner_ring.draw();
 	outer_ring.draw();
 	big_button.draw();
 };
 
 export default _ => {
-	if (window.stop_audio === null) {
-		audio_toggle.color = audio_toggle.color_0;
-	} else {
-		audio_toggle.color = audio_toggle.color_1;
-	}
 	set_item('page', "./home/index.js");
 	on_resize = draw;
 	on_click = click;
