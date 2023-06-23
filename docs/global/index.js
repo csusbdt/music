@@ -46,7 +46,7 @@ export const medium_green_button   = new c_button(medium_green  , medium_border 
 export const large_green_button    = new c_button(large_green   , large_border   );
 export const gigantic_green_button = new c_button(gigantic_green, gigantic_border);
 
-export const back_button = new c_button(upper_left_green, upper_left_border);
+const back_button = new c_button(upper_left_green, upper_left_border);
 
 export const draw_back_button = _ => {
 	back_button.draw();
