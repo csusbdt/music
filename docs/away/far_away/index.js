@@ -1,3 +1,4 @@
+/*
 import start_home             from "../../home/index.js"      ;
 import c_tone                 from "../../../global/tone.js"  ;
 import c_img                  from "../../../global/img.js"   ;
@@ -16,14 +17,101 @@ function c_unit(f, b, green, white, border) {
 	this.tone = new c_tone(f, b);
 	this.toggle = new c_toggle(
 		img(green), img(white), img(border),
-		_ => {
-			this.tone.start();
+		toggle => {
+			if (window.stop_audio === stop_audio) {
+				this.tone.start();
+			} else if (window.stop_audio === null) {
+				start_audio();
+				assert(
+					window.start_audio === null && 
+					window.stop_audio === stop_audio &&
+					saved_start_audio === null 
+				);
+			} else {
+				start_audio();
+				assert(
+					window.start_audio === null && 
+					window.stop_audio === stop_audio &&
+					saved_start_audio === null 
+				);
+			}
 		}, 
 		_ => {
+			if (window.stop_audio === stop_audio) {
+				// this page is playing audio
+				this.tone.stop();
+				if (is_playing()) {
+					// noop
+				} else {
+					// this page is playing silence, so stop
+					stop_audio();
+				}
+			} else if (window.stop_audio !== null) {
+				// audio is playing from other page 
+				assert(!this.tone.is_playing());
+				stop_audio();
+				if (can_play()) {
+					start_audio();
+				} else {
+					// noop
+				}
+			} else {
+				// no audio is playing
+				assert(window.stop_audio !== null);
+			}
+
+			
+				if (this.is_playing()) {
+					assert(
+						window.start_audio === null && 
+						window.stop_audio === stop_audio
+					);
+					this.tone.stop();
+					if (is_playing()) {
+						// noop
+					} else {
+						stop_audio();
+					}
+				} else {
+					if (can_play()) {
+						start_audio();
+					}
+				}
+				start_audio();
+				assert(
+					window.start_audio === null && 
+					window.stop_audio === stop_audio &&
+					saved_start_audio === null 
+				);
+			} else {
+				assert(window.stop_audio === null);
+				start_audio();
+				assert(
+					window.start_audio === null && 
+					window.stop_audio === stop_audio &&
+					saved_start_audio === null 
+				);
+			}
+
+
+			
 			this.tone.stop();
+			if (!is_playing()) {
+				stop_audio();
+			}
 		} 
 	);
 }
+
+c_unit.prototype.start = function() {
+	if (this.toggle.color === this.toggle.color_1) {
+		this.tone.start();
+	}
+};
+
+c_unit.prototype.stop = function() {
+	this.tone.stop();
+};
 
 c_unit.prototype.is_playing = function() { return this.tone.is_playing(); }
 
@@ -57,12 +145,13 @@ let saved_start_audio = null;
 
 const start_audio = _ => {
 	assert(
-		window.start_audio === start_audio && 
+//		window.start_audio === start_audio && 
+		window.start_audio !== null && 
 		window.stop_audio === null &&
 		!is_playing()
 	);
 	if (can_play()) {
-		state.forEach((is_on, i) => is_on && units[i].start());
+		units.forEach(o => o.can_play() && o.start());
 		saved_start_audio = null;
 		window.start_audio = null;
 		window.stop_audio = stop_audio;
@@ -106,8 +195,9 @@ const click_page = _ => {
 		start_home();
 	} 
 	else if (click_audio_toggle()) on_resize();
-	else if (units.some(o => o.click())) on_resize();
-	
+	else if (units.some(o => o.click())) {
+		on_resize();
+	}
 	// else for (let i = 0; i < state.length; ++i) {
 	// 	if (colors[i][0].click()) {
 	// 		if (!is_playing()) {
@@ -189,7 +279,8 @@ export default _ => {
 	on_resize();
 };
 
-
+*/
+export default _ => assert(false);
 
 /*
 
