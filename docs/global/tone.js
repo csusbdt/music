@@ -1,6 +1,7 @@
-function c_tone(f, b = 0) {
+function c_tone(f, b = 0, v = 1) {
 	this.f = f   ;
 	this.b = b   ;
+	this.v = v   ;
 	this.g = null;
 }
 
@@ -21,7 +22,7 @@ c_tone.prototype.start = function() {
     	o_right.frequency.value = this.f + this.b;
     	o_left.start();
     	o_right.start();
-    	this.g.gain.setTargetAtTime(1, audio.currentTime, .05);
+    	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .05);
     }
 	return this;
 };
