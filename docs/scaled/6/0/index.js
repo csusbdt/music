@@ -3,7 +3,8 @@ import c_tone           from "../../../global/tone.js"  ;
 import c_img            from "../../../global/img.js"   ;
 import c_button         from "../../../global/button.js";
 import c_toggle         from "../../../global/toggle.js";
-import { back_button  } from "../../../global/index.js" ;
+import { draw_back_button   } from "../../../global/index.js" ;
+import { click_back_button  } from "../../../global/index.js" ;
 import { draw_audio_toggle  } from "../../../global/index.js" ;
 import { click_audio_toggle } from "../../../global/index.js" ;
 
@@ -93,7 +94,7 @@ units.push(new c_unit([
 ], d, x += dx, 400));
 
 const click = _ => {
-	if (back_button.click()) {
+	if (click_back_button()) {
 		if (saved_audio_start !== null) saved_audio_start();
 		start_scaled_6();
 		return;
@@ -106,7 +107,7 @@ const click = _ => {
 
 const draw = _ => {
 	bg_blue.draw();
-	back_button.draw();
+	draw_back_button();
 	draw_audio_toggle();
 	units.forEach(o => o.draw());
 };

@@ -1,6 +1,5 @@
 import start_home             from "../home/index.js"   ;
 import c_img                  from "../global/img.js"   ;
-import c_toggle               from "../global/toggle.js";
 import c_button               from "../global/button.js";
 import { draw_back_button   } from "../../../global/index.js" ;
 import { click_back_button  } from "../../../global/index.js" ;
@@ -8,15 +7,6 @@ import { draw_audio_toggle  } from "../../../global/index.js" ;
 import { click_audio_toggle } from "../../../global/index.js" ;
 
 let img = n => new c_img("./global/images/" + n + ".png");
-
-// const upper_left_green  = img("upper_left_green"  , 100, 70, 50);
-// const upper_left_border = img("upper_left_border" , 100, 70, 50);
-// const audio_red         = img("upper_right_red"   , 900, 60, 50);
-// const audio_green       = img("upper_right_green" , 900, 60, 50);
-// const audio_border      = img("upper_right_border", 900, 60, 50);
-
-// const back_button  = new c_button(upper_left_green ,upper_left_border);
-// const audio_toggle = new c_toggle(audio_green, audio_red, audio_border);
 
 img = n => new c_img("./space_shooter/images/" + n + ".png");
 
