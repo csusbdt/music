@@ -2,7 +2,9 @@ import c_img       from "./img.js"   ;
 import c_button    from "./button.js";
 import c_toggle    from "./toggle.js";
 
-const img = n => new c_img("./global/images/" + n + ".png");
+const img = (n, cx = 0, cy = 0, cr = 0, bottom = null) => {
+	return new c_img("./global/images/" + n + ".png", cx, cy, cr, bottom);
+};
 
 export const upper_left_green   = img("upper_left_green"  , 100, 70, 50);
 //export const upper_left_yellow  = img("upper_left_yellow" , 100, 70, 50);
@@ -57,10 +59,18 @@ export const gigantic_green_button = new c_button(gigantic_green, gigantic_borde
 const colors = new Map();
 colors.set("medium_green" , medium_green );
 colors.set("medium_yellow", medium_yellow);
+colors.set("small_green"  , small_green  );
+colors.set("small_red"    , small_red    );
+colors.set("small_yellow" , small_yellow );
+colors.set("small_white"  , small_white  );
 
 const borders = new Map();
 borders.set("medium_green" , medium_border);
 borders.set("medium_yellow", medium_border);
+borders.set("small_green"  , small_border );
+borders.set("small_red"    , small_border );
+borders.set("small_yellow" , small_border );
+borders.set("small_white"  , small_border );
 
 export const button = (color_name, x = 0, y = 0) => {
 	assert(colors.has(color_name) && borders.has(color_name));

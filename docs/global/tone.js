@@ -1,8 +1,10 @@
 function c_tone(f, b = 0, v = 1) {
-	this.f = f   ;
-	this.b = b   ;
-	this.v = v   ;
-	this.g = null;
+	this.f       = f   ;
+	this.b       = b   ;
+	this.v       = v   ;
+	this.o_left  = null;
+	this.o_right = null;
+	this.g       = null;
 }
 
 c_tone.prototype.is_playing = function() { return this.g !== null; }
@@ -14,14 +16,14 @@ c_tone.prototype.start = function() {
     	this.g.gain.value = 0;
     	const merger = new ChannelMergerNode(audio);
     	merger.connect(this.g);
-    	const o_left  = audio.createOscillator();
-    	const o_right = audio.createOscillator();
-    	o_left.connect(merger, 0, 0);
-    	o_right.connect(merger, 0, 1);
-    	o_left.frequency.value = this.f; 
-    	o_right.frequency.value = this.f + this.b;
-    	o_left.start();
-    	o_right.start();
+    	this.o_left  = audio.createOscillator();
+    	this.o_right = audio.createOscillator();
+    	this.o_left.connect(merger, 0, 0);
+    	this.o_right.connect(merger, 0, 1);
+    	this.o_left.frequency.value = this.f; 
+    	this.o_right.frequency.value = this.f + this.b;
+    	this.o_left.start();
+    	this.o_right.start();
     	this.g.gain.setTargetAtTime(this.v, audio.currentTime, .05);
     }
 	return this;
@@ -30,10 +32,29 @@ c_tone.prototype.start = function() {
 c_tone.prototype.stop = function() {
 	if (this.g !== null) {
     	this.g.gain.setTargetAtTime(0, audio.currentTime, .05);
-    	let g = this.g;
-    	this.g = null;
+    	let g        = this.g;
+    	this.g       = null;
+		this.o_left  = null;
+		this.o_right = null;
     	setTimeout(_ => g.disconnect(), 1000);
     }
+};
+
+c_tone.prototype.set_f = function(f) {
+	this.f = f;
+	if (this.g !== null) {
+		this.o_left.frequency.setTargetAtTime(this.f, audio.currentTime, .05);
+		this.o_right.frequency.setTargetAtTime(this.f + this.b, audio.currentTime, .05);
+	}
+	return this;
+};
+
+c_tone.prototype.set_v = function(v) { 
+	this.v = v;
+	if (this.g !== null) {
+		this.g.gain.setTargetAtTime(v, audio.currentTime, .05);
+	}
+	return this;
 };
 
 export default c_tone;
