@@ -65,7 +65,7 @@ const draw_1 = [
 	img("window_border")
 ];
 
-const ship_speed = [ 1000, 500, 300, 200, 150 ];
+const ship_speed = [ 650, 450, 300, 200, 150 ];
 
 // app state:
 let ship_i       = null;

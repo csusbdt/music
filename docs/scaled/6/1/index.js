@@ -86,7 +86,7 @@ units.push(new c_unit([ new c_tone(scale(6, 100, 0), 3), phi
 
 units.push(new c_unit([ 
 	new c_tone(scale(6, 100, 2), 3),
-//	new c_tone(scale(6, 100, 4), 3)
+	new c_tone(scale(6, 100, 4), 3)
 ], d, 400, 400));
 
 units.push(new c_unit([ new c_tone(scale(6, 100, 0), 3), phi 
@@ -94,7 +94,7 @@ units.push(new c_unit([ new c_tone(scale(6, 100, 0), 3), phi
 
 units.push(new c_unit([ 
 	new c_tone(scale(6, 100, 2), 3), 
-//	new c_tone(scale(6, 100, 4), 3)
+	new c_tone(scale(6, 100, 4), 3)
 ], d, 600, 400));
 
 units.push(new c_unit([ new c_tone(scale(6, 100, 0), 3), phi 
