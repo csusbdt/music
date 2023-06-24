@@ -3,9 +3,12 @@ import c_img                  from "../../../global/img.js"   ;
 import { draw_back_button   } from "../../../global/index.js" ;
 import { click_back_button  } from "../../../global/index.js" ;
 import { button             } from "../../../global/index.js" ;
+import { audio_toggle       } from "../../../global/index.js" ;
 
 const min_f  = 60;
 const max_f  = 900;
+
+const audio = audio_toggle(_ => tone.start(), _ => tone.stop());
 
 let tone = null;
 
@@ -44,17 +47,20 @@ const click_page = _ => {
 		start_template();
 	} 
 	else if (grid.click()) on_resize();
+	else if (audio.click()) on_resize();
 };
 
 const draw_page = _ => {
 	bg_blue.draw();
 	grid.draw();
+	audio.draw();
 	draw_back_button();
 };
 
 export default o => {
 	tone = o;
 	tone.start();
+	audio.color = audio.color_1;
 	on_resize = draw_page;
 	on_click  = click_page;
 	on_resize();
