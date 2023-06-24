@@ -29,7 +29,11 @@ c_unit.prototype.draw = function() {
 };
 
 c_unit.prototype.click = function() {
-	if (this.on_button.click())	return true;
+	if (this.on_button.click())	{
+		if (is_playing()) stop_audio();
+		start_edit_tone(this.tone);
+		return true;
+	}
 	else return false;
 };
 
@@ -71,7 +75,7 @@ const exit = next_page => {
 		window.start_audio = null;
 		window.stop_audio  = stop_audio;
 	}
-	next_page();
+	next_page(units[unit_i].tone);
 };
 
 units.push(new c_unit(new c_tone(100      , 3, .5), 1000, 300, 300));
@@ -80,10 +84,7 @@ units.push(new c_unit(new c_tone(100 * PHI, 3, .5), 1000, 400, 300));
 const click_page = _ => {
 	if (click_back_button()) return exit(start_composer);
 	else if (audio.click()) on_resize();
-	else if (units.some(o => o.click())) {
-		log("unit clicked");
-		on_resize();
-	}
+	else if (units.some(o => o.click())) return;
 };
 
 const draw_page = _ => {
@@ -95,8 +96,13 @@ const draw_page = _ => {
 
 export default _ => {
 	assert((window.start_audio === null) !== (window.stop_audio === null));
-	if (window.stop_audio !== stop_audio && window.stop_audio !== null) {
+	if (window.stop_audio === null) {
+		audio.color = audio.color_0;
+	} else if (window.stop_audio !== stop_audio) {
 		window.stop_audio();
+		audio.color = audio.color_0;
+	} else {
+		audio.color = audio.color_1;
 	}
 	set_item('page', "./composer/template/index.js");
 	on_resize = draw_page;
