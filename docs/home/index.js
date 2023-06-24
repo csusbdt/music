@@ -5,8 +5,8 @@ import start_space_shooter     from "../space_shooter/index.js";
 import start_scaled            from "../scaled/index.js"       ;
 import c_img                   from "../global/img.js"         ;
 import c_toggle                from "../global/toggle.js"      ;
-import { draw_audio_toggle   } from "../../../global/index.js" ;
-import { click_audio_toggle  } from "../../../global/index.js" ;
+import { draw_audio_toggle   } from "../global/index.js" ;
+import { click_audio_toggle  } from "../global/index.js" ;
 
 let img = n => new c_img("./home/images/" + n + ".png");
 

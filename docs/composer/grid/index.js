@@ -1,17 +1,16 @@
 import start_composer         from "../index.js"      ;
-import c_img                  from "../../../global/img.js"   ;
-import c_tone                 from "../../../global/tone.js"  ;
-import { draw_back_button   } from "../../../global/index.js" ;
-import { click_back_button  } from "../../../global/index.js" ;
-import { draw_audio_toggle  } from "../../../global/index.js" ;
-import { click_audio_toggle } from "../../../global/index.js" ;
-import { button             } from "../../../global/index.js" ;
+import c_img                  from "../../global/img.js"   ;
+import c_tone                 from "../../global/tone.js"  ;
+import { draw_back_button   } from "../../global/index.js" ;
+import { click_back_button  } from "../../global/index.js" ;
+import { draw_audio_toggle  } from "../../global/index.js" ;
+import { click_audio_toggle } from "../../global/index.js" ;
+import { button             } from "../../global/index.js" ;
 
 const min_f  = 60;
 const max_f  = 900;
 
 const tone = new c_tone(108, 3, .5); // init better!!!!!!!!!!!!!
-//let silent = null;
 
 const grid = {
 	x: 200, y: 160, w: 600, h: 600,

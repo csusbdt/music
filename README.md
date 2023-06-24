@@ -2,7 +2,7 @@
 
 A canvas app to create music.
 
-Here's [a link to the running](https://csusbdt.github.io/music/).
+Here's [a link to the running app](https://csusbdt.github.io/music/).
 
 brain waves:
 

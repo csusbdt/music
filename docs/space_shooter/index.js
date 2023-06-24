@@ -1,10 +1,10 @@
 import start_home             from "../home/index.js"   ;
 import c_img                  from "../global/img.js"   ;
 import c_button               from "../global/button.js";
-import { draw_back_button   } from "../../../global/index.js" ;
-import { click_back_button  } from "../../../global/index.js" ;
-import { draw_audio_toggle  } from "../../../global/index.js" ;
-import { click_audio_toggle } from "../../../global/index.js" ;
+import { draw_back_button   } from "../global/index.js" ;
+import { click_back_button  } from "../global/index.js" ;
+import { draw_audio_toggle  } from "../global/index.js" ;
+import { click_audio_toggle } from "../global/index.js" ;
 
 let img = n => new c_img("./global/images/" + n + ".png");
 

@@ -1,13 +1,13 @@
 import start_composer         from "../index.js"              ;
-import c_tone                 from "../../../global/tone.js"  ;
-import c_toggle               from "../../../global/toggle.js";
-import { draw_back_button   } from "../../../global/index.js" ;
-import { click_back_button  } from "../../../global/index.js" ;
-import { draw_audio_toggle  } from "../../../global/index.js" ;
-import { click_audio_toggle } from "../../../global/index.js" ;
-import { gigantic_green     } from "../../../global/index.js" ;
-import { gigantic_red       } from "../../../global/index.js" ;
-import { gigantic_border    } from "../../../global/index.js" ;
+import c_tone                 from "../../global/tone.js"  ;
+import c_toggle               from "../../global/toggle.js";
+import { draw_back_button   } from "../../global/index.js" ;
+import { click_back_button  } from "../../global/index.js" ;
+import { draw_audio_toggle  } from "../../global/index.js" ;
+import { click_audio_toggle } from "../../global/index.js" ;
+import { gigantic_green     } from "../../global/index.js" ;
+import { gigantic_red       } from "../../global/index.js" ;
+import { gigantic_border    } from "../../global/index.js" ;
 
 function c_unit(tone, toggle) {
 	this.tone = tone;

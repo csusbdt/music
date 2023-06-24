@@ -1,8 +1,8 @@
-import start_scaled_8   from "../index.js"              ;
-import c_tone           from "../../../global/tone.js"  ;
-import c_img            from "../../../global/img.js"   ;
-import c_button         from "../../../global/button.js";
-import c_toggle         from "../../../global/toggle.js";
+import start_scaled_8         from "../index.js"              ;
+import c_tone                 from "../../../global/tone.js"  ;
+import c_img                  from "../../../global/img.js"   ;
+import c_button               from "../../../global/button.js";
+import c_toggle               from "../../../global/toggle.js";
 import { draw_back_button   } from "../../../global/index.js" ;
 import { click_back_button  } from "../../../global/index.js" ;
 import { draw_audio_toggle  } from "../../../global/index.js" ;
