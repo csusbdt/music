@@ -1,4 +1,4 @@
-import start_home             from "../../home/index.js"      ;
+import start_composer         from "../index.js"              ;
 import c_tone                 from "../../../global/tone.js"  ;
 import c_toggle               from "../../../global/toggle.js";
 import { draw_back_button   } from "../../../global/index.js" ;
@@ -65,7 +65,7 @@ const click_page = _ => {
 		on_resize(); 
 	}
 	else if (click_back_button()) {
-		exit(start_home);
+		exit(start_composer);
 	} 
 	else if (unit.click()) {
 		restore_previous_audio = false;

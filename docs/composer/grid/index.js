@@ -1,4 +1,4 @@
-import start_home             from "../../home/index.js"      ;
+import start_composer         from "../index.js"      ;
 import c_img                  from "../../../global/img.js"   ;
 import c_tone                 from "../../../global/tone.js"  ;
 import { draw_back_button   } from "../../../global/index.js" ;
@@ -7,70 +7,58 @@ import { draw_audio_toggle  } from "../../../global/index.js" ;
 import { click_audio_toggle } from "../../../global/index.js" ;
 import { button             } from "../../../global/index.js" ;
 
-const left   = 150;
-const top    = 200;
-const width  = 700;
-const height = 700;
 const min_f  = 60;
 const max_f  = 900;
 
-function c_unit(tone, toggle) {
-	this.tone = tone;
-	this.but  = button("small_yellow", 100, 100);
-}
+const tone = new c_tone(108, 3, .5); // init better!!!!!!!!!!!!!
+//let silent = null;
 
-c_unit.prototype.start = function() {
-	this.tone.start();
-	return this;
+const grid = {
+	x: 200, y: 160, w: 600, h: 600,
+	but: button("small_yellow", 200 + 600 / 2 - 120, 160 + 600 / 2 - 200),
+	draw: function() {
+		ctx.fillStyle = rgb_white;
+		ctx.fillRect(this.x, this.y, this.w, this.h);
+		this.but.draw();
+	},
+	click: function() {
+		if (click_x >= this.x - 40 && click_x <= this.x + this.w + 40 && 
+			click_y >= this.y - 40 && click_y <= this.y + this.h + 40
+		) {
+			let x = click_x;
+			let y = click_y;
+			if (x < this.x) x = this.x;
+			if (x > this.x + this.w) x = this.x + this.w;
+			if (y < this.y) y = this.y;
+			if (y > this.y + this.h) y = this.y + this.h;
+			this.but.x = x - this.but.color.cx;
+			this.but.y = y - this.but.color.cy;
+			const f_percent = Math.pow((y - this.y) / this.h, 2);
+			const v_percent = (x - this.x) / this.w;			
+			tone.set_f(min_f + (max_f - min_f) * f_percent);
+			tone.set_v(v_percent);
+			return true;
+		} else return false;
+	}
 };
 
-c_unit.prototype.stop = function() { 
-	this.tone.stop();
-	return this;
-};
-
-c_unit.prototype.draw = function() { this.but.draw(); };
-
-c_unit.prototype.click = function() {
-	if (this.but.click()) { }
-	if (click_x >= left - 40 && click_x <= left + width  + 40 && 
-		click_y >= top  - 40 && click_y <= top  + height + 40
-	) {
-		let grid_x = click_x;
-		let grid_y = click_y;		
-		if (grid_x < left        ) grid_x = left;
-		if (grid_x > left + width) grid_x = left + width; 
-		if (grid_y < top         ) grid_y = top; 
-		if (grid_y > top + height) grid_y = top + height;	
-		this.but.x = grid_x - this.but.color.cx;
-		this.but.y = grid_y - this.but.color.cy;
-		const f_percent = Math.pow((grid_y - top) / height, 2);
-		const v_percent = (grid_x - left) / width;
-		this.tone.set_f(min_f + (max_f - min_f) * f_percent);
-		this.tone.set_v(v_percent);
-		return true;
-	} else return false;
-};
-
-const is_silent = _ => !unit.tone.is_playing();
-const would_be_silent = _ => true; //unit.toggle.color === unit.toggle.color_0;
-
-const unit = new c_unit(
-	new c_tone(108, 3, .5)
-);
+const is_silent = _ => !tone.is_playing();
+const would_be_silent = _ => false;
 
 const stop_audio = _ => {
 	assert((window.start_audio === null) !== (window.stop_audio === null));
 	window.start_audio = start_audio;
 	window.stop_audio = null;
-	unit.stop();
+	tone.stop();
+	//silent = true;
 };
 
 const start_audio = _ => {
 	assert((window.start_audio === null) !== (window.stop_audio === null));
 	window.start_audio = null;
 	window.stop_audio = stop_audio;
-	unit.start();
+	tone.start();
+	//silent = false;
 };
 
 const click_page = _ => {
@@ -79,9 +67,9 @@ const click_page = _ => {
 		on_resize(); 
 	}
 	else if (click_back_button()) {
-		exit(start_home);
+		exit(start_composer);
 	} 
-	else if (unit.click()) {
+	else if (grid.click()) {
 		restore_previous_audio = false;
 		on_resize();
 	}
@@ -89,11 +77,9 @@ const click_page = _ => {
 
 const draw_page = _ => {
 	bg_blue.draw();
-	ctx.fillStyle = rgb_white;
-	ctx.fillRect(left, top, width, height);
+	grid.draw();
 	draw_back_button();
 	draw_audio_toggle();
-	unit.draw();
 };
 
 let restore_previous_audio = null;
