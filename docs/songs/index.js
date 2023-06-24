@@ -81,6 +81,7 @@ export default i => {
 	if (i !== undefined) {
 		song_i = i;
 		window.start_audio = start_audio;
+		window.stop_audio  = null;
 		return;
 	}
 	if (window.start_audio !== null) window.start_audio = start_audio;
