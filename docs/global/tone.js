@@ -49,6 +49,14 @@ c_tone.prototype.set_f = function(f) {
 	return this;
 };
 
+c_tone.prototype.set_b = function(b) {
+	this.b = b;
+	if (this.g !== null) {
+		this.o_right.frequency.setTargetAtTime(this.f + this.b, audio.currentTime, .05);
+	}
+	return this;
+};
+
 c_tone.prototype.set_v = function(v) { 
 	this.v = v;
 	if (this.g !== null) {
