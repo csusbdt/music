@@ -1,4 +1,4 @@
-import start_far_away          from "../away/far_away/index.js";
+import start_compose           from "../compose/index.js";
 import start_inst              from "../inst/index.js"         ;
 import start_composer          from "../composer/index.js"     ;
 import start_songs             from "../songs/index.js"        ;
@@ -48,7 +48,7 @@ const big_action = _ => {
 		} else if (inner_ring.i === 1 && outer_ring.i === 0) {
 	        start_inst();
 		} else if (inner_ring.i === 0 && outer_ring.i === 1) {
-			start_far_away();
+			start_compose();
 		} else if (inner_ring.i === 1 && outer_ring.i === 1) {
 	        start_inst();
 		}		

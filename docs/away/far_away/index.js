@@ -8,20 +8,20 @@ import { audio_toggle       } from "../../global/index.js" ;
 
 const img = n => new c_img("./away/far_away/images/" + n + ".png");
 
-const on     = [];
-const white  = [];
-const green  = [];
-const border = [];
-const tone   = [];
-for (let i = 0; i < 7; ++i) {
-	on.push(false);
-	white.push(new c_img("./away/far_away/images/white_"   + i + ".png"));
-	green.push(new c_img("./away/far_away/images/green_"   + i + ".png"));
-	border.push(new c_img("./away/far_away/images/border_" + i + ".png"));
-	tone.push(new c_tone(scale(6, 100, i * 2), 3));
-}
-tone[0].f = PHI;
-tone[0].b = 0;
+// const on     = [];
+// const white  = [];
+// const green  = [];
+// const border = [];
+// const tone   = [];
+// for (let i = 0; i < 7; ++i) {
+// 	on.push(false);
+// 	white.push(new c_img("./away/far_away/images/white_"   + i + ".png"));
+// 	green.push(new c_img("./away/far_away/images/green_"   + i + ".png"));
+// 	border.push(new c_img("./away/far_away/images/border_" + i + ".png"));
+// 	tone.push(new c_tone(scale(6, 100, i * 2), 3));
+// }
+// tone[0].f = PHI;
+// tone[0].b = 0;
 
 const is_playing = _ => on.some(o => o);
 
