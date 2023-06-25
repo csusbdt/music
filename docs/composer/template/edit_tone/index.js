@@ -14,16 +14,8 @@ let tone = null;
 
 const binaural = {
 	i: 0, 
-//	bs: [ 0, 3, 6, 10, 21, 64 ],
 	bs: [ 0, 3, 6, 11, 24, 96 ],
 	togs: [],
-	// 	[ button("small_green",  50, 200), button("small_red", 100, 200) ],
-	// 	[ button("small_green",  50, 200), button("small_red", 100, 300) ],
-	// 	[ button("small_green",  50, 200), button("small_red", 100, 400) ],
-	// 	[ button("small_green", 100, 200), button("small_red", 100, 500) ],
-	// 	[ button("small_green", 100, 200), button("small_red", 100, 600) ],
-	// 	[ button("small_green", 100, 200), button("small_red", 100, 700) ]
-	// ],
 	set_i: function(i) {
 		if (this.i === i) return;
 		this.i = i;

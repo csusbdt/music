@@ -15,9 +15,10 @@ export const upper_right_red    = img("upper_right_red"   , 900, 60, 50);
 //export const upper_right_yellow = img("upper_right_yellow", 900, 60, 50);
 export const upper_right_border = img("upper_right_border", 900, 60, 50);
 
-// export const lower_left_green   = img("lower_left_green"  , 87, 920, 50);
-// export const lower_left_yellow  = img("lower_left_yellow" , 87, 920, 50);
-// export const lower_left_border  = img("lower_left_border" , 87, 920, 50);
+export const lower_left_green   = img("lower_left_green"  , 87, 920, 50);
+export const lower_left_red     = img("lower_left_red"    , 87, 920, 50);
+export const lower_left_yellow  = img("lower_left_yellow" , 87, 920, 50);
+export const lower_left_border  = img("lower_left_border" , 87, 920, 50);
 
 // export const lower_right_green  = img("lower_right_green" , 922, 922, 50);
 // export const lower_right_yellow = img("lower_right_yellow", 922, 922, 50);
@@ -70,6 +71,10 @@ colors.set("small_white"  , small_white  );
 colors.set("audio_green"  , audio_green  );
 colors.set("audio_red"    , audio_red    );
 
+colors.set("lower_left_green" , lower_left_green );
+colors.set("lower_left_red"   , lower_left_red   );
+colors.set("lower_left_yellow", lower_left_yellow);
+
 const borders = new Map();
 borders.set("medium_green" , medium_border);
 borders.set("medium_yellow", medium_border);
@@ -79,6 +84,10 @@ borders.set("small_yellow" , small_border );
 borders.set("small_white"  , small_border );
 borders.set("audio_green"  , audio_border );
 borders.set("audio_red"    , audio_border );
+
+borders.set("lower_left_green"    , lower_left_border );
+borders.set("lower_left_red"      , lower_left_border );
+borders.set("lower_left_yellow"   , lower_left_border );
 
 export const button = (color_name, x = 0, y = 0) => {
 	assert(colors.has(color_name) && borders.has(color_name));
@@ -99,59 +108,6 @@ export const click_back_button = (start_next_page = null) => {
 		return false;
 	}
 };
-
-//////////////////////////////////////////////////////////////////////////////////
-//
-// c_togglez
-//
-//////////////////////////////////////////////////////////////////////////////////
-
-// const c_togglez = (colors, border = null, x = 0, y = 0, actions = null) => {
-// 	if (!Array.isArray(colors)) colors = [colors];
-// 	this.colors = colors;
-// 	this.i = 0;
-// 	this.x = x;
-// 	this.y = y;
-// 	if (actions === null) actions = Array(colors.length).fill(null);
-// 	else if (!Array.isArray(actions)) actrions = [actions];
-// 	this.actions = actions;
-// }
-
-// c_togglez.prototype.draw = _ => {
-// 	if (this.border !== null) this.border.draw();
-// 	this.colors[this.i].draw();
-// };
-
-// c_togglez.prototype.click = _ => {
-// 	if (this.colors[this.i].click()) {
-// 		const action = this.actions[this.i];
-// 		++this.i; // increment before action in case action draws
-// 		if (action !== null) action();
-// 		return true;
-// 	} return false;
-// };
-
-// c_togglez.prototype.click = _ => {
-// 	if (this.colors[this.i].click()) {
-// 		++this.i;
-// 		return true;
-// 	} return false;
-// };
-
-// export const toggle = (colors, border = null, x = 0, y = 0, actions = null) => {
-// 	return new c_togglez(colors, border, x, y, actions);
-// };
-
-// export const audio_green  = upper_right_green ;
-// export const audio_red    = upper_right_red   ;
-// export const audio_border = upper_right_border;
-
-// export const create_audio_toggle = (
-// 	start = _ => window.audio_start(), 
-// 	stop  = _ => window.audio_start()
-// ) => new c_togglez([audio_green, audio_red], audio_border, [start, stop]);
-	
-//////////////////////////////////////////////////////////////////////////////////
 
 export const audio_toggle = (a0, a1) => new c_toggle(audio_green, audio_red, audio_border, a0, a1);	
 
