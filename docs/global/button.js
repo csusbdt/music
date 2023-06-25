@@ -6,13 +6,13 @@ function c_button(color, border = null, x = 0, y = 0, action = null) {
 	this.action = action;
 }
 
-c_button.prototype.draw = function() {
-	this.color.draw(this.x, this.y);
-	if (this.border !== null) this.border.draw(this.x, this.y);
+c_button.prototype.draw = function(x = 0, y = 0) {
+	this.color.draw(this.x + x, this.y + y);
+	if (this.border !== null) this.border.draw(this.x + x, this.y + y);
 };
 
-c_button.prototype.click = function() {
-	if (this.color.click(this.x, this.y)) {
+c_button.prototype.click = function(x = 0, y = 0) {
+	if (this.color.click(this.x + x, this.y + y)) {
 		if (this.action !== null) this.action(this);
 		return true;
 	} else return false;

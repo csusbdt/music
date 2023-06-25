@@ -1,16 +1,16 @@
-import start_composer         from "../home/index.js"           ;
-//import start_edit_tone        from "./edit_tone/index.js"  ;
-import c_tone                 from "../../global/tone.js"  ;
-import { draw_back_button   } from "../../global/index.js" ;
-import { click_back_button  } from "../../global/index.js" ;
-import { button             } from "../../global/index.js" ;
-import { audio_toggle       } from "../../global/index.js" ;
+import start_composer         from "../home/index.js"      ;
+import c_tone                 from "../global/tone.js"  ;
+import { draw_back_button   } from "../global/index.js" ;
+import { click_back_button  } from "../global/index.js" ;
+import { button             } from "../global/index.js" ;
+import { audio_toggle       } from "../global/index.js" ;
 
 function c_unit(tone, d, x, y) {
-	this.tone       = tone;
-	this.d          = d;
-	this.off_button = button("small_green", x, y);
-	this.on_button  = button("small_red"  , x, y);
+	this.tone   = tone;
+	this.d      = d;
+	this.green  = button("small_green" , x, y);
+	this.red    = button("small_red"   , x, y);
+	this.yellow = button("small_yellow", x, y);
 }
 
 c_unit.prototype.start = function() {
@@ -24,22 +24,72 @@ c_unit.prototype.stop = function() {
 };
 
 c_unit.prototype.draw = function() {
-	if (this.tone.is_playing()) this.on_button.draw(); 
-	else this.off_button.draw();
+	if (this === units[unit_i]) this.red.draw();
+	else if (this === units[edit_i]) this.yellow.draw();
+	else this.green.draw();
 };
 
 c_unit.prototype.click = function() {
-	if (this.on_button.click())	{
-		if (is_playing()) stop_audio();
-	//	start_edit_tone(this.tone);
+	if (this.green.click())	{
+		const i = units.indexOf(this);
+		if (edit_i !== i) {
+			edit_i = i;
+		} else if (edit_i === i) {
+			edit_i = null;
+		}
 		return true;
-	}
-	else return false;
+	} else return false;
 };
 
 const units = [];
-let unit_i  = 0;
+let unit_i  = null;
 let unit_id = null;
+let edit_i  = null;
+
+const min_f  = 60;
+const max_f  = 900;
+const grid_x = 200;
+const grid_y = 300;
+const grid_h = 600;
+const grid_w = 600;
+const grid_c = Math.log2(max_f - min_f) / grid_h;
+const y2f    = y => min_f + Math.pow(2, grid_c * y); // y in grid coords
+const f2y    = f => Math.log2(f - min_f) / grid_c; // y in grid coords
+
+const red_but    = button("small_red"   );
+const yellow_but = button("small_yellow");
+
+const grid = {
+	draw: function () {
+		ctx.fillStyle = rgb_white;
+		ctx.fillRect(grid_x, grid_y, grid_w, grid_h);
+		if (edit_i === null) {
+			const but_x = (units[unit_i].tone.v) * grid_w + grid_x - red_but.color.cx;
+			const but_y = f2y(units[unit_i].tone.f) + grid_y - red_but.color.cy;	
+			red_but.draw(but_x, but_y);
+		} else {
+			const but_x = (units[edit_i].tone.v) * grid_w + grid_x - red_but.color.cx;
+			const but_y = f2y(units[edit_i].tone.f) + grid_y - red_but.color.cy;	
+			yellow_but.draw(but_x, but_y);
+		}
+	},
+	click: function() {
+		if (edit_i === null) return false;
+		if (click_x >= grid_x - 30 && click_x <= grid_x + grid_w + 30 && 
+			click_y >= grid_y - 30 && click_y <= grid_y + grid_h + 30
+		) {
+			let x = click_x;
+			let y = click_y;
+			if (x < grid_x) x = grid_x;
+			if (x > grid_x + grid_w) x = grid_x + grid_w;
+			if (y < grid_y) y = grid_y;
+			if (y > grid_y + grid_h) y = grid_y + grid_h;
+			units[edit_i].tone.set_v((x - grid_x) / grid_w);
+			units[edit_i].tone.set_f(y2f(y - grid_y));
+			return true;
+		} else return false;
+	}
+};
 
 const is_playing = _ => unit_id !== null;
 
@@ -61,7 +111,7 @@ const start_audio = _ => {
 
 const stop_audio = _ => {
 	units[unit_i].stop();
-	unit_i = 0;
+	//unit_i = null;
 	clearTimeout(unit_id);
 	unit_id = null;
 	window.start_audio = start_audio;
@@ -78,19 +128,27 @@ const exit = next_page => {
 	next_page(units[unit_i].tone);
 };
 
-units.push(new c_unit(new c_tone(100      , 3, .5), 1000, 300, 300));
-units.push(new c_unit(new c_tone(100 * PHI, 3, .5), 1000, 400, 300));
+units.push(new c_unit(new c_tone(100 / PHI, 3,  1), 1000,   0, 0));
+units.push(new c_unit(new c_tone(100      , 3,  1), 1000, 100, 0));
+units.push(new c_unit(new c_tone(100 * PHI, 3,  1), 1000, 200, 0));
+units.push(new c_unit(new c_tone(200      , 3,  1), 1000, 300, 0));
+units.push(new c_unit(new c_tone(400      , 3, .5),  500, 400, 0));
+units.push(new c_unit(new c_tone(400 / PHI, 3, .5),  500, 500, 0));
+units.push(new c_unit(new c_tone(200 * PHI, 3, .5),  500, 600, 0));
+units.push(new c_unit(new c_tone(400      , 3, .5),  250, 700, 0));
+units.push(new c_unit(new c_tone(400 / PHI, 3, .5),  250, 800, 0));
 
 const click_page = _ => {
 	if (click_back_button()) return exit(start_composer);
-	else if (audio.click()) on_resize();
-	else if (units.some(o => o.click())) return;
+	else if (audio.click() || grid.click()) on_resize();
+	else if (units.some(o => o.click())) on_resize();
 };
 
 const draw_page = _ => {
 	bg_blue.draw();
 	draw_back_button();
 	units.forEach(o => o.draw());
+	grid.draw();
 	audio.draw();
 };
 
@@ -98,9 +156,13 @@ export default _ => {
 	assert((window.start_audio === null) !== (window.stop_audio === null));
 	if (window.stop_audio === null) {
 		audio.color = audio.color_0;
+		edit_i = null;
+		unit_i = 0;
 	} else if (window.stop_audio !== stop_audio) {
 		window.stop_audio();
 		audio.color = audio.color_0;
+		edit_i = null;
+		unit_i = 0;
 	} else {
 		audio.color = audio.color_1;
 	}
