@@ -1,15 +1,82 @@
+import start_home             from "../../home/index.js"   ;
+import c_tone                 from "../../global/tone.js"  ;
+import { draw_back_button   } from "../../global/index.js" ;
+import { click_back_button  } from "../../global/index.js" ;
+import { audio_toggle       } from "../../global/index.js" ;
+
+const tone = new c_tone(100, 3, 1);
+
+const is_playing = _ => tone.is_playing();
+
+const start_audio = _ => {
+	// unit_i = 0;
+	// units[unit_i].start();
+	// unit_id = setTimeout(next_unit, units[unit_i].d);
+	tone.start();
+	window.start_audio = null;
+	window.stop_audio  = stop_audio;
+};
+
+const stop_audio = _ => {
+	// units[unit_i].stop();
+	// clearTimeout(unit_id);
+	// unit_id = null;
+	tone.stop();
+	window.start_audio = start_audio;
+	window.stop_audio  = null;
+};
+
+const exit = next_page => {
+	if (is_playing()) {
+		window.start_audio = null;
+		window.stop_audio  = stop_audio;
+	}
+	start_home();
+};
+
+const audio = audio_toggle(start_audio, stop_audio);
+
+const click_page = _ => {
+	if (click_back_button()) return exit(start_home);
+	else if (audio.click()) on_resize();
+};
+
+const draw_page = _ => {
+	bg_blue.draw();
+	draw_back_button();
+	audio.draw();
+};
+
+export default _ => {
+	assert((window.start_audio === null) !== (window.stop_audio === null));
+	if (window.stop_audio === null) {
+		audio.color = audio.color_0;
+	} else if (window.stop_audio !== stop_audio) {
+		window.stop_audio();
+		audio.color = audio.color_0;
+	} else {
+		audio.color = audio.color_1;
+	}
+	set_item('page', "./away/far_away/index.js");
+	on_resize = draw_page;
+	on_click = click_page;
+	on_resize();
+};
+
+
+
 /*
 import start_home             from "../../home/index.js"      ;
-import c_tone                 from "../../../global/tone.js"  ;
-import c_img                  from "../../../global/img.js"   ;
-import c_button               from "../../../global/button.js";
-import c_toggle               from "../../../global/toggle.js";
-import { back_button        } from "../../../global/index.js" ;
-import { draw_audio_toggle  } from "../../../global/index.js" ;
-import { click_audio_toggle } from "../../../global/index.js" ;
+import c_tone                 from "../../global/tone.js"  ;
+import c_img                  from "../../global/img.js"   ;
+import c_button               from "../../global/button.js";
+import c_toggle               from "../../global/toggle.js";
+import { back_button        } from "../../global/index.js" ;
+import { draw_audio_toggle  } from "../../global/index.js" ;
+import { click_audio_toggle } from "../../global/index.js" ;
 
-import { upper_left_green  } from "../../../global/index.js" ;
-import { upper_left_border } from "../../../global/index.js" ;
+import { upper_left_green  } from "../../global/index.js" ;
+import { upper_left_border } from "../../global/index.js" ;
 
 const img = n => new c_img("./away/far_away/images/" + n + ".png");
 
@@ -280,7 +347,7 @@ export default _ => {
 };
 
 */
-export default _ => assert(false);
+//export default _ => assert(false);
 
 /*
 
