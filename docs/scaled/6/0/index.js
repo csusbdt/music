@@ -1,45 +1,37 @@
 import start_scaled_6         from "../index.js"              ;
 import c_tone                 from "../../../global/tone.js"  ;
-import c_img                  from "../../../global/img.js"   ;
-import c_button               from "../../../global/button.js";
-import c_toggle               from "../../../global/toggle.js";
 import { draw_back_button   } from "../../../global/index.js" ;
 import { click_back_button  } from "../../../global/index.js" ;
 import { draw_audio_toggle  } from "../../../global/index.js" ;
 import { click_audio_toggle } from "../../../global/index.js" ;
 
-const green  = new c_img("./compose/images/green.png" , 120, 205, 36);
-const red    = new c_img("./compose/images/red.png"   , 120, 205, 36);
-const border = new c_img("./compose/images/border.png", 120, 205, 36);
+import { button } from "../../../global/index.js" ;
 
-const green_button  = new c_button(green , border);
-const red_button    = new c_button(red   , border);
-const border_button = new c_button(border, null  );
+const green  = button("small_green");
+const red    = button("small_red");
 
 function c_unit(tones, d, x, y) {
 	if (!Array.isArray(tones)) tones = [tones];
 	this.tones = tones;
 	this.d = d;
-	this.toggle = new c_toggle(
-		green_button .clone(x - 120, y - 205), 
-		red_button   .clone(x - 120, y - 205), 
-		border_button.clone(x - 120, y - 205)
-	);
+	this.x = x;
+	this.y = y;
 }
 
 c_unit.prototype.start = function() {
-	this.toggle.color = this.toggle.color_1;
 	this.tones.forEach(o => o.start());
 };
 
 c_unit.prototype.stop = function() {
-	this.toggle.color = this.toggle.color_0;
 	this.tones.forEach(o => o.stop());
 };
 
-c_unit.prototype.draw  = function() { this.toggle.draw(); }
+c_unit.prototype.draw  = function() {
+	if (units.indexOf(this) === unit_i) red.draw(this.x - red.color.cx, this.y - red.color.cy);
+	else green.draw(this.x - red.color.cx, this.y - red.color.cy);
+};
 
-c_unit.prototype.click = function() { return this.toggle.click(); }
+c_unit.prototype.click = function() { return red.click(this.x - red.color.cx, this.y - red.color.cy); }
 
 const units = [];
 let unit_i  = null;
