@@ -1,4 +1,5 @@
-import start_scaled            from "../index.js"           ;
+import start_home              from "../../home/index.js"   ;
+//import start_scaled            from "../index.js"           ;
 import start_scaled_8_0        from "./0/index.js"          ;
 import { large_green_button  } from "../../global/index.js" ;
 //import { medium_green_button } from "../../global/index.js" ;
@@ -12,7 +13,7 @@ const large_button  = large_green_button.clone(100, 200);
 
 const click = _ => {
 	if (click_back_button()) {
-		start_scaled();
+		start_home();
 		return;
 	}
 	else if (click_audio_toggle()) on_resize();

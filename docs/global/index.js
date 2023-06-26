@@ -12,7 +12,8 @@ export const upper_left_border  = img("upper_left_border" , 100, 70, 50);
 
 export const upper_right_green  = img("upper_right_green" , 900, 60, 50);
 export const upper_right_red    = img("upper_right_red"   , 900, 60, 50);
-//export const upper_right_yellow = img("upper_right_yellow", 900, 60, 50);
+export const upper_right_blue   = img("upper_right_blue"  , 900, 60, 50);
+export const upper_right_yellow = img("upper_right_yellow", 900, 60, 50);
 export const upper_right_border = img("upper_right_border", 900, 60, 50);
 
 export const lower_left_green   = img("lower_left_green"  , 87, 920, 50);
