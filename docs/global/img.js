@@ -1,10 +1,11 @@
 function c_img(src = null, cx = 0, cy = 0, cr = null, bottom = null) {
-	this.src = src;
-	if (src !== null) {
+	if (typeof src === 'string') {
 	    this.image = new Image();
-	    this.image.src = src;
-	} else {
+	    this.image.src = src;		
+	} else if (src === null) {
 		this.image = null;
+	} else {
+		this.image = src;
 	}
 	this.cx        = cx; 
 	this.cy        = cy; 
@@ -43,6 +44,86 @@ c_img.prototype.click = function(draw_x = 0, draw_y = 0) {
 		const dy = cy - click_y;
 		return dx * dx + dy * dy < this.cr * this.cr;
 	}
+};
+
+const to_color = function(from_img, to_img, r, g, b) {
+	const canvas = document.createElement("canvas");
+	canvas.width  = design_width;
+	canvas.height = design_height;
+	const ctx = canvas.getContext("2d");
+	ctx.drawImage(from_img.image, 0, 0);
+	const image_data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = image_data.data;
+    const len = pixels.length;
+    for (let pixel = 0; pixel < len; pixel += 4) {
+		if (pixels[pixel + 3] !== 0) {
+			pixels[pixel + 0] = window.colors.yellow[0];
+			pixels[pixel + 1] = window.colors.yellow[1];
+			pixels[pixel + 2] = window.colors.yellow[2];
+		}
+    }
+    ctx.putImageData(image_data, 0, 0);
+	to_img.image = new Image();
+	to_img.image.src = canvas.toDataURL();
+};
+
+c_img.prototype.clone_color = function(r, g, b) {
+	const img = new c_img(null, this.cx, this.cy, this.cr, this.bottom);
+	if (!this.image.complete) {
+		let onload = to_color.bind(null, this, img, r, g, b);
+		this.image.addEventListener('load', onload, {once: true});
+	} else {
+		to_color(this, img, r, g, b);
+	}
+	return img;
+};
+
+c_img.prototype.clone_red = function() {
+	return this.clone_color(
+		window.colors.red[0], 
+		window.colors.red[1], 
+		window.colors.red[2]
+	);
+};
+
+c_img.prototype.clone_green = function() {
+	return this.clone_color(
+		window.colors.green[0], 
+		window.colors.green[1], 
+		window.colors.green[2]
+	);
+};
+
+c_img.prototype.clone_blue = function() {
+	return this.clone_color(
+		window.colors.blue[0], 
+		window.colors.blue[1], 
+		window.colors.blue[2]
+	);
+};
+
+c_img.prototype.clone_yellow = function() {
+	return this.clone_color(
+		window.colors.yellow[0], 
+		window.colors.yellow[1], 
+		window.colors.yellow[2]
+	);
+};
+
+c_img.prototype.clone_white = function() {
+	return this.clone_color(
+		window.colors.white[0], 
+		window.colors.white[1], 
+		window.colors.white[2]
+	);
+};
+
+c_img.prototype.clone_black = function() {
+	return this.clone_color(
+		window.colors.black[0], 
+		window.colors.black[1], 
+		window.colors.black[2]
+	);
 };
 
 export default c_img;

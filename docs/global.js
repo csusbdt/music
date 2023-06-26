@@ -107,11 +107,11 @@ window.ctx = canvas.getContext('2d', { alpha: false });
 const click_test_canvas = document.createElement('canvas');
 const click_test_ctx    = click_test_canvas.getContext("2d", { willReadFrequently: true });
 
-let design_width  = 1000 ;
-let design_height = 1000 ;
-let scale         = 1    ;
-let left          = 0    ;
-let top           = 0    ;
+window.design_width  = 1000 ;
+window.design_height = 1000 ;
+let scale            = 1    ;
+let left             = 0    ;
+let top              = 0    ;
 
 window.set_design_size = function(w, h) {
 	design_width  = w;

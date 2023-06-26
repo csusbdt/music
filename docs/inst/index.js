@@ -1,4 +1,4 @@
-import start_composer         from "../home/index.js"      ;
+import start_home             from "../home/index.js"   ;
 import c_tone                 from "../global/tone.js"  ;
 import { draw_back_button   } from "../global/index.js" ;
 import { click_back_button  } from "../global/index.js" ;
@@ -139,7 +139,7 @@ units.push(new c_unit(new c_tone(400      , 3, .5),  250, 700, 0));
 units.push(new c_unit(new c_tone(400 / PHI, 3, .5),  250, 800, 0));
 
 const click_page = _ => {
-	if (click_back_button()) return exit(start_composer);
+	if (click_back_button()) return exit(start_home);
 	else if (audio.click() || grid.click()) on_resize();
 	else if (units.some(o => o.click())) on_resize();
 };
