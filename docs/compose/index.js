@@ -14,11 +14,20 @@ const img = n => new c_img("./compose/images/" + n + ".png");
 
 const borders      = img("borders");
 
-const r_0          = img("r_0");
-const v_red        = [img("r_1_0"), img("r_1_1"), img("r_1_2"), img("r_1_3"), img("r_1_4"), img("r_1_5") ];
-const b_red        = [img("r_2_0"), img("r_2_1"), img("r_2_2"), img("r_2_3"), img("r_2_4"), img("r_2_5") ];
+const b_0          = img("b_0");
 
-
+const v_blue   = [];
+const v_yellow = [];
+const b_blue   = [];
+const b_yellow = [];
+for (let i = 0; i < 5; ++i) {
+	let o = img("b_1_" + i);
+	v_blue.push(o);
+	v_yellow.push(o.clone_yellow());
+	o = img("b_2_" + i);
+	b_blue.push(o);
+	b_yellow.push(o.clone_yellow());
+}
 
 const t_blue   = [];
 const t_yellow = [];
@@ -68,9 +77,9 @@ const click_page = _ => {
 
 const draw_page = _ => {
 	bg_green.draw();
-	r_0.draw();
-	draw(v_red);
-	draw(b_red);
+	b_0.draw();
+	draw(v_yellow);
+	draw(b_blue);
 	draw(t_blue);
 	
 	borders.draw();
