@@ -20,7 +20,7 @@ const v_blue   = [];
 const v_yellow = [];
 const b_blue   = [];
 const b_yellow = [];
-for (let i = 0; i < 5; ++i) {
+for (let i = 0; i < 6; ++i) {
 	let o = img("b_1_" + i);
 	v_blue.push(o);
 	v_yellow.push(o.clone_yellow());
