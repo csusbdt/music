@@ -6,9 +6,9 @@ const img = (n, cx = 0, cy = 0, cr = 0, bottom = null) => {
 	return new c_img("./global/images/" + n + ".png", cx, cy, cr, bottom);
 };
 
-export const upper_left_green   = img("upper_left_green"  , 100, 70, 50);
-//export const upper_left_yellow  = img("upper_left_yellow" , 100, 70, 50);
 export const upper_left_border  = img("upper_left_border" , 100, 70, 50);
+export const upper_left_green   = img("upper_left_green"  , 100, 70, 50);
+export const upper_left_blue    = upper_left_green.clone_blue();
 
 export const upper_right_green  = img("upper_right_green" , 900, 60, 50);
 export const upper_right_red    = img("upper_right_red"   , 900, 60, 50);
@@ -95,20 +95,29 @@ export const button = (color_name, x = 0, y = 0) => {
 	return new c_button(colors.get(color_name), borders.get(color_name), x, y);
 };
 
-const back_button = new c_button(upper_left_green, upper_left_border);
+// back button
 
-export const draw_back_button = _ => {
-	back_button.draw();
-};
-
+const back_button_green = new c_button(upper_left_green, upper_left_border);
+const back_button_blue  = new c_button(upper_left_blue , upper_left_border);
+export const draw_back_button_green = _ => back_button_green.draw();
+export const draw_back_button_blue  = _ => back_button_blue.draw();
 export const click_back_button = (start_next_page = null) => {
-	if (back_button.click()) {
+	if (back_button_green.click()) {
 		if (start_next_page !== null) start_next_page();
 		return true;
 	} else {
 		return false;
 	}
 };
+const back_button = new c_button(upper_left_green, upper_left_border);  // to be removed
+export const draw_back_button = _ => back_button.draw();                // to be removed
+
+
+// audio button
+export const audio_button_green  = new c_button(upper_right_green , upper_right_border);
+export const audio_button_blue   = new c_button(upper_right_blue  , upper_right_border);
+export const audio_button_yellow = new c_button(upper_right_yellow, upper_right_border);
+
 
 export const audio_toggle = (a0, a1) => new c_toggle(audio_green, audio_red, audio_border, a0, a1);	
 
