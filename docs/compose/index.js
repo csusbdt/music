@@ -83,7 +83,7 @@ const draw_page = _ => {
 	draw(t_blue);
 	
 	borders.draw();
-	draw_back_button_blue();
+//	draw_back_button_blue();
 	is_playing() ? audio_button_yellow.draw() : audio_button_blue.draw();
 };
 
@@ -92,6 +92,8 @@ export default _ => {
 	if (window.stop_audio !== null && window.stop_audio !== stop_audio) {
 		window.stop_audio();
 		restart_audio_on_exit = true;
+	} else {
+		restart_audio_on_exit = false;
 	}
 	set_item('page', "./compose/index.js");
 	on_resize = draw_page;

@@ -1,3 +1,4 @@
+import start_test              from "../test/index.js"         ;
 import start_songs             from "../songs/index.js"        ;
 import start_space_shooter     from "../space_shooter/index.js";
 import start_scaled_6          from "../scaled/6/index.js"     ;
@@ -135,7 +136,7 @@ const yellow_blue_system = {
 				} else if (yellow_blue_system.inner_i === 1 && yellow_blue_system.outer_i === 0) {
 					start_composer();
 				} else if (yellow_blue_system.inner_i === 0 && yellow_blue_system.outer_i === 1) {
-					start_composer();
+					start_test();
 				}
 			}, 200);
 		} else return false;

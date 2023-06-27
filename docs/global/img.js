@@ -1,3 +1,10 @@
+let loading = 0;
+
+const on_loading_complete = _ => {
+	assert(loading > 0);
+	if (--loading === 0) on_resize();
+};
+
 function c_img(src = null, cx = 0, cy = 0, cr = null, bottom = null) {
 	if (typeof src === 'string') {
 	    this.image = new Image();
@@ -19,7 +26,8 @@ c_img.prototype.draw = function(x = 0, y = 0) {
 	} else if (this.image.complete) {
 		ctx.drawImage(this.image, x, y);
 	} else {
-		this.image.onload = on_resize;
+		++loading;
+		this.image.onload = on_loading_complete;
 	}
 };
 
