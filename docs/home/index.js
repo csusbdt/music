@@ -1,11 +1,3 @@
-import start_test              from "../test/index.js"         ;
-import start_songs             from "../songs/index.js"        ;
-import start_space_shooter     from "../space_shooter/index.js";
-import start_scaled_6          from "../scaled/6/index.js"     ;
-import start_scaled_8          from "../scaled/8/index.js"     ;
-import start_compose           from "../compose/index.js"      ;
-import start_inst              from "../inst/index.js"         ;
-import start_composer          from "../composer/index.js"     ;
 import c_img                   from "../global/img.js"         ;
 import { draw_audio_toggle   } from "../global/index.js"       ;
 import { click_audio_toggle  } from "../global/index.js"       ;
@@ -79,13 +71,13 @@ const red_green_system = {
 			setTimeout(_ => {
 				red_green_system.big_i = 0;
 				if (red_green_system.inner_i === 0 && red_green_system.outer_i === 0) {
-					start_songs();
+					run("../songs/index.js");
 				} else if (red_green_system.inner_i === 1 && red_green_system.outer_i === 0) {
-					start_scaled_6();
+					run("../scaled/6/index.js");
 				} else if (red_green_system.inner_i === 0 && red_green_system.outer_i === 1) {
-					start_space_shooter();
+					run("../space_shooter/index.js");
 				} else if (red_green_system.inner_i === 1 && red_green_system.outer_i === 1) {
-					start_scaled_8();
+					run("../scaled/8/index.js");
 				}
 			}, 200);
 		} else return false;
@@ -130,13 +122,13 @@ const yellow_blue_system = {
 			setTimeout(_ => {
 				yellow_blue_system.big_i = 0;
 				if (yellow_blue_system.inner_i === 0 && yellow_blue_system.outer_i === 0) {
-					start_compose();
+					run("../compose/index.js");
 				} else if (yellow_blue_system.inner_i === 1 && yellow_blue_system.outer_i === 1) {
-					start_inst();
+					run("../inst/index.js");
 				} else if (yellow_blue_system.inner_i === 1 && yellow_blue_system.outer_i === 0) {
-					start_composer();
+					run("../composer/index.js");
 				} else if (yellow_blue_system.inner_i === 0 && yellow_blue_system.outer_i === 1) {
-					start_test();
+					run("../test/index.js");
 				}
 			}, 200);
 		} else return false;

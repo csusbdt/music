@@ -246,7 +246,7 @@ window.bg_white  = new c_bg(rgb_white );
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //
-// math stuff
+// miscellaneous
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -256,3 +256,5 @@ window.PHI = 1.61803398875;
 window.scale = (octave_tones, base_frequency, half_notes_away_from_base) => {
 	return base_frequency * Math.pow(Math.pow(2, 1.0 / octave_tones), half_notes_away_from_base);
 };
+
+window.run = (path, ...arg) => import(path).then(o => o.default(...arg));

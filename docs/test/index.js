@@ -14,7 +14,7 @@ const y_1_0   = b_1_0.clone_yellow();
 let i = 0;
 
 const click_page = _ => {
-	if (y_0.click()) start_home();
+	if (y_0.click()) run("../home/index.js", 0, 1);
 	else if (b_1_0.click()) {
 		i=== 0 ? i = 1 : i = 0;
 		on_resize();
