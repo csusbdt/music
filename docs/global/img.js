@@ -27,7 +27,7 @@ c_img.prototype.draw = function(x = 0, y = 0) {
 		ctx.drawImage(this.image, x, y);
 	} else {
 		++loading;
-		this.image.onload = on_loading_complete;
+		this.image.addEventListener('load', on_loading_complete, {once: true});
 	}
 };
 
@@ -65,9 +65,9 @@ const to_color = function(from_img, to_img, r, g, b) {
     const len = pixels.length;
     for (let pixel = 0; pixel < len; pixel += 4) {
 		if (pixels[pixel + 3] !== 0) {
-			pixels[pixel + 0] = window.colors.yellow[0];
-			pixels[pixel + 1] = window.colors.yellow[1];
-			pixels[pixel + 2] = window.colors.yellow[2];
+			pixels[pixel + 0] = r;
+			pixels[pixel + 1] = g;
+			pixels[pixel + 2] = b;
 		}
     }
     ctx.putImageData(image_data, 0, 0);

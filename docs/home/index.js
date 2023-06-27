@@ -1,6 +1,6 @@
 import c_img                   from "../global/img.js"         ;
-import { draw_audio_toggle   } from "../global/index.js"       ;
-import { click_audio_toggle  } from "../global/index.js"       ;
+//import { draw_audio_toggle   } from "../global/index.js"       ;
+//import { click_audio_toggle  } from "../global/index.js"       ;
 import { lower_left_red      } from "../global/index.js"       ;
 import { lower_left_yellow   } from "../global/index.js"       ;
 import { lower_left_border   } from "../global/index.js"       ;
