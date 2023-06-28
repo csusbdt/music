@@ -38,7 +38,7 @@ const click_center  = _ => {
 	return false;
 };
 
-const start_center_tone = _ => center_i === 1 && center_tone.start();
+const start_center_tone = _ => center_tone.start();
 const stop_center_tone  = _ => center_tone.stop();
 
 ///////////////////////////////////////////////////////////////////////
@@ -48,7 +48,6 @@ const stop_center_tone  = _ => center_tone.stop();
 ///////////////////////////////////////////////////////////////////////
 
 let tones_i    = [];
-let v_i        = [];
 let b_i        = [];
 const tones    = [];
 const v_blue   = [];
@@ -57,9 +56,8 @@ const b_blue   = [];
 const b_yellow = [];
 for (let i = 0; i < 6; ++i) {
 	tones_i.push(0);
-	v_i.push(0);
 	b_i.push(0);
-	tones.push(new c_tone(80, 0, 0));
+	tones.push(new c_tone(scale(6, 80, 2 * i), 0, 0));
 	let o = img("b_1_" + i);
 	v_blue.push(o);
 	v_yellow.push(o.clone_yellow());
@@ -70,16 +68,16 @@ for (let i = 0; i < 6; ++i) {
 
 const draw_vb = _ => {
 	for (let i = 0; i < 6; ++i) {
-		v_i[i] === 0 ? v_blue[i].draw() : v_yellow[i].draw();
-		b_i[i] === 0 ? b_blue[i].draw() : b_yellow[i].draw();
+		draw(tones_i[i] === 0 ? v_blue[i] : v_yellow[i]);
+		draw(b_i[i]     === 0 ? b_blue[i] : b_yellow[i]);
 	}
 };
 
 const click_v = _ => {
 	for (let i = 0; i < 6; ++i) {
 		if (v_blue[i].click()) {
-			if (++v_i[i] === 2) {
-				v_i[i] = 0;
+			if (++tones_i[i] === 2) {
+				tones_i[i] = 0;
 				tones[i].set_v(0);
 			} else {
 				tones[i].set_v(1);
@@ -105,7 +103,7 @@ const click_b = _ => {
 	return false;
 };
 
-const start_tones = _ => v_i.forEach(i => i === 1 && tones[i].start());
+const start_tones = _ => tones.forEach(o => o.start());
 const stop_tones  = _ => tones.forEach(o => o.stop());
 
 const is_playing = _ => center_tone.is_playing() || tones.some(o => o.is_playing());
@@ -139,7 +137,7 @@ const exit = next_page => {
 const click_page = _ => {
 	if (click_back_button()) return exit(start_home);
 	else if (click(audio_button_blue)) {
-		is_playing() ? stop_audio() : start_audio();
+		window.start_audio === null ? stop_audio() : start_audio();
 		on_resize();
 	} else if (click_center() || click_v() || click_b()) on_resize();
 	restart_audio_on_exit = false;
@@ -149,9 +147,10 @@ const draw_page = _ => {
 	bg_green.draw();
 	draw_center();
 	draw_vb();
-	borders.draw();
+	draw(borders);
 	draw_back_button_blue();
-	is_playing() ? audio_button_yellow.draw() : audio_button_blue.draw();
+	window.start_audio === null ? audio_button_yellow.draw() : audio_button_blue.draw();
+//	is_playing() ? audio_button_yellow.draw() : audio_button_blue.draw();
 };
 
 export default _ => {
