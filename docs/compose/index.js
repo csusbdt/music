@@ -1,18 +1,60 @@
-//import start_home        from "../home/index.js"  ;
-import c_tone            from "../global/tone.js" ;
-import c_img             from "../global/img.js"  ;
-import { draw_back_button_blue } from "../global/index.js"  ;
-import { click_back_button     } from "../global/index.js"  ;
-import xbutton           from "../global/xbutton.js";
+import c_tone  from "../global/tone.js" ;
+import c_img   from "../global/img.js"  ;
+import xbutton from "../global/xbutton.js";
+
+const back_button  = xbutton("upper_left_blue"   );
+const audio_blue   = xbutton("upper_right_blue"  );
+const audio_yellow = xbutton("upper_right_yellow");
 
 const draw  = a => Array.isArray(a) ? a.forEach(o => o.draw()) : a.draw();
 const click = a => Array.isArray(a) ? a.some(o => o.click()) : a.click();
 const img   = n => new c_img("./compose/images/" + n + ".png");
 
-const audio_button_blue   = xbutton("upper_right_blue"  );
-const audio_button_yellow = xbutton("upper_right_yellow");
+const borders = img("borders");
 
-const borders      = img("borders");
+///////////////////////////////////////////////////////////////////////
+//
+// units
+//
+///////////////////////////////////////////////////////////////////////
+
+
+
+
+const unit     = Array(8).fill(0); // unit states
+const u_blue   = [
+	img("b_a_0", 140, 377, 40),
+	img("b_a_1", 238, 268, 40),
+	img("b_a_2", 345, 186, 40),
+	img("b_a_3", 460, 150, 40),
+	img("b_a_4", 584, 163, 40),
+	img("b_a_5", 685, 214, 40),
+	img("b_a_6", 772, 294, 42),
+	img("b_a_7", 824, 405, 45)
+];
+const u_white  = u_blue.map(o => o.clone_white());
+const u_yellow = u_blue.map(o => o.clone_yellow());
+
+const draw_units = _ => {
+	for (let i = 0; i < 8; ++i) {
+		if (unit[i] === 0) ; // noop
+		else if (unit[i] === 1) draw(u_blue[i]);
+		else if (unit[i] === 2) draw(u_yellow[i]);
+	}
+};
+
+const click_units = _ => {
+	for (let i = 0; i < 8; ++i) {
+		if (u_blue[i].click()) {
+			if (++unit[i] === 2) {
+				unit[i] = 0;
+			}
+			return true;
+		}
+	}
+	return false;
+};
+
 
 ///////////////////////////////////////////////////////////////////////
 //
@@ -137,11 +179,11 @@ const exit = next_page => {
 };
 
 const click_page = _ => {
-	if (click_back_button()) return exit("../home/index.js");
-	else if (click(audio_button_blue)) {
+	if (back_button.click()) return exit("../home/index.js");
+	else if (click(audio_blue)) {
 		window.start_audio === null ? stop_audio() : start_audio();
 		on_resize();
-	} else if (click_center() || click_v() || click_b()) on_resize();
+	} else if (click_center() || click_v() || click_b() || click_units()) on_resize();
 	restart_audio_on_exit = false;
 };
 
@@ -149,9 +191,10 @@ const draw_page = _ => {
 	bg_green.draw();
 	draw_center();
 	draw_vb();
+	draw_units();
 	draw(borders);
-	draw_back_button_blue();
-	window.start_audio === null ? audio_button_yellow.draw() : audio_button_blue.draw();
+	draw(back_button);
+	window.start_audio === null ? audio_yellow.draw() : audio_blue.draw();
 };
 
 export default _ => {
