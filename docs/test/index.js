@@ -14,29 +14,26 @@ let img = n => new c_img("./compose/images/" + n + ".png");
 const borders = img("borders");
 const b_0     = img("b_0");
 const y_0     = b_0.clone_yellow();
-const b_1_0   = img("b_1_0");
-const y_1_0   = b_1_0.clone_yellow();
 
-let i = 0;
+let tone_i = 0;
 const tone = new c_tone(80, 3, 1);
 
 const click_page = _ => {
-	if (y_0.click()) run("../home/index.js", 0, 1);
-	else if (b_1_0.click()) {
-		i=== 0 ? i = 1 : i = 0;
+	if (back_button.click()) run("../home/index.js");
+	if (b_0.click()) {
+		if (++tone_i === 2) {
+			tone_i = 0;
+			tone.stop();
+		} else tone.start();
 		on_resize();
 	}
 };
 
-let draw_count = 0;
-
 const draw_page = _ => {
 	draw(bg_green);
 	draw(back_button);
-	draw(y_0);
-	i=== 0 ? draw(b_1_0) : draw(y_1_0);
+	tone_i === 0 ? draw(b_0) : draw(y_0);
 	draw(borders);
-	log(++draw_count);
 };
 
 export default _ => {
