@@ -10,6 +10,8 @@ export const upper_left_border  = img("upper_left_border" , 100, 70, 50);
 export const upper_left_green   = img("upper_left_green"  , 100, 70, 50);
 export const upper_left_blue    = upper_left_green.clone_blue();
 
+
+
 export const upper_right_green  = img("upper_right_green" , 900, 60, 50);
 export const upper_right_red    = img("upper_right_red"   , 900, 60, 50);
 export const upper_right_blue   = img("upper_right_blue"  , 900, 60, 50);
@@ -62,6 +64,24 @@ export const gigantic_green_button = new c_button(gigantic_green, gigantic_borde
 //
 /////////////////////////////////////////////////////////////////////////////////////
 
+// export const upper_left_border  = img("upper_left_border" , 100, 70, 50);
+// export const upper_left_green   = img("upper_left_green"  , 100, 70, 50);
+
+
+const x_borders = new Map();
+
+x_borders.set("upper_left_blue" , "upper_left_border");
+
+export const x_button = (color_name, x = 0, y = 0) => {
+	assert(colors.has(color_name) && borders.has(color_name));
+	return new c_button(colors.get(color_name), borders.get(color_name), x, y);
+};
+
+
+
+
+// older stuff:
+
 const colors = new Map();
 colors.set("medium_green" , medium_green );
 colors.set("medium_yellow", medium_yellow);
@@ -99,8 +119,10 @@ export const button = (color_name, x = 0, y = 0) => {
 
 const back_button_green = new c_button(upper_left_green, upper_left_border);
 const back_button_blue  = new c_button(upper_left_blue , upper_left_border);
+
 export const draw_back_button_green = _ => back_button_green.draw();
 export const draw_back_button_blue  = _ => back_button_blue.draw();
+
 export const click_back_button = (start_next_page = null) => {
 	if (back_button_green.click()) {
 		if (start_next_page !== null) start_next_page();

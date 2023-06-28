@@ -6,15 +6,56 @@ import { click_back_button     } from "../global/index.js"  ;
 import { audio_button_blue     } from "../global/index.js"  ;
 import { audio_button_yellow   } from "../global/index.js"  ;
 
-
-
-const tone = new c_tone(78, 3, 1);
-
-const img = n => new c_img("./compose/images/" + n + ".png");
+const draw  = a => Array.isArray(a) ? a.forEach(o => o.draw()) : a.draw();
+const click = a => Array.isArray(a) ? a.some(o => o.click()) : a.click();
+const img   = n => new c_img("./compose/images/" + n + ".png");
 
 const borders      = img("borders");
 
-const b_0          = img("b_0");
+///////////////////////////////////////////////////////////////////////
+//
+// wave
+//
+///////////////////////////////////////////////////////////////////////
+
+const b_0 = img("b_0");
+const y_0 = b_0.clone_yellow();
+
+const wave = {
+	i: 0,
+	b_0: b_0,
+	y_0: y_0,
+	tone: new c_tone(113, 0, 1),
+	draw: function() {
+		this.i === 0 ? this.b_0.draw() : this.y_0.draw();
+	},
+	click: function() {
+		if (this.b_0.click()) {
+			if (++this.i === 2) {
+				this.i = 0;
+				this.tone.stop();
+			} else {
+				this.tone.start();
+			}
+			return true;
+		} else return false;
+	},
+	is_playing: function() { 
+		return this.tone.is_playing(); 
+	},
+	start: function() {
+		if (this.i === 1) this.tone.start();
+	},
+	stop: function() {
+		this.tone.stop();
+	}
+};
+
+///////////////////////////////////////////////////////////////////////
+//
+// volume
+//
+///////////////////////////////////////////////////////////////////////
 
 const v_blue   = [];
 const v_yellow = [];
@@ -29,6 +70,13 @@ for (let i = 0; i < 6; ++i) {
 	b_yellow.push(o.clone_yellow());
 }
 
+
+///////////////////////////////////////////////////////////////////////
+//
+// binaural
+//
+///////////////////////////////////////////////////////////////////////
+
 const t_blue   = [];
 const t_yellow = [];
 for (let i = 0; i < 8; ++i) {
@@ -37,21 +85,23 @@ for (let i = 0; i < 8; ++i) {
 	t_yellow.push(o.clone_yellow());
 }
 
-const draw  = a => Array.isArray(a) ? a.forEach(o => o.draw()) : a.draw();
-const click = a => Array.isArray(a) ? a.some(o => o.click()) : a.click();
 
-const is_playing = _ => tone.is_playing();
+const is_playing = _ => wave.is_playing();
+
+
+
+
 
 let restart_audio_on_exit = true;
 
 const start_audio = _ => {
-	tone.start();
+	wave.start();
 	window.start_audio = null;
 	window.stop_audio  = stop_audio;
 };
 
 const stop_audio = _ => {
-	tone.stop();
+	wave.stop();
 	window.start_audio = start_audio;
 	window.stop_audio  = null;
 };
@@ -71,19 +121,19 @@ const click_page = _ => {
 	else if (click(audio_button_blue)) {
 		is_playing() ? stop_audio() : start_audio();
 		on_resize();
-	}
+	} else if (wave.click()) on_resize();
 	restart_audio_on_exit = false;
 };
 
 const draw_page = _ => {
 	bg_green.draw();
-	b_0.draw();
+	wave.draw();
 	draw(v_yellow);
 	draw(b_blue);
 	draw(t_blue);
 	
 	borders.draw();
-//	draw_back_button_blue();
+	draw_back_button_blue();
 	is_playing() ? audio_button_yellow.draw() : audio_button_blue.draw();
 };
 
