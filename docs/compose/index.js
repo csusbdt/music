@@ -1,4 +1,4 @@
-import start_home        from "../home/index.js"  ;
+//import start_home        from "../home/index.js"  ;
 import c_tone            from "../global/tone.js" ;
 import c_img             from "../global/img.js"  ;
 import { draw_back_button_blue } from "../global/index.js"  ;
@@ -133,11 +133,11 @@ const exit = next_page => {
 	} else if (restart_audio_on_exit) {
 		window.start_audio();
 	}
-	start_home();
+	run(next_page);
 };
 
 const click_page = _ => {
-	if (click_back_button()) return exit(start_home);
+	if (click_back_button()) return exit("../home/index.js");
 	else if (click(audio_button_blue)) {
 		window.start_audio === null ? stop_audio() : start_audio();
 		on_resize();
@@ -152,7 +152,6 @@ const draw_page = _ => {
 	draw(borders);
 	draw_back_button_blue();
 	window.start_audio === null ? audio_button_yellow.draw() : audio_button_blue.draw();
-//	is_playing() ? audio_button_yellow.draw() : audio_button_blue.draw();
 };
 
 export default _ => {
