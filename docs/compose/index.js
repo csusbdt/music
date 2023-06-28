@@ -3,12 +3,17 @@ import c_tone            from "../global/tone.js" ;
 import c_img             from "../global/img.js"  ;
 import { draw_back_button_blue } from "../global/index.js"  ;
 import { click_back_button     } from "../global/index.js"  ;
-import { audio_button_blue     } from "../global/index.js"  ;
-import { audio_button_yellow   } from "../global/index.js"  ;
+import xbutton           from "../global/xbutton.js";
+
+//import { audio_button_blue     } from "../global/index.js"  ;
+//import { audio_button_yellow   } from "../global/index.js"  ;
 
 const draw  = a => Array.isArray(a) ? a.forEach(o => o.draw()) : a.draw();
 const click = a => Array.isArray(a) ? a.some(o => o.click()) : a.click();
 const img   = n => new c_img("./compose/images/" + n + ".png");
+
+const audio_button_blue   = xbutton("upper_right_blue"  );
+const audio_button_yellow = xbutton("upper_right_yellow");
 
 const borders      = img("borders");
 

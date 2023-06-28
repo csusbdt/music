@@ -180,7 +180,9 @@ const draw_page = _ => {
 	system.draw();
 };
 
-export default _ => {
+export default (a, b) => {
+	log(a);
+	log(b);
 	set_item('page', "./home/index.js");
 	on_resize = draw_page;
 	on_click = click_page;

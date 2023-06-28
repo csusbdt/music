@@ -5,7 +5,7 @@ const on_loading_complete = _ => {
 	if (--loading === 0) on_resize();
 };
 
-function c_img(src = null, cx = 0, cy = 0, cr = null, bottom = null) {
+export default function c_img(src = null, cx = 0, cy = 0, cr = null, bottom = null) {
 	if (typeof src === 'string') {
 	    this.image = new Image();
 	    this.image.src = src;		
@@ -133,5 +133,3 @@ c_img.prototype.clone_black = function() {
 		window.colors.black[2]
 	);
 };
-
-export default c_img;

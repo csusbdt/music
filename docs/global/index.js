@@ -2,9 +2,12 @@ import c_img       from "./img.js"   ;
 import c_button    from "./button.js";
 import c_toggle    from "./toggle.js";
 
+
 const img = (n, cx = 0, cy = 0, cr = 0, bottom = null) => {
 	return new c_img("./global/images/" + n + ".png", cx, cy, cr, bottom);
 };
+
+
 
 export const upper_left_border  = img("upper_left_border" , 100, 70, 50);
 export const upper_left_green   = img("upper_left_green"  , 100, 70, 50);
