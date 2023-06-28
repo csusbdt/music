@@ -14,54 +14,52 @@ const borders      = img("borders");
 
 ///////////////////////////////////////////////////////////////////////
 //
-// wave
+// center_tone
 //
 ///////////////////////////////////////////////////////////////////////
 
-const b_0 = img("b_0");
-const y_0 = b_0.clone_yellow();
+let center_i        = 0;
+const center_tone   = new c_tone(3, 0, 0);
+const center_blue   = img("b_0");
+const center_yellow = center_blue.clone_yellow();
 
-const wave = {
-	i: 0,
-	b_0: b_0,
-	y_0: y_0,
-	tone: new c_tone(113, 0, 1),
-	draw: function() {
-		this.i === 0 ? this.b_0.draw() : this.y_0.draw();
-	},
-	click: function() {
-		if (this.b_0.click()) {
-			if (++this.i === 2) {
-				this.i = 0;
-				this.tone.stop();
-			} else {
-				this.tone.start();
-			}
-			return true;
-		} else return false;
-	},
-	is_playing: function() { 
-		return this.tone.is_playing(); 
-	},
-	start: function() {
-		if (this.i === 1) this.tone.start();
-	},
-	stop: function() {
-		this.tone.stop();
+const draw_center   = _ => draw(center_i === 0 ? center_blue : center_yellow);
+
+const click_center  = _ => {
+	if (center_blue.click()) {
+		if (++center_i === 2) {
+			center_i = 0;
+			center_tone.set_v(0);
+		} else {
+			center_tone.set_v(1);
+		}
+		return true;
 	}
+	return false;
 };
 
+const start_center_tone = _ => center_i === 1 && center_tone.start();
+const stop_center_tone  = _ => center_tone.stop();
+
 ///////////////////////////////////////////////////////////////////////
 //
-// volume
+// 6 tones
 //
 ///////////////////////////////////////////////////////////////////////
 
+let tones_i    = [];
+let v_i        = [];
+let b_i        = [];
+const tones    = [];
 const v_blue   = [];
 const v_yellow = [];
 const b_blue   = [];
 const b_yellow = [];
 for (let i = 0; i < 6; ++i) {
+	tones_i.push(0);
+	v_i.push(0);
+	b_i.push(0);
+	tones.push(new c_tone(80, 0, 0));
 	let o = img("b_1_" + i);
 	v_blue.push(o);
 	v_yellow.push(o.clone_yellow());
@@ -70,38 +68,60 @@ for (let i = 0; i < 6; ++i) {
 	b_yellow.push(o.clone_yellow());
 }
 
+const draw_vb = _ => {
+	for (let i = 0; i < 6; ++i) {
+		v_i[i] === 0 ? v_blue[i].draw() : v_yellow[i].draw();
+		b_i[i] === 0 ? b_blue[i].draw() : b_yellow[i].draw();
+	}
+};
 
-///////////////////////////////////////////////////////////////////////
-//
-// binaural
-//
-///////////////////////////////////////////////////////////////////////
+const click_v = _ => {
+	for (let i = 0; i < 6; ++i) {
+		if (v_blue[i].click()) {
+			if (++v_i[i] === 2) {
+				v_i[i] = 0;
+				tones[i].set_v(0);
+			} else {
+				tones[i].set_v(1);
+			}
+			return true;
+		}
+	}
+	return false;
+};
 
-const t_blue   = [];
-const t_yellow = [];
-for (let i = 0; i < 8; ++i) {
-	const o = img("b_a_" + i);
-	t_blue.push(o);
-	t_yellow.push(o.clone_yellow());
-}
+const click_b = _ => {
+	for (let i = 0; i < 6; ++i) {
+		if (b_blue[i].click()) {
+			if (++b_i[i] === 2) {
+				b_i[i] = 0;
+				tones[i].set_b(0);
+			} else {
+				tones[i].set_b(3);
+			}
+			return true;
+		}
+	}
+	return false;
+};
 
+const start_tones = _ => v_i.forEach(i => i === 1 && tones[i].start());
+const stop_tones  = _ => tones.forEach(o => o.stop());
 
-const is_playing = _ => wave.is_playing();
-
-
-
-
+const is_playing = _ => center_tone.is_playing() || tones.some(o => o.is_playing());
 
 let restart_audio_on_exit = true;
 
 const start_audio = _ => {
-	wave.start();
+	start_center_tone();
+	start_tones();
 	window.start_audio = null;
 	window.stop_audio  = stop_audio;
 };
 
 const stop_audio = _ => {
-	wave.stop();
+	stop_center_tone();
+	stop_tones();
 	window.start_audio = start_audio;
 	window.stop_audio  = null;
 };
@@ -121,17 +141,14 @@ const click_page = _ => {
 	else if (click(audio_button_blue)) {
 		is_playing() ? stop_audio() : start_audio();
 		on_resize();
-	} else if (wave.click()) on_resize();
+	} else if (click_center() || click_v() || click_b()) on_resize();
 	restart_audio_on_exit = false;
 };
 
 const draw_page = _ => {
 	bg_green.draw();
-	wave.draw();
-	draw(v_yellow);
-	draw(b_blue);
-	draw(t_blue);
-	
+	draw_center();
+	draw_vb();
 	borders.draw();
 	draw_back_button_blue();
 	is_playing() ? audio_button_yellow.draw() : audio_button_blue.draw();
