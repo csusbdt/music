@@ -257,4 +257,6 @@ window.scale = (octave_tones, base_frequency, half_notes_away_from_base) => {
 	return base_frequency * Math.pow(Math.pow(2, 1.0 / octave_tones), half_notes_away_from_base);
 };
 
-window.run = (path, ...arg) => import(path).then(o => o.default(...arg));
+window.run   = (path, ...arg) => import(path).then(o => o.default(...arg));
+window.draw  = a => Array.isArray(a) ? a.forEach(o => o.draw()) : a.draw();
+window.click = a => Array.isArray(a) ? a.some(o => o.click()) : a.click();

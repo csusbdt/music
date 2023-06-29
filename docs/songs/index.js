@@ -1,32 +1,27 @@
-import c_img    from "../global/img.js"    ;
-import c_toggle from "../global/toggle.js" ;
+//import c_img    from "../global/img.js"    ;
 import songs    from "./songs.js"          ;
 import xbutton  from "../global/xbutton.js";
+
+const draw = a => Array.isArray(a) ? a.forEach(o => o.draw()) : a.draw();
 
 const back_button = xbutton("upper_left_green");
 const audio_green = xbutton("upper_right_green");
 const audio_red   = xbutton("upper_right_red");
 
-const img = n => new c_img("./songs/images/" + n + ".png");
-const big_green         = img("big_green");
-const big_red           = img("big_red");
-const big_border        = img("big_border");
-const medium_1_green    = img("medium_1_green");
-const medium_1_red      = img("medium_1_red");
-const medium_1_border   = img("medium_1_border");
-const medium_2_green    = img("medium_2_green");
-const medium_2_red      = img("medium_2_red");
-const medium_2_border   = img("medium_2_border");
-const small_1_green     = img("small_1_green");
-const small_1_red       = img("small_1_red");
-const small_1_border    = img("small_1_border");
-
-const song_toggles = [
-	new c_toggle(big_green     , big_red     , big_border     ),
-	new c_toggle(medium_1_green, medium_1_red, medium_1_border),
-	new c_toggle(medium_2_green, medium_2_red, medium_2_border),
-	new c_toggle(small_1_green , small_1_red , small_1_border )
+const green = [
+	xbutton("medium_green", 100,  50),
+	xbutton("medium_green", 300, 250),
+	xbutton("small_green" , 450, 600),
+	xbutton("small_green" , 600, 550)	
 ];
+
+const red = [
+	xbutton("medium_red"  , 100,  50),
+	xbutton("medium_red"  , 300, 250),
+	xbutton("small_red"   , 450, 600),
+	xbutton("small_red"   , 600, 550)
+];
+
 
 let song_i = 0;
 
@@ -35,21 +30,43 @@ const start_audio = _ => {
 	window.start_audio = null;
 	window.stop_audio = stop_audio;
 	songs[song_i].start();
-	song_toggles[song_i].color = song_toggles[song_i].color_1;
 };
 
 const stop_audio = _ => {
 	songs[song_i].stop();
-	song_toggles[song_i].color = song_toggles[song_i].color_0;
 	window.start_audio = start_audio;
 	window.stop_audio = null;
 }; 
 
 const draw_page = _ => {
 	bg_blue.draw();
+	draw(green);
+	if (window.stop_audio === stop_audio) red[song_i].draw();
 	back_button.draw();
 	window.stop_audio === null ? audio_green.draw() : audio_red.draw();
-	song_toggles.forEach(o => o.draw());
+};
+
+const click_song_buttons = _ => {
+	for (let i = 0; i < green.length; ++i) {
+		if (green[i].click()) {
+			if (window.stop_audio === null) {
+				song_i = i;
+				start_audio();
+			} else if (window.stop_audio === stop_audio) {
+				stop_audio();
+				if (i !== song_i) {
+					song_i = i;
+					start_audio();
+				}
+			} else {
+				window.stop_audio();
+				song_i = i;
+				start_audio();
+			}
+			return true;
+		}
+	}
+	return false;
 };
 
 const click_page = _ => {
@@ -58,19 +75,7 @@ const click_page = _ => {
 		on_resize(); 
 	} else if (back_button.click()) {
 		run("../home/index.js");
-	} else for (let i = 0; i < song_toggles.length; ++i) {
-		if (song_toggles[i].click()) {
-			if (songs[i].is_playing()) {
-				stop_audio();
-			} else {
-				if (window.stop_audio !== null) window.stop_audio();
-				song_i = i;
-				start_audio();
-			}
-			on_resize();
-		 	return;
-		}
-	}
+	} else if (click_song_buttons()) on_resize();
 };
 
 export default i => {

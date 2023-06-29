@@ -49,3 +49,9 @@ img("upper_right_green", 900, 60, 50);
 clone("upper_right_red"   );
 clone("upper_right_blue"  );
 clone("upper_right_yellow");
+
+// generic buttons
+img("medium_green", 160, 240, 80);
+clone("medium_red");
+img("small_green", 120, 200, 40);
+clone("small_red");

@@ -96,6 +96,4 @@ const happy_birthday = song(happy_birthday_notes, 0.02, 0.05, 3);
 
 const songs = [ song_0, song_1, song_2, song_3 ];
 
-//export { song_0, song_1, song_2, song_3, happy_birthday };
-
 export default songs;

@@ -1,10 +1,3 @@
-let loading = 0;
-
-const on_loading_complete = _ => {
-	assert(loading > 0);
-	if (--loading === 0) on_resize();
-};
-
 export default function c_img(src = null, cx = 0, cy = 0, cr = null, bottom = null) {
 	if (typeof src === 'string') {
 	    this.image = new Image();
@@ -20,6 +13,8 @@ export default function c_img(src = null, cx = 0, cy = 0, cr = null, bottom = nu
 	this.bottom    = bottom;
 }
 
+let loading = 0;
+
 c_img.prototype.draw = function(x = 0, y = 0) {
 	if (this.image === null) {
 		return;
@@ -27,7 +22,7 @@ c_img.prototype.draw = function(x = 0, y = 0) {
 		ctx.drawImage(this.image, x, y);
 	} else {
 		++loading;
-		this.image.addEventListener('load', on_loading_complete, {once: true});
+		this.image.addEventListener('load', _ => --loading !== 0 && on_resize(), {once: true});
 	}
 };
 
