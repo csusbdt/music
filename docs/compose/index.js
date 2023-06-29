@@ -2,26 +2,35 @@ import c_tone  from "../global/tone.js" ;
 import c_img   from "../global/img.js"  ;
 import xbutton from "../global/xbutton.js";
 
+const draw  = a => Array.isArray(a) ? a.forEach(o => o.draw()) : a.draw();
+const click = a => Array.isArray(a) ? a.some(o => o.click()) : a.click();
+
+///////////////////////////////////////////////////////////////////////
+//
+// tones
+//
+///////////////////////////////////////////////////////////////////////
+
+const center_tone = new c_tone(3, 0, 0);
+const tones = [];
+for (let i = 0; i < 6; ++i) tones.push(new c_tone(scale(6, 80, 2 * i), 0, 0));
+
+///////////////////////////////////////////////////////////////////////
+//
+// buttons
+//
+///////////////////////////////////////////////////////////////////////
+
+const img = (n, cx = null, cy = null, cr = null) => {
+	return new c_img("./compose/images/" + n + ".png", cx, cy, cr);
+};
+
+const borders      = img("borders");
+
 const back_button  = xbutton("upper_left_blue"   );
 const audio_blue   = xbutton("upper_right_blue"  );
 const audio_yellow = xbutton("upper_right_yellow");
 
-const draw  = a => Array.isArray(a) ? a.forEach(o => o.draw()) : a.draw();
-const click = a => Array.isArray(a) ? a.some(o => o.click()) : a.click();
-const img   = n => new c_img("./compose/images/" + n + ".png");
-
-const borders = img("borders");
-
-///////////////////////////////////////////////////////////////////////
-//
-// units
-//
-///////////////////////////////////////////////////////////////////////
-
-
-
-
-const unit     = Array(8).fill(0); // unit states
 const u_blue   = [
 	img("b_a_0", 140, 377, 40),
 	img("b_a_1", 238, 268, 40),
@@ -35,73 +44,14 @@ const u_blue   = [
 const u_white  = u_blue.map(o => o.clone_white());
 const u_yellow = u_blue.map(o => o.clone_yellow());
 
-const draw_units = _ => {
-	for (let i = 0; i < 8; ++i) {
-		if (unit[i] === 0) ; // noop
-		else if (unit[i] === 1) draw(u_blue[i]);
-		else if (unit[i] === 2) draw(u_yellow[i]);
-	}
-};
-
-const click_units = _ => {
-	for (let i = 0; i < 8; ++i) {
-		if (u_blue[i].click()) {
-			if (++unit[i] === 2) {
-				unit[i] = 0;
-			}
-			return true;
-		}
-	}
-	return false;
-};
-
-
-///////////////////////////////////////////////////////////////////////
-//
-// center_tone
-//
-///////////////////////////////////////////////////////////////////////
-
-let center_i        = 0;
-const center_tone   = new c_tone(3, 0, 0);
 const center_blue   = img("b_0");
 const center_yellow = center_blue.clone_yellow();
 
-const draw_center   = _ => draw(center_i === 0 ? center_blue : center_yellow);
-
-const click_center  = _ => {
-	if (center_blue.click()) {
-		if (++center_i === 2) {
-			center_i = 0;
-			center_tone.set_v(0);
-		} else {
-			center_tone.set_v(1);
-		}
-		return true;
-	}
-	return false;
-};
-
-const start_center_tone = _ => center_tone.start();
-const stop_center_tone  = _ => center_tone.stop();
-
-///////////////////////////////////////////////////////////////////////
-//
-// 6 tones
-//
-///////////////////////////////////////////////////////////////////////
-
-let tones_i    = [];
-let b_i        = [];
-const tones    = [];
 const v_blue   = [];
 const v_yellow = [];
 const b_blue   = [];
 const b_yellow = [];
 for (let i = 0; i < 6; ++i) {
-	tones_i.push(0);
-	b_i.push(0);
-	tones.push(new c_tone(scale(6, 80, 2 * i), 0, 0));
 	let o = img("b_1_" + i);
 	v_blue.push(o);
 	v_yellow.push(o.clone_yellow());
@@ -110,20 +60,121 @@ for (let i = 0; i < 6; ++i) {
 	b_yellow.push(o.clone_yellow());
 }
 
-const draw_vb = _ => {
-	for (let i = 0; i < 6; ++i) {
-		draw(tones_i[i] === 0 ? v_blue[i] : v_yellow[i]);
-		draw(b_i[i]     === 0 ? b_blue[i] : b_yellow[i]);
+///////////////////////////////////////////////////////////////////////
+//
+// units
+//
+///////////////////////////////////////////////////////////////////////
+
+let unit_i = 0; // the selected or playing unit
+
+function c_unit(i) {
+	this.i   = i;
+	this.c_i = 0;
+	this.v_i = Array(6).fill(0);
+	this.b_i = Array(6).fill(0);
+	this.v_i[0] = 1;
+}
+
+c_unit.prototype.draw = function() {
+	if (this.i !== unit_i) {
+		u_blue[this.i].draw();
+		return;
 	}
+	u_yellow[this.i].draw();
+	this.c_i === 0 ? draw(center_blue) : draw(center_yellow);
+	for (let i = 0; i < 6; ++i) {
+		draw(this.v_i[i] === 0 ? v_blue[i] : v_yellow[i]);
+		draw(this.b_i[i] === 0 ? b_blue[i] : b_yellow[i]);
+	}
+};
+
+c_unit.prototype.click = function() {
+	if (u_blue[this.i].click()) {
+		if (window.stop_audio !== null && window.stop_audio !== stop_audio) {
+			// this is first click in page so stop external audio
+			window.stop_audio();
+		}
+		if (this.i === unit_i) {
+			if (window.stop_audio === stop_audio) {
+				// i'm the playing unit
+				// go into edit mode
+				stop_audio();
+				this.start();
+			} else {
+				// i'm the unit being edited
+				// go into play mode
+				this.stop();
+				unit_i = null;
+				start_audio();
+			}
+		} else {
+			if (window.stop_audio === stop_audio) {
+				// unit sequence is playing
+				// go into edit mode
+				stop_audio();
+				unit_i = this.i;
+				this.start();
+			} else {
+				// a different unit is being edited
+				// switch to editing this node
+				units[unit_i].stop();
+				unit_i = this.i;
+				this.start();
+			}
+		}
+		return true;
+	} else return false; 
+};
+
+c_unit.prototype.start = function() {
+	center_tone.start();
+	center_tone.set_v(this.c_i === 0 ? 0 : 1);
+	for (let i = 0; i < 6; ++i) {
+		tones[i].start();
+		tones[i].set_v(this.v_i[i] === 0 ? 0 : 1);
+		tones[i].set_b(this.b_i[i] === 0 ? 0 : 1);
+	}
+};
+
+c_unit.prototype.stop = function() {
+	center_tone.stop();
+	for (let i = 0; i < 6; ++i) {
+		tones[i].stop();
+	}
+};
+
+const units = [];
+for (let i = 0; i < 8; ++i) units.push(new c_unit(i));
+
+///////////////////////////////////////////////////////////////////////
+//
+// editor
+//
+///////////////////////////////////////////////////////////////////////
+
+const click_center = _ => {
+	if (center_blue.click()) {
+		if (window.stop_audio !== null) window.stop_audio();
+		if (++units[unit_i].c_i === 2) {
+			units[unit_i].c_i = 0;
+			center_tone.set_v(0);
+		} else {
+			center_tone.set_v(1);
+		}
+		return true;
+	} else return false;
 };
 
 const click_v = _ => {
 	for (let i = 0; i < 6; ++i) {
 		if (v_blue[i].click()) {
-			if (++tones_i[i] === 2) {
-				tones_i[i] = 0;
+			if (window.stop_audio !== null) window.stop_audio();
+			if (++units[unit_i].v_i[i] === 2) {
+				units[unit_i].v_i[i] = 0;
 				tones[i].set_v(0);
 			} else {
+				units[unit_i].v_i[i] = 1;
 				tones[i].set_v(1);
 			}
 			return true;
@@ -135,11 +186,13 @@ const click_v = _ => {
 const click_b = _ => {
 	for (let i = 0; i < 6; ++i) {
 		if (b_blue[i].click()) {
-			if (++b_i[i] === 2) {
-				b_i[i] = 0;
+			if (window.stop_audio !== null) window.stop_audio();
+			if (++units[unit_i].b_i[i] === 2) {
+				units[unit_i].b_i[i] = 0;
 				tones[i].set_b(0);
 			} else {
-				tones[i].set_b(3);
+				units[unit_i].b_i[i] = 1;
+				tones[i].set_b(1);
 			}
 			return true;
 		}
@@ -147,23 +200,32 @@ const click_b = _ => {
 	return false;
 };
 
-const start_tones = _ => tones.forEach(o => o.start());
-const stop_tones  = _ => tones.forEach(o => o.stop());
-
-const is_playing = _ => center_tone.is_playing() || tones.some(o => o.is_playing());
+const is_playing = _ => window.stop_audio === stop_audio;
 
 let restart_audio_on_exit = true;
 
+let id = null;
+
+const next_unit = _ => {
+	if (++unit_i === 8) unit_i = 0;
+	units[unit_i].start();
+	on_resize();
+	id = setTimeout(next_unit, 1000);
+};
+
 const start_audio = _ => {
-	start_center_tone();
-	start_tones();
+	unit_i = 0;
+	units[unit_i].start();
+	id = setTimeout(next_unit, 1000);
 	window.start_audio = null;
 	window.stop_audio  = stop_audio;
 };
 
 const stop_audio = _ => {
-	stop_center_tone();
-	stop_tones();
+	clearTimeout(id);
+	id = null;
+	units[unit_i].stop();
+	unit_i = 0;
 	window.start_audio = start_audio;
 	window.stop_audio  = null;
 };
@@ -183,15 +245,13 @@ const click_page = _ => {
 	else if (click(audio_blue)) {
 		window.start_audio === null ? stop_audio() : start_audio();
 		on_resize();
-	} else if (click_center() || click_v() || click_b() || click_units()) on_resize();
+	} else if (click_center() || click_v() || click_b() || click(units)) on_resize();
 	restart_audio_on_exit = false;
 };
 
 const draw_page = _ => {
 	bg_green.draw();
-	draw_center();
-	draw_vb();
-	draw_units();
+	draw(units);
 	draw(borders);
 	draw(back_button);
 	window.start_audio === null ? audio_yellow.draw() : audio_blue.draw();
