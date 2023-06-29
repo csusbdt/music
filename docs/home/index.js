@@ -1,12 +1,12 @@
-import c_img                   from "../global/img.js"         ;
-import { lower_left_red      } from "../global/index.js"       ;
-import { lower_left_yellow   } from "../global/index.js"       ;
-import { lower_left_border   } from "../global/index.js"       ;
-import { upper_right_green   } from "../global/index.js"       ;
-import { upper_right_red     } from "../global/index.js"       ;
-import { upper_right_blue    } from "../global/index.js"       ;
-import { upper_right_yellow  } from "../global/index.js"       ;
-import { upper_right_border  } from "../global/index.js"       ;
+import c_img    from "../global/img.js"    ;
+import xbutton  from "../global/xbutton.js";
+
+const lower_left_red     = xbutton("lower_left_red");
+const lower_left_yellow  = xbutton("lower_left_yellow");
+const upper_right_green  = xbutton("upper_right_green");
+const upper_right_red    = xbutton("upper_right_red");
+const upper_right_blue   = xbutton("upper_right_blue");
+const upper_right_yellow = xbutton("upper_right_yellow");
 
 let img = n => new c_img("./home/images/" + n + ".png");
 
@@ -141,18 +141,14 @@ const system = {
 			bg_blue.draw();
 			red_green_system.draw();
 			lower_left_red.draw();
-			lower_left_border.draw();
 			if (window.start_audio === null) upper_right_red.draw();
 			else upper_right_green.draw();
-			 upper_right_border.draw();
 		} else {
 			bg_green.draw();
 			yellow_blue_system.draw();
 			lower_left_yellow.draw();
-			lower_left_border.draw();
 			if (window.start_audio === null) upper_right_yellow.draw();
 			else upper_right_blue.draw();
-			upper_right_border.draw();
 		}
 	},
 	click: function() {

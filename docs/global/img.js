@@ -22,7 +22,8 @@ c_img.prototype.draw = function(x = 0, y = 0) {
 		ctx.drawImage(this.image, x, y);
 	} else {
 		++loading;
-		this.image.addEventListener('load', _ => --loading !== 0 && on_resize(), {once: true});
+		let onload = _ => --loading !== 0 && on_resize();
+		this.image.addEventListener('load', onload, {once: true});
 	}
 };
 

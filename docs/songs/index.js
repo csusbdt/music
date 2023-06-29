@@ -1,4 +1,3 @@
-//import c_img    from "../global/img.js"    ;
 import songs    from "./songs.js"          ;
 import xbutton  from "../global/xbutton.js";
 
@@ -21,7 +20,6 @@ const red = [
 	xbutton("small_red"   , 450, 600),
 	xbutton("small_red"   , 600, 550)
 ];
-
 
 let song_i = 0;
 

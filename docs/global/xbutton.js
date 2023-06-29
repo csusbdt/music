@@ -50,6 +50,18 @@ clone("upper_right_red"   );
 clone("upper_right_blue"  );
 clone("upper_right_yellow");
 
+// lower_left
+img("lower_left_green" , 87, 920, 50);
+clone("lower_left_red");
+clone("lower_left_blue");
+clone("lower_left_yellow");
+
+// lower_right
+img("lower_right_green" , 922, 922, 50);
+clone("lower_right_red");
+clone("lower_right_blue");
+clone("lower_right_yellow");
+
 // generic buttons
 img("medium_green", 160, 240, 80);
 clone("medium_red");

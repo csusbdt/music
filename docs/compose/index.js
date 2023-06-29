@@ -2,9 +2,6 @@ import c_tone  from "../global/tone.js" ;
 import c_img   from "../global/img.js"  ;
 import xbutton from "../global/xbutton.js";
 
-//const draw  = a => Array.isArray(a) ? a.forEach(o => o.draw()) : a.draw();
-//const click = a => Array.isArray(a) ? a.some(o => o.click()) : a.click();
-
 ///////////////////////////////////////////////////////////////////////
 //
 // tones
