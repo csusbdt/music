@@ -1,18 +1,13 @@
-import start_home             from "../home/index.js"   ;
-import c_img                  from "../global/img.js"   ;
-import c_toggle               from "../global/toggle.js";
-import songs                  from "./songs.js"         ;
-import { draw_back_button   } from "../global/index.js" ;
-import { click_back_button  } from "../global/index.js" ;
-import { draw_audio_toggle  } from "../global/index.js" ;
-import { click_audio_toggle } from "../global/index.js" ;
+import c_img    from "../global/img.js"    ;
+import c_toggle from "../global/toggle.js" ;
+import songs    from "./songs.js"          ;
+import xbutton  from "../global/xbutton.js";
 
-let img = n => new c_img("./global/images/" + n + ".png");
-const audio_red         = img("upper_right_red", 900, 60, 50);
-const audio_green       = img("upper_right_green", 900, 60, 50);
-const audio_border      = img("upper_right_border", 900, 60, 50);
+const back_button = xbutton("upper_left_green");
+const audio_green = xbutton("upper_right_green");
+const audio_red   = xbutton("upper_right_red");
 
-img = n => new c_img("./songs/images/" + n + ".png");
+const img = n => new c_img("./songs/images/" + n + ".png");
 const big_green         = img("big_green");
 const big_red           = img("big_red");
 const big_border        = img("big_border");
@@ -52,16 +47,17 @@ const stop_audio = _ => {
 
 const draw_page = _ => {
 	bg_blue.draw();
-	draw_back_button();
-	draw_audio_toggle();
+	back_button.draw();
+	window.stop_audio === null ? audio_green.draw() : audio_red.draw();
 	song_toggles.forEach(o => o.draw());
 };
 
 const click_page = _ => {
-	if (click_audio_toggle()) {
+	if (audio_green.click()) {
+		window.stop_audio !== null ? window.stop_audio() : start_audio();
 		on_resize(); 
-	} else if (click_back_button()) {
-		start_home();
+	} else if (back_button.click()) {
+		run("../home/index.js");
 	} else for (let i = 0; i < song_toggles.length; ++i) {
 		if (song_toggles[i].click()) {
 			if (songs[i].is_playing()) {
