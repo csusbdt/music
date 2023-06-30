@@ -1,34 +1,33 @@
-import start_home              from "../home/index.js"             ;
-import start_template          from "./template/index.js"          ;
-import start_grid              from "./grid/index.js"              ;
-import { draw_back_button    } from "../global/index.js"           ;
-import { click_back_button   } from "../global/index.js"           ;
-import { draw_audio_toggle   } from "../global/index.js"           ;
-import { click_audio_toggle  } from "../global/index.js"           ;
-import { button              } from "../global/index.js"           ;
+import xbutton from "../../global/xbutton.js";
 
-const template_button = button("medium_yellow" , 100, 500);
-const grid_button     = button("medium_yellow", 480, 500);
+const back_button     = xbutton("upper_left_blue");
+const audio_blue      = xbutton("upper_right_blue");
+const audio_yellow    = xbutton("upper_right_yellow");
+const template_button = xbutton("medium_yellow", 100, 500);
+const grid_button     = xbutton("medium_yellow", 480, 500);
 
-const click = _ => {
-	if (click_back_button()) return start_home();
-	else if (template_button.click()) return start_template();
-	else if (grid_button.click()) start_grid();
-	else if (click_audio_toggle()) on_resize();
+const click_page = _ => {
+	if (audio_blue.click()) {
+		window.stop_audio === null ? window.start_audio() : window.stop_audio();
+		on_resize();
+	}
+	else if (click(back_button    )) run("./home/index.js");
+	else if (click(template_button)) run("./composer/template/index.js");
+	else if (click(grid_button    )) run("./composer/grid/index.js");
 };
 
-const draw = _ => {
-	bg_blue.draw();
-	draw_back_button();
-	draw_audio_toggle();
-	template_button.draw();
-	grid_button.draw();
+const draw_page = _ => {
+	bg_green.draw();
+	draw(back_button);
+	window.stop_audio === null ? draw(audio_blue) : draw(audio_yellow);
+	draw(template_button);
+	draw(grid_button);
 };
 
 const start = _ => {
 	set_item('page', "./composer/index.js");
-    on_click  = click;
-    on_resize = draw;
+    on_click  = click_page;
+    on_resize = draw_page;
     on_resize();
 };
 

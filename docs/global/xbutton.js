@@ -70,6 +70,8 @@ clone("large_red");
 
 img("medium_green", 160, 240, 80);
 clone("medium_red");
+clone("medium_blue");
+clone("medium_yellow");
 
 img("small_green", 120, 200, 40);
 clone("small_red");

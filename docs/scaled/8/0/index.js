@@ -1,14 +1,12 @@
-import start_scaled_8         from "../index.js"              ;
-import c_tone                 from "../../../global/tone.js"  ;
-import { draw_back_button   } from "../../../global/index.js" ;
-import { click_back_button  } from "../../../global/index.js" ;
-import { draw_audio_toggle  } from "../../../global/index.js" ;
-import { click_audio_toggle } from "../../../global/index.js" ;
+import start_scaled_8 from "../index.js"               ;
+import c_tone         from "../../../global/tone.js"   ;
+import xbutton        from "../../../global/xbutton.js";
 
-import { button } from "../../../global/index.js" ;
-
-const green  = button("small_green");
-const red    = button("small_red");
+const back_button = xbutton("upper_left_green" );
+const audio_green = xbutton("upper_right_green");
+const audio_red   = xbutton("upper_right_red"  );
+const green       = xbutton("small_green"      );
+const red         = xbutton("small_red"        );
 
 function c_unit(tones, d, x, y) {
 	if (!Array.isArray(tones)) tones = [tones];
@@ -65,51 +63,54 @@ const stop_audio = _ => {
 
 let saved_audio_start = null;
 
-const ot = 6;
+const ot = 8;
 const f  = 100;
 const b  = 0;
-const d  = 2000;
+const d  = 4000;
 let x    = 100;
 const dx = 100;
 
-const tone = half_steps => new c_tone(ot, scale(ot, f, half_steps), b);
-const phi  = new c_tone(PHI, b);
+const phi  = new c_tone(PHI, 0);
 
-units.push(new c_unit([ new c_tone(scale(8, f,  0), 3), phi ],   d, x +=  0, 400));
-units.push(new c_unit([ new c_tone(scale(8, f,  2), 3), phi ],   d, x += dx, 400));
-units.push(new c_unit([ new c_tone(scale(8, f, 14), 3) ], d/4, x += dx, 400));
-units.push(new c_unit([ new c_tone(scale(8, f, 11), 3), new c_tone(1, 0) ], d/4, x += dx, 400));
-units.push(new c_unit([ new c_tone(scale(8, f, 12), 3), new c_tone(1, 0) ], d/4, x += dx, 400));
-units.push(new c_unit([ new c_tone(scale(8, f,  9), 3) ], d/4, x += dx, 400));
+units.push(new c_unit([ new c_tone(scale(ot, f,  0), b), phi ],   d, x +=  0, 400));
+units.push(new c_unit([ new c_tone(scale(ot, f,  2), b), phi ],   d, x += dx, 400));
+units.push(new c_unit([ new c_tone(scale(ot, f,  5), b), phi ], d/2, x += dx, 400));
+units.push(new c_unit([ new c_tone(scale(ot, f,  7), b), phi ], d/2, x += dx, 400));
+units.push(new c_unit([ new c_tone(scale(ot, f,  3), b), phi ], d/2, x += dx, 400));
 
-const click = _ => {
-	if (click_back_button()) {
-		if (saved_audio_start !== null) saved_audio_start();
+const click_page = _ => {
+	if (click(back_button)) {
+		if (start_external_audio !== null) start_external_audio();
 		start_scaled_8();
 		return;
 	}
-	else if (click_audio_toggle()) {
-		saved_audio_start = null;
+	else if (click(audio_green)) {
+		window.stop_audio === null ? start_audio() : window.stop_audio();
 		on_resize();
 	}
+	start_external_audio = null;
 };
 
-const draw = _ => {
+const draw_page = _ => {
 	bg_blue.draw();
-	draw_back_button();
-	draw_audio_toggle();
+	draw(back_button);
+	window.stop_audio === null ? draw(audio_green) : draw(audio_red);
 	units.forEach(o => o.draw());
 };
 
+let start_external_audio = null;
+
 const start = _ => {
-	if (window.stop_audio !== stop_audio) {
-		if (window.stop_audio !== null) window.stop_audio();
-		saved_audio_start = window.start_audio;
+	if (window.stop_audio !== null && window.stop_audio !== stop_audio) {
+		window.stop_audio();
+		start_external_audio = window.start_audio;
 		window.start_audio = start_audio;
+	} else {
+		start_external_audio = null;
 	}
 	set_item('page', "./scaled/8/0/index.js");
-    on_click  = click;
-    on_resize = draw;
+    on_click  = click_page;
+    on_resize = draw_page;
     on_resize();
 };
 

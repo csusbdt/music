@@ -1,3 +1,41 @@
+import xbutton from "../../global/xbutton.js";
+
+const back_button   = xbutton("upper_left_green");
+const audio_green   = xbutton("upper_right_green");
+const audio_red     = xbutton("upper_right_red");
+const large_button  = xbutton("large_green", 100, 200);
+
+const click_page = _ => {
+	if (back_button.click()) {
+		run("./home/index.js");
+		return;
+	}
+	else if (audio_green.click()) {
+		window.stop_audio === null ? window.start_audio() : window.stop_audio();
+		on_resize();
+	}
+	else if (large_button.click()) run("./scaled/8/0/index.js");
+};
+
+const draw_page = _ => {
+	bg_blue.draw();
+	draw(back_button);
+	window.stop_audio === null ? draw(audio_green) : draw(audio_red);
+	large_button.draw();
+};
+
+const start = _ => {
+	set_item('page', "./scaled/8/index.js");
+    on_click  = click_page;
+    on_resize = draw_page;
+    on_resize();
+};
+
+export default start;
+
+
+
+/*
 import start_home              from "../../home/index.js"   ;
 //import start_scaled            from "../index.js"           ;
 import start_scaled_8_0        from "./0/index.js"          ;
@@ -37,3 +75,4 @@ const start = _ => {
 };
 
 export default start;
+*/
