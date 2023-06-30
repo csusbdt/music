@@ -1,9 +1,8 @@
 import xbutton from "../../global/xbutton.js";
 
-const back_button = xbutton("upper_left_green");
-const audio_green = xbutton("upper_right_green");
-const audio_red   = xbutton("upper_right_red");
-
+const back_button   = xbutton("upper_left_green");
+const audio_green   = xbutton("upper_right_green");
+const audio_red     = xbutton("upper_right_red");
 const large_button  = xbutton("large_green", 100, 200);
 const medium_button = xbutton("medium_green", 480, 500);
 

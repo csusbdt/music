@@ -1,14 +1,13 @@
-import start_home             from "../home/index.js"   ;
-import c_img                  from "../global/img.js"   ;
-import c_button               from "../global/button.js";
-import { draw_back_button   } from "../global/index.js" ;
-import { click_back_button  } from "../global/index.js" ;
-import { draw_audio_toggle  } from "../global/index.js" ;
-import { click_audio_toggle } from "../global/index.js" ;
+import start_home from "../home/index.js"       ;
+import c_img      from "../global/img.js"       ;
+import c_button   from "../global/button.js"    ;
+import xbutton    from "../../global/xbutton.js";
 
-let img = n => new c_img("./global/images/" + n + ".png");
+const back_button   = xbutton("upper_left_green");
+const audio_green   = xbutton("upper_right_green");
+const audio_red     = xbutton("upper_right_red");
 
-img = n => new c_img("./space_shooter/images/" + n + ".png");
+const img = n => new c_img("./space_shooter/images/" + n + ".png");
 
 const ship = [
 	new c_button(img("ship_left_yellow")  , img("ship_left_border"  )),
@@ -98,7 +97,7 @@ const next_bullet = _ => {
 	if (++bullet_i === 5) {
 		bullet_i  = null;
 		gun_i     = null;
-		on_click = click;
+		on_click = click_page;
 	} else if (bullet_i === 4) {
 		if (gun_i === 0 && ship_i === 0 || gun_i === 1 && ship_i === 2) {
 			if (++ship_speed_i === ship_speed.length) ship_speed_i = 0;
@@ -122,14 +121,14 @@ const next_explosion = _ => {
 		gun_i        = null;
 		explosion_i  = null;
 		start_ship();
-		on_click = click;
+		on_click = click_page;
 	} else {
 		setTimeout(next_explosion, 100);
 	}
 	on_resize();
 };
 
-const draw = _ => {
+const draw_page = _ => {
 	draw_0.forEach(o => o.draw());
 	if (ship_i !== null) ship[ship_i].draw();
 	if (gun_i !== null) {
@@ -141,15 +140,16 @@ const draw = _ => {
 		}
 	}
 	draw_1.forEach(o => o.draw());
-	draw_back_button();
-	draw_audio_toggle();
+	draw(back_button);
+	window.stop_audio === null ? draw(audio_green) : draw(audio_red);
 };
 
-const click = _ => {
-	if (click_audio_toggle()) {
-		// noop
+const click_page = _ => {
+	if (click(audio_green)) {
+		if (window.stop_audio === null) window.start_audio();
+		else window.stop_audio();
 	}
-	else if (click_back_button()) {
+	else if (click(back_button)) {
 		clearTimeout(ship_id);
 		start_home();
 		return;
@@ -163,18 +163,15 @@ const click = _ => {
 	on_resize();
 };
 
-const start = _ => {
+export default _ => {
+	set_item('page', "./space_shooter/index.js");	
+	on_resize    = draw_page;
+	on_click     = click_page;
 	gun_i        = null;
 	bullet_i     = null;
 	explosion_i  = null;
-	ship_speed_i = 0   ;
+	ship_speed_i = 0;
 	start_ship();
-};
-
-export default _ => {
-	set_item('page', "./space_shooter/index.js");	
-	on_resize = draw;
-	on_click  = click;
-	start();
+	bg_blue.draw();
 	on_resize();
 };

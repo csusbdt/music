@@ -61,8 +61,6 @@ const stop_audio = _ => {
 	window.stop_audio = null;
 };
 
-let saved_audio_start = null;
-
 const ot = 6;
 const f  = 100;
 const b  = 0;
