@@ -7,15 +7,16 @@ const color_name = n => n.substring(n.lastIndexOf("_") + 1);
 const image_name = n => n.substring(0, n.lastIndexOf("_"));
 
 const button = (n, x = 0, y = 0, action = null) => {
-    const border_name = image_name(n) + "_border";
+    //const border_name = image_name(n) + "_border";
     if (color_name(n) === "null") {
-        const border_image = m.get(border_name);
-    	assert(border_image !== null);
+        const border_image = m.get(image_name(n) + "_border");
+		if (border_image === undefined) throw new Error(image_name(n) + "_border" + " not found");
     	return new c_button(border_image, null, x, y, action);
     } else {
         const color_image  = m.get(n);
-        const border_image = m.get(border_name);
-    	assert(color_image !== null && border_image !== null);
+        const border_image = m.get(image_name(n) + "_border");
+		if (color_image  === undefined) throw new Error(n + " not found");
+		if (border_image === undefined) throw new Error(image_name(n) + "_border" + " not found");
     	return new c_button(color_image, border_image, x, y, action);
     }
 };
@@ -63,7 +64,12 @@ clone("lower_right_blue");
 clone("lower_right_yellow");
 
 // generic buttons
+
+img("large_green", 220, 260, 150);
+clone("large_red");
+
 img("medium_green", 160, 240, 80);
 clone("medium_red");
+
 img("small_green", 120, 200, 40);
 clone("small_red");
