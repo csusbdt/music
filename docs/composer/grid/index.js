@@ -1,18 +1,11 @@
-import start_composer         from "../index.js"      ;
-import c_img                  from "../../global/img.js"   ;
-import c_tone                 from "../../global/tone.js"  ;
+import start_composer from "../index.js"            ;
+import c_img          from "../../global/img.js"    ;
+import c_tone         from "../../global/tone.js"   ;
+import xbutton        from "../../global/xbutton.js";
 
-// import { draw_back_button   } from "../../global/index.js" ;
-// import { click_back_button  } from "../../global/index.js" ;
-// import { draw_audio_toggle  } from "../../global/index.js" ;
-// import { click_audio_toggle } from "../../global/index.js" ;
-// import { button             } from "../../global/index.js" ;
-
-import xbutton from "../global/xbutton.js";
-
-const back_button     = xbutton("upper_left_blue");
-const audio_blue      = xbutton("upper_right_blue");
-const audio_yellow    = xbutton("upper_right_yellow");
+const back_button  = xbutton("upper_left_blue");
+const audio_blue   = xbutton("upper_right_blue");
+const audio_yellow = xbutton("upper_right_yellow");
 
 const min_f  = 60;
 const max_f  = 900;
@@ -21,7 +14,7 @@ const tone = new c_tone(108, 3, .5); // init better!!!!!!!!!!!!!
 
 const grid = {
 	x: 200, y: 160, w: 600, h: 600,
-	but: button("small_yellow", 200 + 600 / 2 - 120, 160 + 600 / 2 - 200),
+	but: xbutton("small_yellow", 200 + 600 / 2 - 120, 160 + 600 / 2 - 200),
 	draw: function() {
 		ctx.fillStyle = rgb_white;
 		ctx.fillRect(this.x, this.y, this.w, this.h);
@@ -65,9 +58,11 @@ const start_audio = _ => {
 	tone.start();
 };
 
+let start_external_audio = null;
+
 const click_page = _ => {
-	else if (audio_blue.click()) {
-		if (window.stop_audio === null) window.start_audio();
+	if (audio_blue.click()) {
+		if (window.stop_audio === null) start_audio();
 		else window.stop_audio();
 		on_resize();
 	}
@@ -75,81 +70,31 @@ const click_page = _ => {
 		exit(start_composer);
 	} 
 	else if (grid.click()) {
-//		restore_previous_audio = false;
+		if (window.stop_audio === null) start_audio();
 		on_resize();
 	}
 	start_external_audio = null;
 };
 
 const draw_page = _ => {
-	bg_blue.draw();
+	draw(bg_green);
 	grid.draw();
-	draw_back_button();
-	draw_audio_toggle();
+	draw(back_button);
+	window.stop_audio === null ? draw(audio_blue) : draw(audio_yellow);
 };
 
-let restore_previous_audio = null;
-let previous_was_playing   = null;
-let previous_start_audio   = null;
-let previous_stop_audio    = null;
-
 const exit = next_page => {
-	if (restore_previous_audio) {
-		stop_audio();
-		window.start_audio = previous_start_audio;
-		window.stop_audio  = null;
-		if (previous_was_playing) {
-			window.start_audio();
-		}
-	}
-	else if (window.stop_audio !== null) {
-		// audio is started
-		if (is_silent()) {
-			window.stop_audio();
-			window.start_audio = previous_start_audio;
-			window.stop_audio  = null;
-		} else {
-			assert(window.start_audio === null);
-			assert(window.stop_audio === stop_audio);
-		}
-	} else {
-		// audio is stopped
-		if (would_be_silent()) {
-			window.start_audio = previous_start_audio;
-			window.stop_audio  = null;
-		} else {
-			window.start_audio = start_audio;
-			window.stop_audio  = null;
-		}
-	}
+	if (start_external_audio !== null) start_external_audio();
 	next_page();
 };
 
 export default _ => {
-	assert((window.start_audio === null) !== (window.stop_audio === null));
-	if (audio === null) {
-		previous_was_playing = false;
-		previous_stop_audio  = stop_audio;
-		previous_start_audio = start_audio;
+	if (window.stop_audio !== null && window.stop_audio !== stop_audio) {
+		window.stop_audio();
+		start_external_audio = window.start_audio;
 		window.start_audio = start_audio;
-		window.stop_audio = null;
 	} else {
-		restore_previous_audio = true;	
-		if (window.stop_audio === stop_audio) {
-			restore_previous_audio = false;
-		} 
-		else if (window.stop_audio !== null) {
-			previous_was_playing = true;
-			previous_stop_audio  = window.stop_audio;
-			window.stop_audio();
-			previous_start_audio = window.start_audio;
-			start_audio();
-		} else {
-			previous_was_playing = false;
-			previous_start_audio = window.start_audio;
-			previous_stop_audio  = null;
-			start_audio();
-		}
+		start_external_audio = null;
 	}
 	set_item('page', "./composer/grid/index.js");
 	on_resize = draw_page;

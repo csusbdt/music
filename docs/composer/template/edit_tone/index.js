@@ -93,7 +93,7 @@ const click_page = _ => {
 };
 
 const draw_page = _ => {
-	bg_blue.draw();
+	draw(bg_green);
 	grid.draw();
 	binaural.draw();
 	window.audio_stop === null ? draw(audio_blue) : draw(audio_yellow);
