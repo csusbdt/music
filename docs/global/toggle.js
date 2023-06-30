@@ -1,3 +1,4 @@
+/*
 function c_toggle(color_0, color_1, border = null, action_0 = null, action_1 = null) {
 	this.color_0  = color_0;
 	this.color_1  = color_1;
@@ -41,3 +42,4 @@ c_toggle.prototype.click = function() {
 };
 
 export default c_toggle;
+*/

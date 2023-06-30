@@ -1,16 +1,23 @@
 import start_home             from "../home/index.js"   ;
 import c_tone                 from "../global/tone.js"  ;
-import { draw_back_button   } from "../global/index.js" ;
-import { click_back_button  } from "../global/index.js" ;
-import { button             } from "../global/index.js" ;
-import { audio_toggle       } from "../global/index.js" ;
+
+// import { draw_back_button   } from "../global/index.js" ;
+// import { click_back_button  } from "../global/index.js" ;
+// import { button             } from "../global/index.js" ;
+// import { audio_toggle       } from "../global/index.js" ;
+
+import xbutton from "../../global/xbutton.js";
+
+const back_button     = xbutton("upper_left_blue");
+const audio_blue      = xbutton("upper_right_blue");
+const audio_yellow    = xbutton("upper_right_yellow");
 
 function c_unit(tone, d, x, y) {
 	this.tone   = tone;
 	this.d      = d;
-	this.green  = button("small_green" , x, y);
-	this.red    = button("small_red"   , x, y);
-	this.yellow = button("small_yellow", x, y);
+	this.green  = xbutton("small_green" , x, y);
+	this.red    = xbutton("small_red"   , x, y);
+	this.yellow = xbutton("small_yellow", x, y);
 }
 
 c_unit.prototype.start = function() {
@@ -56,8 +63,8 @@ const grid_c = Math.log2(max_f - min_f) / grid_h;
 const y2f    = y => min_f + Math.pow(2, grid_c * y); // y in grid coords
 const f2y    = f => Math.log2(f - min_f) / grid_c; // y in grid coords
 
-const red_but    = button("small_red"   );
-const yellow_but = button("small_yellow");
+const red_but    = xbutton("small_red"   );
+const yellow_but = xbutton("small_yellow");
 
 const grid = {
 	draw: function () {
@@ -118,14 +125,11 @@ const stop_audio = _ => {
 	window.stop_audio  = null;
 };
 
-const audio = audio_toggle(start_audio, stop_audio);
-
 const exit = next_page => {
-	if (is_playing()) {
-		window.start_audio = null;
-		window.stop_audio  = stop_audio;
-	}
-	next_page(units[unit_i].tone);
+	if (start_external_audio !== null) start_external_audio();
+	if (window.stop_audio !== stop_audio) stop_audio();
+//	next_page(units[unit_i].tone);
+	next_page();
 };
 
 units.push(new c_unit(new c_tone(100 / PHI, 3,  1), 1000,   0, 0));
@@ -138,34 +142,51 @@ units.push(new c_unit(new c_tone(200 * PHI, 3, .5),  500, 600, 0));
 units.push(new c_unit(new c_tone(400      , 3, .5),  250, 700, 0));
 units.push(new c_unit(new c_tone(400 / PHI, 3, .5),  250, 800, 0));
 
+let start_external_audio = null;
+
 const click_page = _ => {
-	if (click_back_button()) return exit(start_home);
-	else if (audio.click() || grid.click()) on_resize();
+	if (audio_blue.click()) {
+		if (window.stop_audio === null) start_audio();
+		else window.stop_audio();
+		on_resize();
+	}
+	if (click(back_button)) return exit(start_home);
+	else if (grid.click()) on_resize();
 	else if (units.some(o => o.click())) on_resize();
+	start_external_audio = null;
 };
 
 const draw_page = _ => {
-	bg_blue.draw();
-	draw_back_button();
+	bg_green.draw();
+	draw(back_button);
 	units.forEach(o => o.draw());
 	grid.draw();
-	audio.draw();
+	window.stop_audio === null ? draw(audio_blue) : draw(audio_yellow);
 };
 
 export default _ => {
-	assert((window.start_audio === null) !== (window.stop_audio === null));
-	if (window.stop_audio === null) {
-		audio.color = audio.color_0;
-		edit_i = null;
-		unit_i = 0;
-	} else if (window.stop_audio !== stop_audio) {
+	if (window.stop_audio !== null && window.stop_audio !== stop_audio) {
 		window.stop_audio();
-		audio.color = audio.color_0;
-		edit_i = null;
-		unit_i = 0;
+		start_external_audio = window.start_audio;
+		window.start_audio = start_audio;
 	} else {
-		audio.color = audio.color_1;
+		start_external_audio = null;
 	}
+	edit_i = null;
+	unit_i = 0;
+	// assert((window.start_audio === null) !== (window.stop_audio === null));
+	// if (window.stop_audio === null) {
+	// 	audio.color = audio.color_0;
+	// 	edit_i = null;
+	// 	unit_i = 0;
+	// } else if (window.stop_audio !== stop_audio) {
+	// 	window.stop_audio();
+	// 	audio.color = audio.color_0;
+	// 	edit_i = null;
+	// 	unit_i = 0;
+	// } else {
+	// 	audio.color = audio.color_1;
+	// }
 	set_item('page', "./inst/index.js");
 	on_resize = draw_page;
 	on_click = click_page;
