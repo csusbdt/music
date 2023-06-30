@@ -1,16 +1,10 @@
-import start_home             from "../home/index.js"   ;
-import c_tone                 from "../global/tone.js"  ;
+import start_home  from "../home/index.js"       ;
+import c_tone      from "../global/tone.js"      ;
+import xbutton     from "../../global/xbutton.js";
 
-// import { draw_back_button   } from "../global/index.js" ;
-// import { click_back_button  } from "../global/index.js" ;
-// import { button             } from "../global/index.js" ;
-// import { audio_toggle       } from "../global/index.js" ;
-
-import xbutton from "../../global/xbutton.js";
-
-const back_button     = xbutton("upper_left_blue");
-const audio_blue      = xbutton("upper_right_blue");
-const audio_yellow    = xbutton("upper_right_yellow");
+const back_button  = xbutton("upper_left_blue");
+const audio_blue   = xbutton("upper_right_blue");
+const audio_yellow = xbutton("upper_right_yellow");
 
 function c_unit(tone, d, x, y) {
 	this.tone   = tone;
@@ -63,7 +57,7 @@ const grid_c = Math.log2(max_f - min_f) / grid_h;
 const y2f    = y => min_f + Math.pow(2, grid_c * y); // y in grid coords
 const f2y    = f => Math.log2(f - min_f) / grid_c; // y in grid coords
 
-const red_but    = xbutton("small_red"   );
+const red_but    = xbutton("small_blue"   );
 const yellow_but = xbutton("small_yellow");
 
 const grid = {
@@ -126,9 +120,8 @@ const stop_audio = _ => {
 };
 
 const exit = next_page => {
-	if (start_external_audio !== null) start_external_audio();
 	if (window.stop_audio !== stop_audio) stop_audio();
-//	next_page(units[unit_i].tone);
+	if (start_external_audio !== null) start_external_audio();
 	next_page();
 };
 
@@ -174,144 +167,8 @@ export default _ => {
 	}
 	edit_i = null;
 	unit_i = 0;
-	// assert((window.start_audio === null) !== (window.stop_audio === null));
-	// if (window.stop_audio === null) {
-	// 	audio.color = audio.color_0;
-	// 	edit_i = null;
-	// 	unit_i = 0;
-	// } else if (window.stop_audio !== stop_audio) {
-	// 	window.stop_audio();
-	// 	audio.color = audio.color_0;
-	// 	edit_i = null;
-	// 	unit_i = 0;
-	// } else {
-	// 	audio.color = audio.color_1;
-	// }
 	set_item('page', "./inst/index.js");
 	on_resize = draw_page;
 	on_click = click_page;
 	on_resize();
 };
-
-/*
-
-import start_home                            from "../index.js"       ;
-import { start_freq as binaural_start_freq } from "../../binaural.js" ;
-import { stop       as binaural_stop       } from "../../binaural.js" ;
-import { start_loop as binaural_start_loop } from "../../binaural.js" ;
-import { reset_play_buttons                } from "../songs/index.js" ;
-import { set_play_capture_button           } from "../songs/index.js" ;
-
-const i_ship_left   = image("/space_shooter/images/ship_left.png"  );
-const i_ship_middle = image("/space_shooter/images/ship_middle.png");
-const i_ship_right  = image("/space_shooter/images/ship_right.png" );
-
-const ship = [ 
-	[ i_ship_left  ,  -78, -46 ], 
-	[ i_ship_middle, -187, -45 ],
-	[ i_ship_right , -306, -39 ]
-];
-
-const back   = O(image("/home/capture/back.png"), rect(  0,   0, 150, 150)          );
-const cancel = O(image("/space_shooter/images/blue_dot.png"  ), rect(250, -15, 400, 135), 600, 865);
-
-let update_id               = null ;
-let ship_i                  = 0    ;
-let x                       = 250  ;
-let y                       = 350  ;
-let dest_x                  = x    ;
-let dest_y                  = y    ;
-const speed                 = 180  ;
-let notes                   = null ;
-let current_note_start_time = null ;
-
-const freq = y => {
-	return 40 + y * y / 1400;
-};
-
-const vol = x => {
-	return x / 1000;
-};
-
-const exit = start_func => {
-	x = dest_x;
-	y = dest_y;
-	canvas.removeEventListener('click', click);
-	clearInterval(update_id);
-	start_func();
-};
-
-const click = e => {
-	const p = design_coords(e);
-	if (back.click(p)) {
-		const t = audio.currentTime - current_note_start_time;
-		notes[notes.length - 1][2] = t;
-		set_item("home_capture", { x: x, y: y, notes: notes });
-		play_capture_notes();
-		exit(start_home);
-	} else if (cancel.click(p)) {
-		binaural_stop();
-		exit(start_home);
-	} else {
-		const t = audio.currentTime - current_note_start_time;
-		current_note_start_time = audio.currentTime;
-		notes[notes.length - 1][2] = t;		
-		dest_x  = p.x;
-		dest_y  = p.y;
-		const f = freq(dest_y);
-		const v = vol (dest_y);
-		notes.push([f, v, null]);
-		binaural_start_freq(f, 3, v);
-	}
-};
-
-const update = _ => {
-	if (++ship_i === 3) ship_i = 0;
-	let dx   = dest_x - x;
-	let dy   = dest_y - y;
-	let dist = Math.sqrt(dx * dx + dy * dy);
-	if (dist < speed) dist = speed;
-	dx = dx / dist * speed;
-	dy = dy / dist * speed;
-	x += dx;
-	y += dy;
-	
-	bg_blue();
-	if (ship_i !== null) {
-		const i        = ship[ship_i][0];
-		const offset_x = ship[ship_i][1];
-		const offset_y = ship[ship_i][2];
-		ctx.drawImage(i, x + offset_x, y + offset_y);
-	}
-	back.draw();
-	cancel.draw();
-};
-
-const play_capture_notes = _ => {
-	let o = get_item("home_capture", { x: x, y: y, notes: [[freq(y), vol(x), 1]] });
-	binaural_start_loop(o.notes, 3);
-	reset_play_buttons();
-	set_play_capture_button();
-};
-
-const start = _ => {
-	let o  = get_item("home_capture", { x: x, y: y, notes: [[freq(y), vol(x), 1]] });
-	x      = o.x;
-	y      = o.y;
-	dest_x = o.x;
-	dest_y = o.y;
-	notes  = o.notes;
-	reset_play_buttons();
-	binaural_start_freq(freq(y), 3, vol(x));
-	notes = [];
-	notes.push([freq(y), vol(x), null]);
-	current_note_start_time = audio.currentTime;
-	canvas.addEventListener('click', click);
-	update();
-	update_id = setInterval(update, 100);
-};
-
-export { start, play_capture_notes };
-
-
-*/
