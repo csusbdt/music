@@ -1,4 +1,4 @@
-import xbutton from "../../global/xbutton.js";
+import xbutton from "../global/xbutton.js";
 
 const back_button     = xbutton("upper_left_blue");
 const audio_blue      = xbutton("upper_right_blue");

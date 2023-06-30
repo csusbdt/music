@@ -1,14 +1,20 @@
 import start_template         from "../index.js"              ;
 import c_img                  from "../../../global/img.js"   ;
-import { draw_back_button   } from "../../../global/index.js" ;
-import { click_back_button  } from "../../../global/index.js" ;
-import { button             } from "../../../global/index.js" ;
-import { audio_toggle       } from "../../../global/index.js" ;
+// import { draw_back_button   } from "../../../global/index.js" ;
+// import { click_back_button  } from "../../../global/index.js" ;
+// import { button             } from "../../../global/index.js" ;
+// import { audio_toggle       } from "../../../global/index.js" ;
+
+import xbutton from "../../../global/xbutton.js";
+
+const back_button     = xbutton("upper_left_blue");
+const audio_blue      = xbutton("upper_right_blue");
+const audio_yellow    = xbutton("upper_right_yellow");
 
 const min_f  = 60;
 const max_f  = 900;
 
-const audio = audio_toggle(_ => tone.start(), _ => tone.stop());
+//const audio = audio_toggle(_ => tone.start(), _ => tone.stop());
 
 let tone = null;
 
@@ -38,14 +44,14 @@ const binaural = {
 
 for (let i = 0; i < binaural.bs.length; ++i) {
 	binaural.togs.push([
-		button("small_green", -20, 10 + 100 * i), 
-		button("small_red"  , -20, 10 + 100 * i)
+		xbutton("small_green", -20, 10 + 100 * i), 
+		xbutton("small_red"  , -20, 10 + 100 * i)
 	]);
 }
 
 const grid = {
 	x: 200, y: 160, w: 600, h: 600,
-	but: button("small_yellow", 200 + 600 / 2 - 120, 160 + 600 / 2 - 200),
+	but: xbutton("small_yellow", 200 + 600 / 2 - 120, 160 + 600 / 2 - 200),
 	set_xy: function(f) { log("set_xy not implemented"); }, 
 	draw: function() {
 		ctx.fillStyle = rgb_white;
@@ -74,19 +80,24 @@ const grid = {
 };
 
 const click_page = _ => {
-	if (click_back_button()) {
+	if (click(back_button)) {
 		tone.stop();
 		start_template();
 	} 
-	else if (grid.click() || binaural.click() || audio.click()) on_resize();
+	else if (click(audio_blue)) {
+		if (window.stop_audio === null) start_audio();
+		else window.stop_audio();
+		on_resize();
+	}
+	else if (grid.click() || binaural.click()) on_resize();
 };
 
 const draw_page = _ => {
 	bg_blue.draw();
 	grid.draw();
 	binaural.draw();
-	audio.draw();
-	draw_back_button();
+	window.audio_stop === null ? draw(audio_blue) : draw(audio_yellow);
+	draw(back_button);
 };
 
 export default o => {

@@ -1,16 +1,23 @@
 import start_composer         from "../index.js"           ;
 import start_edit_tone        from "./edit_tone/index.js"  ;
 import c_tone                 from "../../global/tone.js"  ;
-import { draw_back_button   } from "../../global/index.js" ;
-import { click_back_button  } from "../../global/index.js" ;
-import { button             } from "../../global/index.js" ;
-import { audio_toggle       } from "../../global/index.js" ;
+
+// import { draw_back_button   } from "../../global/index.js" ;
+// import { click_back_button  } from "../../global/index.js" ;
+// import { button             } from "../../global/index.js" ;
+// import { audio_toggle       } from "../../global/index.js" ;
+
+import xbutton from "../../global/xbutton.js";
+
+const back_button     = xbutton("upper_left_blue");
+const audio_blue      = xbutton("upper_right_blue");
+const audio_yellow    = xbutton("upper_right_yellow");
 
 function c_unit(tone, d, x, y) {
 	this.tone       = tone;
 	this.d          = d;
-	this.off_button = button("small_green", x, y);
-	this.on_button  = button("small_red"  , x, y);
+	this.off_button = xbutton("small_blue", x, y);
+	this.on_button  = xbutton("small_yellow"  , x, y);
 }
 
 c_unit.prototype.start = function() {
@@ -68,8 +75,6 @@ const stop_audio = _ => {
 	window.stop_audio  = null;
 };
 
-const audio = audio_toggle(start_audio, stop_audio);
-
 const exit = next_page => {
 	if (is_playing()) {
 		window.start_audio = null;
@@ -82,27 +87,32 @@ units.push(new c_unit(new c_tone(100      , 3, .5), 1000, 300, 300));
 units.push(new c_unit(new c_tone(100 * PHI, 3, .5), 1000, 400, 300));
 
 const click_page = _ => {
-	if (click_back_button()) return exit(start_composer);
-	else if (audio.click()) on_resize();
-	else if (units.some(o => o.click())) return;
+	if (click(back_button)) return exit(start_composer);
+	else if (audio_blue.click()) {
+		if (window.stop_audio === null) start_audio();
+		else window.stop_audio();
+		on_resize();
+	}
+	else if (units.some(o => o.click())) on_resize();
+	start_external_audio = null;
 };
 
 const draw_page = _ => {
-	bg_blue.draw();
-	draw_back_button();
-	units.forEach(o => o.draw());
-	audio.draw();
+	draw(bg_green);
+	draw(back_button);
+	draw(units);
+	window.stop_audio === null ? draw(audio_blue) : draw(audio_yellow);
 };
 
+let start_external_audio = null;
+
 export default _ => {
-	assert((window.start_audio === null) !== (window.stop_audio === null));
-	if (window.stop_audio === null) {
-		audio.color = audio.color_0;
-	} else if (window.stop_audio !== stop_audio) {
+	if (window.stop_audio !== null && window.stop_audio !== stop_audio) {
 		window.stop_audio();
-		audio.color = audio.color_0;
+		start_external_audio = window.start_audio;
+		window.start_audio = start_audio;
 	} else {
-		audio.color = audio.color_1;
+		start_external_audio = null;
 	}
 	set_item('page', "./composer/template/index.js");
 	on_resize = draw_page;

@@ -22,8 +22,8 @@ c_img.prototype.draw = function(x = 0, y = 0) {
 		ctx.drawImage(this.image, x, y);
 	} else {
 		++loading;
-		let onload = _ => --loading !== 0 && on_resize();
-		this.image.addEventListener('load', onload, {once: true});
+		const onload = _ => --loading === 0 && on_resize();
+		this.image.addEventListener('load', onload, { once: true });
 	}
 };
 
@@ -74,8 +74,12 @@ const to_color = function(from_img, to_img, r, g, b) {
 c_img.prototype.clone_color = function(r, g, b) {
 	const img = new c_img(null, this.cx, this.cy, this.cr, this.bottom);
 	if (!this.image.complete) {
-		let onload = to_color.bind(null, this, img, r, g, b);
-		this.image.addEventListener('load', onload, {once: true});
+		++loading;
+		const onload = _ => {
+			to_color(this, img, r, g, b);
+			if (--loading === 0) on_resize();
+		};
+		this.image.addEventListener('load', onload, { once: true });
 	} else {
 		to_color(this, img, r, g, b);
 	}

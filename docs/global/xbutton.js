@@ -75,3 +75,5 @@ clone("medium_yellow");
 
 img("small_green", 120, 200, 40);
 clone("small_red");
+clone("small_blue");
+clone("small_yellow");

@@ -1,11 +1,18 @@
 import start_composer         from "../index.js"      ;
 import c_img                  from "../../global/img.js"   ;
 import c_tone                 from "../../global/tone.js"  ;
-import { draw_back_button   } from "../../global/index.js" ;
-import { click_back_button  } from "../../global/index.js" ;
-import { draw_audio_toggle  } from "../../global/index.js" ;
-import { click_audio_toggle } from "../../global/index.js" ;
-import { button             } from "../../global/index.js" ;
+
+// import { draw_back_button   } from "../../global/index.js" ;
+// import { click_back_button  } from "../../global/index.js" ;
+// import { draw_audio_toggle  } from "../../global/index.js" ;
+// import { click_audio_toggle } from "../../global/index.js" ;
+// import { button             } from "../../global/index.js" ;
+
+import xbutton from "../global/xbutton.js";
+
+const back_button     = xbutton("upper_left_blue");
+const audio_blue      = xbutton("upper_right_blue");
+const audio_yellow    = xbutton("upper_right_yellow");
 
 const min_f  = 60;
 const max_f  = 900;
@@ -49,7 +56,6 @@ const stop_audio = _ => {
 	window.start_audio = start_audio;
 	window.stop_audio = null;
 	tone.stop();
-	//silent = true;
 };
 
 const start_audio = _ => {
@@ -57,21 +63,22 @@ const start_audio = _ => {
 	window.start_audio = null;
 	window.stop_audio = stop_audio;
 	tone.start();
-	//silent = false;
 };
 
 const click_page = _ => {
-	if (click_audio_toggle()) {
-		restore_previous_audio = false;
-		on_resize(); 
+	else if (audio_blue.click()) {
+		if (window.stop_audio === null) window.start_audio();
+		else window.stop_audio();
+		on_resize();
 	}
-	else if (click_back_button()) {
+	else if (click(back_button)) {
 		exit(start_composer);
 	} 
 	else if (grid.click()) {
-		restore_previous_audio = false;
+//		restore_previous_audio = false;
 		on_resize();
 	}
+	start_external_audio = null;
 };
 
 const draw_page = _ => {

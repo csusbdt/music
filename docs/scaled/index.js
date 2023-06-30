@@ -1,3 +1,4 @@
+/*
 import start_home              from "../home/index.js"   ;
 import start_scaled_6          from "./6/index.js"     ;
 import start_scaled_8          from "./8/index.js"     ;
@@ -37,3 +38,4 @@ const start = _ => {
 };
 
 export default start;
+*/
