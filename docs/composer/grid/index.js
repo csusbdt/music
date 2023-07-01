@@ -8,7 +8,6 @@ const audio_blue    = xbutton("upper_right_blue");
 const audio_yellow  = xbutton("upper_right_yellow");
 const record_blue   = xbutton("upper_right_blue"  , 0, 150);
 const record_yellow = xbutton("upper_right_yellow", 0, 150);
-const grid_dot      = xbutton("small_yellow", 200 + 600 / 2 - 120, 160 + 600 / 2 - 200);
 
 const min_f     = 60;
 const max_f     = 900;
@@ -16,6 +15,17 @@ const grid_left = 200;
 const grid_top  = 160;
 const grid_w    = 600;
 const grid_h    = 600;
+
+const y2f = y => {
+	return min_f + (y - grid_top) / grid_h * (max_f - min_f);
+};
+const f2y = f => {
+	return grid_top + (f - min_f) / (max_f - min_f) * grid_h;
+};
+const x2v = x => (x - grid_left) / grid_w;
+const v2x = v => grid_left + v * grid_w;
+
+const grid_dot      = xbutton("small_yellow", v2x(.5), f2y(80));
 
 const silence   = 0;
 const playback  = 1;
@@ -42,7 +52,12 @@ const draw_record = _ => {
 const draw_grid = _ => {
 	ctx.fillStyle = rgb_white;
 	ctx.fillRect(grid_left, grid_top, grid_w, grid_h);
-	grid_dot.draw();
+	grid_dot.draw(-grid_dot.color.cx, -grid_dot.color.cy);
+};
+
+const draw_audio = _ => {
+	if (state === playback) audio_yellow.draw();
+	else audio_blue.draw();
 };
 
 const click_grid = _ => {
@@ -53,8 +68,10 @@ const click_grid = _ => {
 	) {
 		let x = clamp(click_x, grid_left, grid_left + grid_w);
 		let y = clamp(click_y, grid_top , grid_top  + grid_h);
-		grid_dot.x = x - grid_dot.color.cx;
-		grid_dot.y = y - grid_dot.color.cy;
+		grid_dot.x = x;
+		grid_dot.y = y;
+		tone.set_f(y2f(y));
+		tone.set_v(x2v(x));
 		if (state === silence) {
 			start_recording();
 		} else if (state === playback) {
@@ -62,13 +79,37 @@ const click_grid = _ => {
 			start_recording();
 		} else {
 			push_tone();
-			const f_percent = Math.pow((y - grid_top) / grid_h, 2);
-			const v_percent = (x - grid_left) / grid_w;			
-			tone.set_f(min_f + (max_f - min_f) * f_percent);
-			tone.set_v(v_percent);
 		}
 		return true;
 	} else return false;
+};
+
+const next = _ => {
+	if (++i === tones.length) i = 0;
+ 	tone.set_f(tones[i].f);
+ 	tone.set_v(tones[i].v);
+	grid_dot.x = v2x(tones[i].v);
+	grid_dot.y = f2y(tones[i].f);
+	id = setTimeout(next, durs[i]);
+	on_resize();
+};
+
+const start_playback = _ => {
+	i = 0;
+ 	tone.set_f(tones[i].f);
+ 	tone.set_v(tones[i].v);
+	grid_dot.x = v2x(tones[i].v);
+	grid_dot.y = f2y(tones[i].f);
+	tone.start();
+	id = setTimeout(next, durs[i]);
+	state = playback;
+};
+
+const stop_playback = _ => {
+	tone.stop();
+	clearTimeout(id);
+	id = null;
+	state = silence;
 };
 
 const push_tone = _ => {
@@ -79,61 +120,32 @@ const push_tone = _ => {
 	tones.push(tone.clone());
 };
 
-const next = _ => {
-	tones[i].stop();
-	if (++i === tones.length) i = 0;
-	tones[i].start();
-	id = setTimeout(next, durs[i]);
-};
-
-const start_playback = _ => {
-	i  = 0;
-	tones[i].start();
-	id = setTimeout(next, durs[i]);
-	state = playback;
-};
-
-const stop_playback = _ => {
-	tones[i].stop();
-	clearTimeout(id);
-	id = null;
-	state = silence;
-};
-
 const start_recording = _ => {
 	tones.length = 0;
 	durs.length = 0;
 	t = new Date().getTime();
-	// tone.set_f(y2f(grid_y));
-	// tone.set_v(x2v(grid_x));
 	tone.start();
 	state = recording;
 };
 
 const stop_recording = _ => {
-	tone.stop();
 	push_tone();
+	tone.stop();
 	state = silence;
 };
 
 const click_record = _ => {
 	if (click(record_blue)) {
-		if (state === silence) {
-			start_recording();
+		if (state === recording) {
+			stop_recording();
 		} else if (state === playback) {
 			stop_playback();
 			start_recording();
 		} else {
-			stop_recording();
-			start_playback();
+			start_recording();
 		}
 		return true;
 	} else return false;
-};
-
-const draw_audio = _ => {
-	if (state === silence) audio_blue.draw();
-	else audio_yellow.draw();
 };
 
 const click_audio  = _ => {
@@ -144,7 +156,7 @@ const click_audio  = _ => {
 			stop_playback();
 		} else {
 			stop_recording();
-			state = silence;
+			start_playback();
 		}
 		return true;
 	} else return false;
@@ -154,7 +166,15 @@ let start_external_audio = null;
 
 const click_page = _ => {
 	if (click(back_button)) {
-		if (start_external_audio !== null) start_external_audio();
+		if (state === silence) {
+			if (start_external_audio !== null) start_external_audio();
+		} else if (state === recording) {
+			stop_recording();
+			state = silence;
+		} else {
+			window.start_audio = null;
+			window.stop_audio = stop_audio;
+		}
 		start_composer();
 	}
 	else if (click_audio() || click_record() || click_grid()) on_resize(); 
@@ -185,7 +205,6 @@ export default _ => {
 	if (window.stop_audio !== null && window.stop_audio !== stop_audio) {
 		window.stop_audio();
 		start_external_audio = window.start_audio;
-//		window.start_audio = start_audio;
 	} else {
 		start_external_audio = null;
 	}
