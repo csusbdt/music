@@ -7,6 +7,10 @@ function c_tone(f, b = 0, v = 1) {
 	this.g       = null;
 }
 
+c_tone.prototype.clone = function() {
+	return new c_tone(this.f, this.b, this.v);
+};
+
 c_tone.prototype.is_playing = function() { return this.g !== null; }
 
 c_tone.prototype.start = function() {

@@ -252,6 +252,8 @@ window.bg_white  = new c_bg(rgb_white );
 
 window.PHI = 1.61803398875;
 
+window.clamp = (n, a, b) => Math.max(Math.min(n, Math.max(a, b)), Math.min(a, b));
+
 // See http://www.phy.mtu.edu/~suits/NoteFreqCalcs.html
 window.scale = (octave_tones, base_frequency, half_notes_away_from_base) => {
 	return base_frequency * Math.pow(Math.pow(2, 1.0 / octave_tones), half_notes_away_from_base);

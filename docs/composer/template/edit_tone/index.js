@@ -1,20 +1,13 @@
-import start_template         from "../index.js"              ;
-import c_img                  from "../../../global/img.js"   ;
-// import { draw_back_button   } from "../../../global/index.js" ;
-// import { click_back_button  } from "../../../global/index.js" ;
-// import { button             } from "../../../global/index.js" ;
-// import { audio_toggle       } from "../../../global/index.js" ;
+import start_template from "../index.js"               ;
+import c_img          from "../../../global/img.js"    ;
+import xbutton        from "../../../global/xbutton.js";
 
-import xbutton from "../../../global/xbutton.js";
-
-const back_button     = xbutton("upper_left_blue");
-const audio_blue      = xbutton("upper_right_blue");
-const audio_yellow    = xbutton("upper_right_yellow");
+const back_button  = xbutton("upper_left_blue");
+const audio_blue   = xbutton("upper_right_blue");
+const audio_yellow = xbutton("upper_right_yellow");
 
 const min_f  = 60;
 const max_f  = 900;
-
-//const audio = audio_toggle(_ => tone.start(), _ => tone.stop());
 
 let tone = null;
 
