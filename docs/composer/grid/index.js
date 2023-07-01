@@ -25,19 +25,18 @@ const f2y = f => {
 const x2v = x => (x - grid_left) / grid_w;
 const v2x = v => grid_left + v * grid_w;
 
-const grid_dot      = xbutton("small_yellow", v2x(.5), f2y(80));
-
 const silence   = 0;
 const playback  = 1;
 const recording = 2;
 let   state     = silence; 
 
-const tones = [];
-const durs  = [];
-const tone  = new c_tone(100, 3, 1); 
-let id      = null;
-let i       = null;
-let t       = null;
+const tones     = [];
+const durs      = [];
+const tone      = new c_tone(200, 3, .7); 
+let id          = null;
+let i           = null;
+let t           = null;
+const grid_dot  = xbutton("small_yellow", v2x(tone.v), f2y(tone.f));
 
 const draw_record = _ => {
 	if (state === recording) record_yellow.draw();
@@ -66,6 +65,7 @@ const click_grid = _ => {
 		click_y >= grid_top  - 40           && 
 		click_y <= grid_top  + grid_h + 40
 	) {
+		if (state === recording) push_tone();
 		let x = clamp(click_x, grid_left, grid_left + grid_w);
 		let y = clamp(click_y, grid_top , grid_top  + grid_h);
 		grid_dot.x = x;
@@ -77,8 +77,6 @@ const click_grid = _ => {
 		} else if (state === playback) {
 			stop_playback();
 			start_recording();
-		} else {
-			push_tone();
 		}
 		return true;
 	} else return false;
@@ -98,8 +96,8 @@ const start_playback = _ => {
 	i = 0;
  	tone.set_f(tones[i].f);
  	tone.set_v(tones[i].v);
-	grid_dot.x = v2x(tones[i].v);
-	grid_dot.y = f2y(tones[i].f);
+	grid_dot.x = v2x(tone.v);
+	grid_dot.y = f2y(tone.f);
 	tone.start();
 	id = setTimeout(next, durs[i]);
 	state = playback;
@@ -220,11 +218,6 @@ export default _ => {
 };
 
 
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
 
 /*
 const units = [];
