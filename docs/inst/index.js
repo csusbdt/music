@@ -13,8 +13,16 @@ const playback  = 1;
 const recording = 2;
 let   state     = silence; 
 
-const blues     = [xbutton("medium_blue"  , 200, 200), xbutton("medium_blue"  , 400, 400)];
-const yellows   = [xbutton("medium_yellow", 200, 200), xbutton("medium_yellow", 400, 400)];
+const blues = [];
+const yellows = [];
+
+for (let i = 0; i < 6; ++i) {
+	blues.push(xbutton("upper_right_blue", -810 + i * 150, 500));
+	blues.push(xbutton("small_blue"   , 20 + i * 150, 260));
+	yellows.push(xbutton("upper_right_yellow", -810 + i * 150, 500));
+	yellows.push(xbutton("small_yellow"   , 20 + i * 150, 260));
+}
+
 const freq      = i => scale(6, 80, i);
 
 let t           = null; // time in seconds
