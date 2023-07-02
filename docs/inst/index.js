@@ -135,6 +135,7 @@ const click_record = _ => {
 
 const click_audio  = _ => {
 	if (click(audio_blue)) {
+		if (notes.length === 0) return true;
 		if (state === silence) {
 			start_playback();
 		} else if (state === playback) {
