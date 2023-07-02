@@ -8,12 +8,20 @@ const audio_yellow  = xbutton("upper_right_yellow");
 const record_blue   = xbutton("upper_right_blue"  , 0, 120);
 const record_yellow = xbutton("upper_right_yellow", 0, 120);
 
+const waver_blue   = xbutton("medium_blue"  , 20, 560);
+const waver_yellow = xbutton("medium_yellow", 20, 560);
+let   waver_i      = 0;
+
+const binaural_blue   = xbutton("medium_blue"  , 220, 560);
+const binaural_yellow = xbutton("medium_yellow", 220, 560);
+let   binaural_i      = 0;
+
 const silence   = 0;
 const playback  = 1;
 const recording = 2;
 let   state     = silence; 
 
-const blues = [];
+const blues   = [];
 const yellows = [];
 
 for (let i = 0; i < 6; ++i) {
@@ -32,8 +40,8 @@ const durs      = [];   // captured durations
 const notes     = [];   // captured note index
 let dur_i       = null; // index into durs and notes, for playback
 
-const tone      = new c_tone(freq(note), 3, 1);  // playing tone
-const waver     = new c_tone(3, 0, 1); 
+const tone      = new c_tone(freq(note), 0, 1);  // playing tone
+const waver     = new c_tone(3, 0, 0); 
 
 const draw_record = _ => {
 	if (state === recording) record_yellow.draw();
@@ -51,6 +59,14 @@ const draw_audio = _ => {
 	if (state === playback) audio_yellow.draw();
 	else audio_blue.draw();
 };
+
+const draw_waver = _ => {
+	if (waver_i === 0) draw(waver_blue); else draw(waver_yellow);
+}
+
+const draw_binaural = _ => {
+	if (binaural_i === 0) draw(binaural_blue); else draw(binaural_yellow);
+}
 
 const click_notes = _ => {
 	for (let i = 0; i < blues.length; ++i) {
@@ -148,6 +164,34 @@ const click_audio  = _ => {
 	} else return false;
 };
 
+const click_waver = _ => {
+	if (waver_blue.click()) {
+		if (waver_i === 0) {
+			waver.set_v(1);
+			waver_i = 1;
+		} else {
+			waver.set_v(0);
+			waver_i = 0;
+		}
+		return true;
+	}
+	return false;
+};
+
+const click_binaural = _ => {
+	if (binaural_blue.click()) {
+		if (binaural_i === 0) {
+			tone.set_b(3);
+			binaural_i = 1;
+		} else {
+			tone.set_b(0);
+			binaural_i = 0;
+		}
+		return true;
+	}
+	return false;
+};
+
 let start_external_audio = null;
 
 const click_page = _ => {
@@ -163,7 +207,10 @@ const click_page = _ => {
 		}
 		run("../home/index.js");
 	}
-	else if (click_audio() || click_record() || click_notes()) on_resize(); 
+	else if (
+		click_audio() || click_record() || click_notes() || 
+		click_waver() || click_binaural()
+	) on_resize(); 
 	start_external_audio = null;
 };
 
@@ -172,6 +219,8 @@ const draw_page = _ => {
 	draw_notes();
 	draw_audio();
 	draw_record();
+	draw_waver();
+	draw_binaural();
 	draw(back_button);
 };
 
