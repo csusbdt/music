@@ -17,11 +17,13 @@ const grid_w    = 600;
 const grid_h    = 600;
 
 const y2f = y => {
-	return min_f + (y - grid_top) / grid_h * (max_f - min_f);
+	return min_f + (max_f - min_f) * Math.pow((y - grid_top)/grid_h, 3);
 };
+
 const f2y = f => {
-	return grid_top + (f - min_f) / (max_f - min_f) * grid_h;
+	return grid_top + Math.pow( (f - min_f)/(max_f - min_f), 1 / 3) * grid_h;
 };
+
 const x2v = x => (x - grid_left) / grid_w;
 const v2x = v => grid_left + v * grid_w;
 
@@ -43,11 +45,6 @@ const draw_record = _ => {
 	else record_blue.draw();
 };
 
-// const y2f = y => min_f + (max_f - min_f) * Math.pow((y - grid_top) / grid_h, 2);
-// const x2v = x => (x - grid_left) / grid_w;
-// const f2y = f => grid_top + 1 / grid_h * Math.log2((f - min_f) / (max_f - min_f));
-// const v2x = v => grid_left + grid_w * v;
-	
 const draw_grid = _ => {
 	ctx.fillStyle = rgb_white;
 	ctx.fillRect(grid_left, grid_top, grid_w, grid_h);
