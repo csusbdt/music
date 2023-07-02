@@ -33,6 +33,7 @@ const notes     = [];   // captured note index
 let dur_i       = null; // index into durs and notes, for playback
 
 const tone      = new c_tone(freq(note), 3, 1);  // playing tone
+const waver     = new c_tone(3, 0, 1); 
 
 const draw_record = _ => {
 	if (state === recording) record_yellow.draw();
@@ -82,6 +83,7 @@ const start_playback = _ => {
 	note = notes[dur_i];
  	tone.set_f(freq(note));
 	tone.start();
+	waver.start();
 	id = setTimeout(next, durs[dur_i]);
 	state = playback;
 };
@@ -106,12 +108,14 @@ const start_recording = _ => {
 	notes.length = 0;
 	t = new Date().getTime();
 	tone.start();
+	waver.start();
 	state = recording;
 };
 
 const stop_recording = _ => {
 	capture();
 	tone.stop();
+	waver.stop();
 	state = silence;
 };
 
@@ -156,7 +160,7 @@ const click_page = _ => {
 			window.start_audio = null;
 			window.stop_audio = stop_audio;
 		}
-		start_composer();
+		run("../home/index.js");
 	}
 	else if (click_audio() || click_record() || click_notes()) on_resize(); 
 	start_external_audio = null;
