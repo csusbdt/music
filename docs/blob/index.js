@@ -151,8 +151,8 @@ const f_border = img("f_border");
 const f_tone   = new c_tone(0, 0, .5); 
 let   f        = 0;
 let   f_dur    = p_dur * 3;
-const f_f_org  = p_f * Math.pow(2 * (1 - PHI), 1); 
-let   f_f      = 220; //f_f_org; //220; 
+const f_f_org  = 220; //p_f * Math.pow(2 * (1 - PHI), 1); 
+let   f_f      = f_f_org; 
 let   f_i      = null;
 let   f_id     = null;
 const draw_f   = _ => { 
@@ -219,6 +219,7 @@ const draw_e   = _ => {
 const click_e  = _ => {
 	if (e_blue.click()) {
 		if (window.stop_audio === null) start_audio();
+		if (f === 0) { f = 1; start_f(); }
 		if (++e === 2) { 
 			e = 0; 
 			f_f = f_f_org; 
@@ -248,6 +249,7 @@ const draw_g   = _ => {
 const click_g  = _ => {
 	if (g_blue.click()) {
 		if (window.stop_audio === null) start_audio();
+		if (f === 0) { f = 1; start_f(); }
 		if (++g === 2) { 
 			g = 0; 
 			f_f = f_f_org; 
@@ -277,6 +279,7 @@ const draw_h   = _ => {
 const click_h  = _ => {
 	if (h_blue.click()) {
 		if (window.stop_audio === null) start_audio();
+		if (f === 0) { f = 1; start_f(); }
 		if (++h === 2) { 
 			h = 0; 
 			f_f = f_f_org; 
@@ -291,7 +294,6 @@ const click_h  = _ => {
 };
 const start_h = _ => {};
 const stop_h  = _ => {};
-
 
 const start_audio = _ => {
 	assert(window.stop_audio === null);
