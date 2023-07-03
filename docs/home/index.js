@@ -67,6 +67,10 @@ const red_green_system = {
 				on_resize();
 			}, 100);
 			setTimeout(_ => {
+				red_green_system.big_i = 3;
+				on_resize();
+			}, 200);
+			setTimeout(_ => {
 				red_green_system.big_i = 0;
 				if (red_green_system.inner_i === 0 && red_green_system.outer_i === 0) {
 					run("./songs/index.js");
@@ -77,7 +81,7 @@ const red_green_system = {
 				} else if (red_green_system.inner_i === 1 && red_green_system.outer_i === 1) {
 					run("./scaled/8/index.js");
 				}
-			}, 200);
+			}, 300);
 		} else return false;
 		return true;
 	}
@@ -118,6 +122,10 @@ const yellow_blue_system = {
 				on_resize();
 			}, 100);
 			setTimeout(_ => {
+				yellow_blue_system.big_i = 3;
+				on_resize();
+			}, 200);
+			setTimeout(_ => {
 				yellow_blue_system.big_i = 0;
 				if (yellow_blue_system.inner_i === 0 && yellow_blue_system.outer_i === 0) {
 					run("./compose/index.js");
@@ -128,7 +136,7 @@ const yellow_blue_system = {
 				} else if (yellow_blue_system.inner_i === 0 && yellow_blue_system.outer_i === 1) {
 					run("./blob/index.js");
 				}
-			}, 200);
+			}, 300);
 		} else return false;
 		return true;
 	}
