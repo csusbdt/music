@@ -64,6 +64,7 @@ const p_tone   = new c_tone(90 * PHI, 0, 1);
 let   p        = 0;
 let   p_i      = null;
 let   p_id     = null;
+let   p_dur    = 1000;
 const draw_p   = _ => { 
 	if (p === 0) draw(p_blue);
 	else draw(p_yellow);
@@ -95,13 +96,13 @@ const next_p = _ => {
 	} else if (p_i === 4) {
 		p_tone.set_f(90 * (PHI + 3) / 4);
 	}
-	p_id = setTimeout(next_p, 1000);
+	p_id = setTimeout(next_p, p_dur);
 };
 const start_p = _ => {
 	p_i = 0;
 	p_tone.set_f(90 * PHI);
 	p_tone.start();
-	p_id = setTimeout(next_p, 1000);
+	p_id = setTimeout(next_p, p_dur);
 };
 const stop_p = _ => {
 	if (p_id !== null) {
@@ -136,12 +137,38 @@ const click_d  = _ => {
 const start_d = _ => d === 1 && d_tone.start();
 const stop_d  = _ => d_tone.stop();
 
+
+// ? CHANGE -- add to sequence
+
+const e_blue   = img("e_blue");
+const e_yellow = e_blue.clone_yellow();
+const e_border = img("e_border");
+//const e_tone   = new c_tone(8, 0, 1);
+let   e        = 0;
+const draw_e   = _ => { 
+	if (e === 0) draw(e_blue);
+	else draw(e_yellow);
+	draw(e_border);
+};
+const click_e  = _ => {
+	if (e_blue.click()) {
+		if (window.stop_audio === null) start_audio();
+		if (++e === 2) { e = 0; p_dur = 1000; }
+		else p_dur = 500;
+		return true;
+	}
+	return false;
+};
+const start_e = _ => {};
+const stop_e  = _ => {};
+
 const start_audio = _ => {
 	assert(window.stop_audio === null);
 	if (a === 1) start_a();
 	if (b === 1) start_b();
 	if (p === 1) start_p();
 	if (d === 1) start_d();
+	if (e === 1) start_e();
 	window.start_audio = null;
 	window.stop_audio  = stop_audio;
 };
@@ -151,6 +178,7 @@ const stop_audio = _ => {
 	stop_b();
 	stop_p();
 	stop_d();
+	stop_e();
 	window.start_audio = start_audio;
 	window.stop_audio  = null;
 };
@@ -178,7 +206,7 @@ const click_page = _ => {
 		run("./home/index.js");
 	}
 	else if (
-		click_audio() || click_a() || click_b() || click_p() || click_d() 
+		click_audio() || click_a() || click_b() || click_p() || click_d() || click_e() 
 	) on_resize(); 
 	start_external_audio = null;
 };
@@ -191,6 +219,7 @@ const draw_page = _ => {
 	draw_b();
 	draw_p();
 	draw_d();
+	draw_e();
 };
 
 export default _ => {
