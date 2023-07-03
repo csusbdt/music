@@ -50,13 +50,14 @@ c_img.prototype.click = function(draw_x = 0, draw_y = 0) {
 	}
 };
 
+const clone_canvas = document.createElement("canvas");
+
 const to_color = function(from_img, to_img, r, g, b) {
-	const canvas = document.createElement("canvas");
-	canvas.width  = design_width;
-	canvas.height = design_height;
-	const ctx = canvas.getContext("2d");
+	clone_canvas.width  = design_width;
+	clone_canvas.height = design_height;
+	const ctx = clone_canvas.getContext("2d", { willReadFrequently: true });
 	ctx.drawImage(from_img.image, 0, 0);
-	const image_data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+	const image_data = ctx.getImageData(0, 0, clone_canvas.width, clone_canvas.height);
     const pixels = image_data.data;
     const len = pixels.length;
     for (let pixel = 0; pixel < len; pixel += 4) {
@@ -68,7 +69,7 @@ const to_color = function(from_img, to_img, r, g, b) {
     }
     ctx.putImageData(image_data, 0, 0);
 	to_img.image = new Image();
-	to_img.image.src = canvas.toDataURL();
+	to_img.image.src = clone_canvas.toDataURL();
 };
 
 c_img.prototype.clone_color = function(r, g, b) {
