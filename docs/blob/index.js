@@ -13,7 +13,7 @@ const img = n => new c_img("./blob/images/" + n + ".png");
 const a_blue   = img("a_blue");
 const a_yellow = a_blue.clone_yellow();
 const a_border = img("a_border");
-const a_tone   = new c_tone(75, 3, 1);
+const a_tone   = new c_tone(75, 0, 1);
 let   a        = 0;
 const draw_a   = _ => { 
 	if (a === 0) draw(a_blue);
