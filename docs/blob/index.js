@@ -87,7 +87,7 @@ const click_p  = _ => {
 const next_p = _ => {
 	if (++p_i === 5) {
 		p_i = 0;
-		p_tone.set_f(p_f);
+		p_tone.set_f(p_f * PHI);
 	} else if (p_i === 1) {
 		p_tone.set_f(p_f * (PHI + 7) / 8);
 	} else if (p_i === 2) {
@@ -105,9 +105,7 @@ const start_p = _ => {
 		start_f();
 	}
 	p_i = 4;
-//	p_tone.set_f(p_f * PHI);
 	p_tone.start();
-//	p_id = setTimeout(next_p, p_dur);
 	next_p();
 };
 const stop_p = _ => {
@@ -220,6 +218,8 @@ const click_e  = _ => {
 	if (e_blue.click()) {
 		if (window.stop_audio === null) start_audio();
 		if (f === 0) { f = 1; start_f(); }
+		if (p === 1) { stop_p(); start_p(); }
+		stop_f(); start_f();
 		if (++e === 2) { 
 			e = 0; 
 			f_f = f_f_org; 
@@ -250,6 +250,8 @@ const click_g  = _ => {
 	if (g_blue.click()) {
 		if (window.stop_audio === null) start_audio();
 		if (f === 0) { f = 1; start_f(); }
+		if (p === 1) { stop_p(); start_p(); }
+		stop_f(); start_f();
 		if (++g === 2) { 
 			g = 0; 
 			f_f = f_f_org; 
@@ -280,6 +282,8 @@ const click_h  = _ => {
 	if (h_blue.click()) {
 		if (window.stop_audio === null) start_audio();
 		if (f === 0) { f = 1; start_f(); }
+		if (p === 1) { stop_p(); start_p(); }
+		stop_f(); start_f();
 		if (++h === 2) { 
 			h = 0; 
 			f_f = f_f_org; 
