@@ -1,6 +1,6 @@
-import c_img   from "../../global/img.js"    ;
-import c_tone  from "../../global/tone.js"   ;
-import xbutton from "../../global/xbutton.js";
+import c_img   from "../global/img.js"    ;
+import c_tone  from "../global/tone.js"   ;
+import xbutton from "../global/xbutton.js";
 
 const back_button   = xbutton("upper_left_blue");
 const audio_blue    = xbutton("upper_right_blue");
