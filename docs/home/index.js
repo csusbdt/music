@@ -126,7 +126,7 @@ const yellow_blue_system = {
 				} else if (yellow_blue_system.inner_i === 1 && yellow_blue_system.outer_i === 0) {
 					run("./composer/index.js");
 				} else if (yellow_blue_system.inner_i === 0 && yellow_blue_system.outer_i === 1) {
-					run("./test/index.js");
+					run("./blob/index.js");
 				}
 			}, 200);
 		} else return false;
