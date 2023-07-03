@@ -45,7 +45,7 @@ const exit = next_page => {
 };
 
 const click_page = _ => {
-	if (back_button.click()) exit("../home/index.js");
+	if (back_button.click()) exit("./home/index.js");
 	if (audio_blue.click()) {
 		window.start_audio === null ? stop_audio() : start_audio();
 		on_resize();

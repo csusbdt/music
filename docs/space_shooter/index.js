@@ -1,7 +1,7 @@
-import start_home from "../home/index.js"       ;
-import c_img      from "../global/img.js"       ;
-import c_button   from "../global/button.js"    ;
-import xbutton    from "../../global/xbutton.js";
+import start_home from "../home/index.js"    ;
+import c_img      from "../global/img.js"    ;
+import c_button   from "../global/button.js" ;
+import xbutton    from "../global/xbutton.js";
 
 const back_button   = xbutton("upper_left_green");
 const audio_green   = xbutton("upper_right_green");

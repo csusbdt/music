@@ -69,13 +69,13 @@ const red_green_system = {
 			setTimeout(_ => {
 				red_green_system.big_i = 0;
 				if (red_green_system.inner_i === 0 && red_green_system.outer_i === 0) {
-					run("../songs/index.js");
+					run("./songs/index.js");
 				} else if (red_green_system.inner_i === 1 && red_green_system.outer_i === 0) {
-					run("../scaled/6/index.js");
+					run("./scaled/6/index.js");
 				} else if (red_green_system.inner_i === 0 && red_green_system.outer_i === 1) {
-					run("../space_shooter/index.js");
+					run("./space_shooter/index.js");
 				} else if (red_green_system.inner_i === 1 && red_green_system.outer_i === 1) {
-					run("../scaled/8/index.js");
+					run("./scaled/8/index.js");
 				}
 			}, 200);
 		} else return false;
@@ -120,13 +120,13 @@ const yellow_blue_system = {
 			setTimeout(_ => {
 				yellow_blue_system.big_i = 0;
 				if (yellow_blue_system.inner_i === 0 && yellow_blue_system.outer_i === 0) {
-					run("../compose/index.js");
+					run("./compose/index.js");
 				} else if (yellow_blue_system.inner_i === 1 && yellow_blue_system.outer_i === 1) {
-					run("../inst/index.js");
+					run("./inst/index.js");
 				} else if (yellow_blue_system.inner_i === 1 && yellow_blue_system.outer_i === 0) {
-					run("../composer/index.js");
+					run("./composer/index.js");
 				} else if (yellow_blue_system.inner_i === 0 && yellow_blue_system.outer_i === 1) {
-					run("../test/index.js");
+					run("./test/index.js");
 				}
 			}, 200);
 		} else return false;

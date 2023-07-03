@@ -72,7 +72,7 @@ const click_page = _ => {
 		window.stop_audio !== null ? window.stop_audio() : start_audio();
 		on_resize(); 
 	} else if (back_button.click()) {
-		run("../home/index.js");
+		run("./home/index.js");
 	} else if (click_song_buttons()) on_resize();
 };
 

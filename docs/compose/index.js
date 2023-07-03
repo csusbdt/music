@@ -238,7 +238,7 @@ const exit = next_page => {
 };
 
 const click_page = _ => {
-	if (back_button.click()) return exit("../home/index.js");
+	if (back_button.click()) return exit("./home/index.js");
 	else if (click(audio_blue)) {
 		window.start_audio === null ? stop_audio() : start_audio();
 		on_resize();
