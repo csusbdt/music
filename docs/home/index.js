@@ -1,5 +1,6 @@
-import c_img    from "../global/img.js"    ;
-import xbutton  from "../global/xbutton.js";
+import c_img   from "../global/img.js"    ;
+import xbutton from "../global/xbutton.js";
+import volume  from "../global/volume.js" ;
 
 const lower_left_red     = xbutton("lower_left_red");
 const lower_left_yellow  = xbutton("lower_left_yellow");
@@ -149,12 +150,14 @@ const system = {
 			bg_blue.draw();
 			red_green_system.draw();
 			lower_left_red.draw();
+			volume.draw_green();
 			if (window.start_audio === null) upper_right_red.draw();
 			else upper_right_green.draw();
 		} else {
 			bg_green.draw();
 			yellow_blue_system.draw();
 			lower_left_yellow.draw();
+			volume.draw_blue();
 			if (window.start_audio === null) upper_right_yellow.draw();
 			else upper_right_blue.draw();
 		}
@@ -166,6 +169,8 @@ const system = {
 		} else if (upper_right_red.click()) {
 			if (window.start_audio !== null) window.start_audio();
 			else window.stop_audio();
+			return true;
+		} else if (volume.click()) {
 			return true;
 		} else if (this.i === 0) {
 			if (red_green_system.click()) return true;
