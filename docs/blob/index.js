@@ -286,9 +286,9 @@ const stop_e = _ => {
 const g_blue   = img("g_blue");
 const g_yellow = g_blue.clone_yellow();
 const g_border = img("g_border");
-const g_tone   = new c_tone(0, 0, .5); 
-const g_f      = p_f * Math.pow(2 * (1 - PHI), 3);
-const g_dur    = p_dur * 5;
+const g_tone   = new c_tone(0, 0, 1); 
+const g_f      = p_f * Math.pow(2 * (1 - PHI), 5);
+const g_dur    = p_dur * 6;
 let   g        = 0;
 let   g_i      = null;
 let   g_id     = null;
@@ -316,22 +316,20 @@ const click_g  = _ => {
 	return false;
 };
 const next_g = _ => {
-	if (++g_i === 5) {
+	if (++g_i === 4) {
 		g_i = 0;
-		g_tone.set_f(g_f * (PHI + 0));
+		g_tone.set_f(g_f); 
 	} else if (g_i === 1) {
-		g_tone.set_f(g_f * (PHI + 7) / 8);
+		g_tone.set_f(g_f * (PHI - 1)); 
 	} else if (g_i === 2) {
-		e_tone.set_f(g_f * (PHI + 7) / 8);
+		g_tone.set_f(g_f * (PHI + 1) / 2); 
 	} else if (g_i === 3) {
-		g_tone.set_f(g_f * (PHI + 1) / 2);
-	} else if (g_i === 4) {
-		g_tone.set_f(g_f * (PHI + 3) / 4);
+		g_tone.set_f(g_f * PHI); 
 	}
 	g_id = setTimeout(next_g, g_dur);
 };
 const start_g = _ => {
-	g_i = 4;
+	g_i = 3;
 	g_tone.start();
 	next_g();
 };
@@ -350,7 +348,7 @@ const h_yellow = h_blue.clone_yellow();
 const h_border = img("d_border");
 const h_tone   = new c_tone(0, 0, .5); 
 const h_f      = p_f * Math.pow(2 * (1 - PHI), 3);
-const h_dur    = p_dur * 3;
+const h_dur    = p_dur * 12;
 let   h        = 0;
 let   h_i      = null;
 let   h_id     = null;
@@ -381,7 +379,7 @@ const next_h = _ => {
 	if (++h_i === 5) {
 		h_i = 0;
 		h_tone.set_f(h_f * (PHI + 0));
-	} else if (g_i === 1) {
+	} else if (h_i === 1) {
 		h_tone.set_f(h_f * (PHI + 7) / 8);
 	} else if (h_i === 2) {
 		h_tone.set_f(h_f * (PHI + 7) / 8);

@@ -4,7 +4,6 @@ const back_green   = xbutton("upper_left_green" );
 const back_blue    = xbutton("upper_left_blue"  );
 const volume_green = xbutton("lower_right_green");
 const volume_blue  = xbutton("lower_right_blue" );
-const volumes      = [ .025, .05, .1, .2, .3, .5, .7, 1 ];
 const greens       = [];
 const reds         = [];
 const blues        = [];
@@ -15,9 +14,8 @@ const yellow_blue  = 1;
 let system         = null;
 let save_draw      = null;
 let save_click     = null;
-let volume_i       = volumes.length - 1;
 
-for (let i = 0; i < volumes.length; ++i) {
+for (let i = 0; i < window.volumes.length; ++i) {
 	greens .push(xbutton("small_green" , 20 + i * 100, 260));
 	reds   .push(xbutton("small_red"   , 20 + i * 100, 260));
 	blues  .push(xbutton("small_blue"  , 20 + i * 100, 260));
@@ -33,12 +31,13 @@ const click_page = _ => {
     } else {
         for (let i = 0; i < greens.length; ++i) {
             if (greens[i].click()) {
-                const v = volumes[i];
-                if (gain.gain.value !== v) {
-                    gain.gain.setTargetAtTime(v, audio.currentTime, .05);
-                    volume_i = i;
-                }
-                on_resize();
+				if (i !== volume_i) {
+	                gain.gain.setTargetAtTime(volumes[i], audio.currentTime, .05);
+	                volume_i = i;
+					set_item('volume_i', volume_i);
+	                on_resize();
+				}
+				return;
             }
         }
     }

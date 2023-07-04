@@ -73,7 +73,10 @@ window.get_item = (key, _default) => {
 
 window.audio       = null;
 let main_gain      = null;
-window.gain        = null; 
+window.gain        = null;
+
+window.volumes     = [ .025, .05, .1, .2, .3, .5, .7, 1 ];
+window.volume_i    = get_item('volume_i', 5);
 
 window.init_audio = _ => {
 	if (audio === null) {
@@ -87,7 +90,7 @@ window.init_audio = _ => {
 		main_gain.gain.value = 1;
 		main_gain.connect(audio.destination);
 		gain = audio.createGain();
-		gain.gain.value = 1;
+		gain.gain.value = volumes[volume_i];
 		gain.connect(main_gain);
 	}
 };
