@@ -53,10 +53,14 @@ const click_b  = _ => {
 			p_tone.set_b(0); 
 			f_tone.set_b(0); 
 			e_tone.set_b(0); 
+			g_tone.set_b(0); 
+			h_tone.set_b(0); 
 		} else {
 			p_tone.set_b(3); 
 			f_tone.set_b(3);
 			e_tone.set_b(3);
+			g_tone.set_b(3);
+			h_tone.set_b(3);
 		}
 		return true;
 	}
@@ -64,6 +68,30 @@ const click_b  = _ => {
 };
 const start_b = _ => {};
 const stop_b  = _ => {};
+
+// 1/2 
+
+const d_blue   = img("h_blue");
+const d_yellow = d_blue.clone_yellow();
+const d_border = img("h_border");
+const d_tone   = new c_tone(1/2, 0, 1);
+let   d        = 0;
+const draw_d   = _ => { 
+	if (d === 0) draw(d_blue);
+	else draw(d_yellow);
+	draw(d_border);
+};
+const click_d  = _ => {
+	if (d_blue.click()) {
+		if (window.stop_audio === null) start_audio();
+		if (++d === 2) { d = 0; d_tone.stop(); }
+		else d_tone.start();
+		return true;
+	}
+	return false;
+};
+const start_d = _ => d === 1 && d_tone.start();
+const stop_d  = _ => d_tone.stop();
 
 // base sequence
 
@@ -91,6 +119,8 @@ const click_p  = _ => {
 		} else {
 			if (f === 1) { stop_f(); start_f(); }
 			if (e === 1) { stop_e(); start_e(); }
+			if (g === 1) { stop_g(); start_g(); }
+			if (h === 1) { stop_h(); start_h(); }
 			start_p();
 		}
 		return true;
@@ -152,6 +182,8 @@ const click_f  = _ => {
 		} else {
 			if (p === 1) { stop_p(); start_p(); }
 			if (e === 1) { stop_e(); start_e(); }
+			if (g === 1) { stop_g(); start_g(); }
+			if (h === 1) { stop_h(); start_h(); }
 			start_f();
 		}
 		return true;
@@ -212,6 +244,8 @@ const click_e  = _ => {
 		} else {
 			if (p === 1) { stop_p(); start_p(); }
 			if (f === 1) { stop_f(); start_f(); }
+			if (g === 1) { stop_g(); start_g(); }
+			if (h === 1) { stop_h(); start_h(); }
 			start_e();
 		}
 		return true;
@@ -246,37 +280,17 @@ const stop_e = _ => {
 	}
 };
 
-
-// 1/2 
-
-const d_blue   = img("d_blue");
-const d_yellow = d_blue.clone_yellow();
-const d_border = img("d_border");
-const d_tone   = new c_tone(1/2, 0, 1);
-let   d        = 0;
-const draw_d   = _ => { 
-	if (d === 0) draw(d_blue);
-	else draw(d_yellow);
-	draw(d_border);
-};
-const click_d  = _ => {
-	if (d_blue.click()) {
-		if (window.stop_audio === null) start_audio();
-		if (++d === 2) { d = 0; d_tone.stop(); }
-		else d_tone.start();
-		return true;
-	}
-	return false;
-};
-const start_d = _ => d === 1 && d_tone.start();
-const stop_d  = _ => d_tone.stop();
-
-// g
+// overlay 3
 
 const g_blue   = img("g_blue");
 const g_yellow = g_blue.clone_yellow();
 const g_border = img("g_border");
+const g_tone   = new c_tone(0, 0, .5); 
+const g_f      = p_f * Math.pow(2 * (1 - PHI), 3);
+const g_dur    = p_dur * 5;
 let   g        = 0;
+let   g_i      = null;
+let   g_id     = null;
 const draw_g   = _ => { 
 	if (g === 0) draw(g_blue);
 	else draw(g_yellow);
@@ -284,30 +298,61 @@ const draw_g   = _ => {
 };
 const click_g  = _ => {
 	if (g_blue.click()) {
-		if (window.stop_audio === null) start_audio();
-		if (f === 0) { f = 1; start_f(); } else { stop_f(); start_f(); }
-		if (p === 1) { stop_p(); start_p(); }
 		if (++g === 2) { 
 			g = 0; 
-			f_f = f_f_org; 
+			stop_g(); 
+		} else if (window.stop_audio === null) {
+			start_audio();
 		} else {
-			if (e === 1) e = 0;
-			if (h === 1) h = 0;
-			//f_f = p_f * Math.pow(2 * (1 - PHI), 3); 
+			if (p === 1) { stop_p(); start_p(); }
+			if (f === 1) { stop_f(); start_f(); }
+			if (e === 1) { stop_e(); start_e(); }
+			if (h === 1) { stop_h(); start_h(); }
+			start_g();
 		}
 		return true;
 	}
 	return false;
 };
-const start_g = _ => {};
-const stop_g  = _ => {};
+const next_g = _ => {
+	if (++g_i === 5) {
+		g_i = 0;
+		g_tone.set_f(g_f * (PHI + 0));
+	} else if (g_i === 1) {
+		g_tone.set_f(g_f * (PHI + 7) / 8);
+	} else if (g_i === 2) {
+		e_tone.set_f(g_f * (PHI + 7) / 8);
+	} else if (g_i === 3) {
+		g_tone.set_f(g_f * (PHI + 1) / 2);
+	} else if (g_i === 4) {
+		g_tone.set_f(g_f * (PHI + 3) / 4);
+	}
+	g_id = setTimeout(next_g, g_dur);
+};
+const start_g = _ => {
+	g_i = 4;
+	g_tone.start();
+	next_g();
+};
+const stop_g = _ => {
+	if (g_id !== null) {
+		clearTimeout(g_id);
+		g_id = null;
+		g_tone.stop();
+	}
+};
 
-// h
+// overlay 4
 
-const h_blue   = img("h_blue");
+const h_blue   = img("d_blue");
 const h_yellow = h_blue.clone_yellow();
-const h_border = img("h_border");
+const h_border = img("d_border");
+const h_tone   = new c_tone(0, 0, .5); 
+const h_f      = p_f * Math.pow(2 * (1 - PHI), 3);
+const h_dur    = p_dur * 3;
 let   h        = 0;
+let   h_i      = null;
+let   h_id     = null;
 const draw_h   = _ => { 
 	if (h === 0) draw(h_blue);
 	else draw(h_yellow);
@@ -315,24 +360,49 @@ const draw_h   = _ => {
 };
 const click_h  = _ => {
 	if (h_blue.click()) {
-		if (window.stop_audio === null) start_audio();
-		if (f === 0) { f = 1; start_f(); }
-		if (p === 1) { stop_p(); start_p(); }
-		stop_f(); start_f();
 		if (++h === 2) { 
 			h = 0; 
-			f_f = f_f_org; 
+			stop_h(); 
+		} else if (window.stop_audio === null) {
+			start_audio();
 		} else {
-			if (e === 1) e = 0;
-			if (g === 1) g = 0;
-			f_f = p_f * Math.pow(2 * (1 - PHI), 4); 
+			if (p === 1) { stop_p(); start_p(); }
+			if (f === 1) { stop_f(); start_f(); }
+			if (e === 1) { stop_e(); start_e(); }
+			if (g === 1) { stop_g(); start_g(); }
+			start_h();
 		}
 		return true;
 	}
 	return false;
 };
-const start_h = _ => {};
-const stop_h  = _ => {};
+const next_h = _ => {
+	if (++h_i === 5) {
+		h_i = 0;
+		h_tone.set_f(h_f * (PHI + 0));
+	} else if (g_i === 1) {
+		h_tone.set_f(h_f * (PHI + 7) / 8);
+	} else if (h_i === 2) {
+		h_tone.set_f(h_f * (PHI + 7) / 8);
+	} else if (h_i === 3) {
+		h_tone.set_f(h_f * (PHI + 1) / 2);
+	} else if (h_i === 4) {
+		h_tone.set_f(h_f * (PHI + 3) / 4);
+	}
+	h_id = setTimeout(next_h, h_dur);
+};
+const start_h = _ => {
+	h_i = 4;
+	h_tone.start();
+	next_h();
+};
+const stop_h = _ => {
+	if (h_id !== null) {
+		clearTimeout(h_id);
+		h_id = null;
+		h_tone.stop();
+	}
+};
 
 const start_audio = _ => {
 	assert(window.stop_audio === null);
@@ -342,8 +412,8 @@ const start_audio = _ => {
 	if (d === 1) start_d();
 	if (e === 1) start_e();
 	if (f === 1) start_f();
-	//if (g === 1) start_g();
-	//if (h === 1) start_h();
+	if (g === 1) start_g();
+	if (h === 1) start_h();
 	window.start_audio = null;
 	window.stop_audio  = stop_audio;
 };
@@ -355,8 +425,8 @@ const stop_audio = _ => {
 	stop_d();
 	stop_e();
 	stop_f();
-	//stop_g();
-	//stop_h();
+	stop_g();
+	stop_h();
 	window.start_audio = start_audio;
 	window.stop_audio  = null;
 };
@@ -385,7 +455,7 @@ const click_page = _ => {
 	}
 	else if (
 		click_audio() || click_a() || click_b() || click_p() || click_d() 
-		|| click_f() || click_e() //|| click_g() || click_h() 
+		|| click_f() || click_e() || click_g() || click_h() 
 	) on_resize(); 
 	start_external_audio = null;
 };
@@ -400,8 +470,8 @@ const draw_page = _ => {
 	draw_d();
 	draw_e();
 	draw_f();
-	//draw_g();
-	//draw_h();
+	draw_g();
+	draw_h();
 };
 
 export default _ => {
