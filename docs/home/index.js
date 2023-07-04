@@ -33,6 +33,9 @@ const big_blue_0   = img("big_button_blue_0"  );
 const big_blue_1   = img("big_button_blue_1"  );
 const big_blue_2   = img("big_button_blue_2"  );
 
+const red_green    = 0;
+const yellow_blue  = 1;
+
 const red_green_system = {
 	inner_i: 0,
 	outer_i: 0,
@@ -144,9 +147,9 @@ const yellow_blue_system = {
 };
 
 const system = {
-	i: 0,
+	i: red_green,
 	draw: function() {
-		if (this.i === 0) {
+		if (this.i === red_green) {
 			bg_blue.draw();
 			red_green_system.draw();
 			lower_left_red.draw();
@@ -164,7 +167,7 @@ const system = {
 	},
 	click: function() {
 		if (lower_left_red.click()) {
-			if (this.i === 0) this.i = 1; else this.i = 0;
+			if (this.i === red_green) this.i = yellow_blue; else this.i = red_green;
 			return true;
 		} else if (upper_right_red.click()) {
 			if (window.start_audio !== null) window.start_audio();
@@ -172,9 +175,9 @@ const system = {
 			return true;
 		} else if (volume.click()) {
 			return true;
-		} else if (this.i === 0) {
+		} else if (this.i === red_green) {
 			if (red_green_system.click()) return true;
-		} else if (this.i === 1) {
+		} else if (this.i === yellow_blue) {
 			if (yellow_blue_system.click()) return true;
 		}
 		return false;
