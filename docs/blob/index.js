@@ -1,6 +1,7 @@
 import c_img   from "../global/img.js"    ;
 import c_tone  from "../global/tone.js"   ;
 import xbutton from "../global/xbutton.js";
+import volume  from "../global/volume.js" ;
 
 const back_button   = xbutton("upper_left_blue");
 const audio_blue    = xbutton("upper_right_blue");
@@ -454,8 +455,8 @@ const click_page = _ => {
 		run("./home/index.js");
 	}
 	else if (
-		click_audio() || click_a() || click_b() || click_p() || click_d() 
-		|| click_f() || click_e() || click_g() || click_h() 
+		click_audio() || click_a() || click_b() || click_p() || click_d() ||
+		click_f()     || click_e() || click_g() || click_h() || volume.click()
 	) on_resize(); 
 	start_external_audio = null;
 };
@@ -464,6 +465,7 @@ const draw_page = _ => {
 	draw(bg_green);
 	draw_audio();
 	draw(back_button);
+	volume.draw_blue();
 	draw_a();
 	draw_b();
 	draw_p();
