@@ -22,9 +22,12 @@ const draw_a   = _ => {
 };
 const click_a  = _ => {
 	if (a_blue.click()) {
-		if (window.stop_audio === null) start_audio();
-		if (++a === 2) { a = 0; a_tone.stop(); }
-		else a_tone.start();
+		if (++a === 2) { 
+			a = 0; 
+			a_tone.stop(); 
+		} else if (window.stop_audio !== null) {
+			a_tone.start();
+		}
 		return true;
 	}
 	return false;
@@ -45,27 +48,34 @@ const draw_b   = _ => {
 };
 const click_b  = _ => {
 	if (b_blue.click()) {
-		if (window.stop_audio === null) start_audio();
-		if (++b === 2) { b = 0; p_tone.set_b(0); f_tone.set_b(0); }
-		else p_tone.set_b(3); f_tone.set_b(3);
+		if (++b === 2) { 
+			b = 0; 
+			p_tone.set_b(0); 
+			f_tone.set_b(0); 
+			e_tone.set_b(0); 
+		} else {
+			p_tone.set_b(3); 
+			f_tone.set_b(3);
+			e_tone.set_b(3);
+		}
 		return true;
 	}
 	return false;
 };
-const start_b = _ => b === 0 ? p_tone.set_b(0) : p_tone.set_b(3);
+const start_b = _ => {};
 const stop_b  = _ => {};
 
-// sequence
+// base sequence
 
 const p_blue   = img("a_blue");
 const p_yellow = p_blue.clone_yellow();
 const p_border = img("a_border");
-const p_tone   = new c_tone(90 * PHI, 0, 1);
+const p_dur    = 1000;
+const p_f      = 90;
+const p_tone   = new c_tone(p_f * PHI, 0, 1);
 let   p        = 0;
 let   p_i      = null;
 let   p_id     = null;
-let   p_dur    = 1000;
-let   p_f      = 90;
 const draw_p   = _ => { 
 	if (p === 0) draw(p_blue);
 	else draw(p_yellow);
@@ -73,11 +83,14 @@ const draw_p   = _ => {
 };
 const click_p  = _ => {
 	if (p_blue.click()) {
-		if (window.stop_audio === null) start_audio();
 		if (++p === 2) {
 			p = 0;
 			stop_p();
+		} else if (window.stop_audio === null) {
+			start_audio();
 		} else {
+			if (f === 1) { stop_f(); start_f(); }
+			if (e === 1) { stop_e(); start_e(); }
 			start_p();
 		}
 		return true;
@@ -87,7 +100,7 @@ const click_p  = _ => {
 const next_p = _ => {
 	if (++p_i === 5) {
 		p_i = 0;
-		p_tone.set_f(p_f * PHI);
+		p_tone.set_f(p_f * (PHI + 0));
 	} else if (p_i === 1) {
 		p_tone.set_f(p_f * (PHI + 7) / 8);
 	} else if (p_i === 2) {
@@ -100,10 +113,6 @@ const next_p = _ => {
 	p_id = setTimeout(next_p, p_dur);
 };
 const start_p = _ => {
-	if (f_i === 1) {
-		stop_f();
-		start_f();
-	}
 	p_i = 4;
 	p_tone.start();
 	next_p();
@@ -116,6 +125,127 @@ const stop_p = _ => {
 		p_tone.stop();
 	}
 };
+
+// overlay 1
+
+const f_blue   = img("f_blue");
+const f_yellow = f_blue.clone_yellow();
+const f_border = img("f_border");
+const f_tone   = new c_tone(0, 0, .7); 
+const f_dur    = p_dur * 3;
+const f_f      = p_f * Math.pow(2 * (1 - PHI), 3); 
+let   f        = 0;
+let   f_i      = null;
+let   f_id     = null;
+const draw_f   = _ => { 
+	if (f === 0) draw(f_blue);
+	else draw(f_yellow);
+	draw(f_border);
+};
+const click_f  = _ => {
+	if (f_blue.click()) {
+		if (++f === 2) { 
+			f = 0; 
+			stop_f(); 
+		} else if (window.stop_audio === null) {
+			start_audio();
+		} else {
+			if (p === 1) { stop_p(); start_p(); }
+			if (e === 1) { stop_e(); start_e(); }
+			start_f();
+		}
+		return true;
+	}
+	return false;
+};
+const next_f = _ => {
+	if (++f_i === 5) {
+		f_i = 0;
+		f_tone.set_f(f_f * (PHI + 0));
+	} else if (f_i === 1) {
+		f_tone.set_f(f_f * (PHI + 7) / 8);
+	} else if (f_i === 2) {
+		f_tone.set_f(f_f * (PHI + 7) / 8);
+	} else if (f_i === 3) {
+		f_tone.set_f(f_f * (PHI + 1) / 2);
+	} else if (f_i === 4) {
+		f_tone.set_f(f_f * (PHI + 3) / 4);
+	}
+	f_id = setTimeout(next_f, f_dur);
+};
+const start_f = _ => {
+	f_i = 4;
+	f_tone.start();
+	next_f();
+};
+const stop_f = _ => {
+	if (f_id !== null) {
+		clearTimeout(f_id);
+		f_id = null;
+		f_tone.stop();
+	}
+};
+
+// overlay 2
+
+const e_blue   = img("e_blue");
+const e_yellow = e_blue.clone_yellow();
+const e_border = img("e_border");
+const e_tone   = new c_tone(0, 0, .7); 
+const e_f      = p_f * Math.pow(2 * (1 - PHI), 2);
+const e_dur    = p_dur * 9;
+let   e        = 0;
+let   e_i      = null;
+let   e_id     = null;
+const draw_e   = _ => { 
+	if (e === 0) draw(e_blue);
+	else draw(e_yellow);
+	draw(e_border);
+};
+const click_e  = _ => {
+	if (e_blue.click()) {
+		if (++e === 2) { 
+			e = 0; 
+			stop_e(); 
+		} else if (window.stop_audio === null) {
+			start_audio();
+		} else {
+			if (p === 1) { stop_p(); start_p(); }
+			if (f === 1) { stop_f(); start_f(); }
+			start_e();
+		}
+		return true;
+	}
+	return false;
+};
+const next_e = _ => {
+	if (++e_i === 5) {
+		e_i = 0;
+		e_tone.set_f(e_f * (PHI + 0));
+	} else if (e_i === 1) {
+		e_tone.set_f(e_f * (PHI + 7) / 8);
+	} else if (e_i === 2) {
+		e_tone.set_f(e_f * (PHI + 7) / 8);
+	} else if (e_i === 3) {
+		e_tone.set_f(e_f * (PHI + 1) / 2);
+	} else if (e_i === 4) {
+		e_tone.set_f(e_f * (PHI + 3) / 4);
+	}
+	e_id = setTimeout(next_e, e_dur);
+};
+const start_e = _ => {
+	e_i = 4;
+	e_tone.start();
+	next_e();
+};
+const stop_e = _ => {
+	if (e_id !== null) {
+		clearTimeout(e_id);
+		e_id = null;
+		e_tone.stop();
+	}
+};
+
 
 // 1/2 
 
@@ -141,100 +271,6 @@ const click_d  = _ => {
 const start_d = _ => d === 1 && d_tone.start();
 const stop_d  = _ => d_tone.stop();
 
-// overlay
-
-const f_blue   = img("f_blue");
-const f_yellow = f_blue.clone_yellow();
-const f_border = img("f_border");
-const f_tone   = new c_tone(0, 0, .5); 
-let   f        = 0;
-let   f_dur    = p_dur * 3;
-const f_f_org  = 220; //p_f * Math.pow(2 * (1 - PHI), 1); 
-let   f_f      = f_f_org; 
-let   f_i      = null;
-let   f_id     = null;
-const draw_f   = _ => { 
-	if (f === 0) draw(f_blue);
-	else draw(f_yellow);
-	draw(f_border);
-};
-const click_f  = _ => {
-	if (f_blue.click()) {
-		if (window.stop_audio === null) start_audio();
-		if (++f === 2) { 
-			f = 0; 
-			stop_f(); 
-		}
-		else start_f();
-		return true;
-	}
-	return false;
-};
-const next_f = _ => {
-	if (++f_i === 5) {
-		f_i = 0;
-		f_tone.set_f(f_f * PHI);
-	} else if (f_i === 1) {
-		f_tone.set_f(f_f * (PHI + 7) / 8);
-	} else if (f_i === 2) {
-		f_tone.set_f(f_f * (PHI + 7) / 8);
-	} else if (f_i === 3) {
-		f_tone.set_f(f_f * (PHI + 1) / 2);
-	} else if (f_i === 4) {
-		f_tone.set_f(f_f * (PHI + 3) / 4);
-	}
-	f_id = setTimeout(next_f, f_dur);
-};
-const start_f = _ => {
-	if (p_i === 1) {
-		stop_p();
-		start_p();
-	}
-	f_i = 4;
-	f_tone.start();
-	next_f();
-};
-const stop_f = _ => {
-	if (f_id !== null) {
-		clearTimeout(f_id);
-		f_i = 0;
-		f_id = null;
-		f_tone.stop();
-	}
-};
-
-// e
-
-const e_blue   = img("e_blue");
-const e_yellow = e_blue.clone_yellow();
-const e_border = img("e_border");
-let   e        = 0;
-const draw_e   = _ => { 
-	if (e === 0) draw(e_blue);
-	else draw(e_yellow);
-	draw(e_border);
-};
-const click_e  = _ => {
-	if (e_blue.click()) {
-		if (window.stop_audio === null) start_audio();
-		if (f === 0) { f = 1; start_f(); }
-		if (p === 1) { stop_p(); start_p(); }
-		stop_f(); start_f();
-		if (++e === 2) { 
-			e = 0; 
-			f_f = f_f_org; 
-		} else { 
-			if (g === 1) g = 0;
-			if (h === 1) h = 0;
-			f_f = p_f * Math.pow(2 * (1 - PHI), 2); 
-		}
-		return true;
-	}
-	return false;
-};
-const start_e = _ => {};
-const stop_e  = _ => {};
-
 // g
 
 const g_blue   = img("g_blue");
@@ -249,16 +285,15 @@ const draw_g   = _ => {
 const click_g  = _ => {
 	if (g_blue.click()) {
 		if (window.stop_audio === null) start_audio();
-		if (f === 0) { f = 1; start_f(); }
+		if (f === 0) { f = 1; start_f(); } else { stop_f(); start_f(); }
 		if (p === 1) { stop_p(); start_p(); }
-		stop_f(); start_f();
 		if (++g === 2) { 
 			g = 0; 
 			f_f = f_f_org; 
 		} else {
 			if (e === 1) e = 0;
 			if (h === 1) h = 0;
-			f_f = p_f * Math.pow(2 * (1 - PHI), 3); 
+			//f_f = p_f * Math.pow(2 * (1 - PHI), 3); 
 		}
 		return true;
 	}
@@ -307,8 +342,8 @@ const start_audio = _ => {
 	if (d === 1) start_d();
 	if (e === 1) start_e();
 	if (f === 1) start_f();
-	if (g === 1) start_g();
-	if (h === 1) start_h();
+	//if (g === 1) start_g();
+	//if (h === 1) start_h();
 	window.start_audio = null;
 	window.stop_audio  = stop_audio;
 };
@@ -320,8 +355,8 @@ const stop_audio = _ => {
 	stop_d();
 	stop_e();
 	stop_f();
-	stop_g();
-	stop_h();
+	//stop_g();
+	//stop_h();
 	window.start_audio = start_audio;
 	window.stop_audio  = null;
 };
@@ -349,8 +384,8 @@ const click_page = _ => {
 		run("./home/index.js");
 	}
 	else if (
-		click_audio() || click_a() || click_b() || click_p() || click_d() || click_f()
-		|| click_e() || click_g() || click_h() 
+		click_audio() || click_a() || click_b() || click_p() || click_d() 
+		|| click_f() || click_e() //|| click_g() || click_h() 
 	) on_resize(); 
 	start_external_audio = null;
 };
@@ -365,8 +400,8 @@ const draw_page = _ => {
 	draw_d();
 	draw_e();
 	draw_f();
-	draw_g();
-	draw_h();
+	//draw_g();
+	//draw_h();
 };
 
 export default _ => {
