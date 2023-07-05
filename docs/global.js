@@ -104,7 +104,7 @@ window.start_audio = null;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-// alpha === false speeds up drawing of transparent images
+// alpha === I read that false speeds up drawing of transparent images
 window.ctx = canvas.getContext('2d', { alpha: false });
 
 const click_test_canvas = document.createElement('canvas');
@@ -141,7 +141,6 @@ window.adjust_canvas = _ => {
 	canvas.style.left = left;
 	canvas.style.top  = top ;
 	ctx.setTransform(scale, 0, 0, scale, 0, 0);
-	
 	click_test_canvas.width  = design_width / 4; 
 	click_test_canvas.height = design_height / 4;
     click_test_ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -220,12 +219,6 @@ const rgb_blue   = `rgb(${colors.blue  [0]}, ${colors.blue  [1]}, ${colors.blue 
 const rgb_yellow = `rgb(${colors.yellow[0]}, ${colors.yellow[1]}, ${colors.yellow[2]})`;
 const rgb_black  = `rgb(${colors.black [0]}, ${colors.black [1]}, ${colors.black [2]})`;
 window.rgb_white  = `rgb(${colors.white [0]}, ${colors.white [1]}, ${colors.white [2]})`;
-
-////////////////////////////////////////////////////////////////////////////////////
-//
-// bg 
-//
-////////////////////////////////////////////////////////////////////////////////////
 
 function c_bg(rgb) {
 	this.rgb = rgb;
