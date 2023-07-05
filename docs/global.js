@@ -75,7 +75,7 @@ window.audio       = null;
 let main_gain      = null;
 window.gain        = null;
 
-window.volumes     = [ .025, .05, .1, .2, .3, .5, .7, 1 ];
+window.volumes     = [ .005, .01, .02, .04, .08, .16, .32, .5, .7, 1 ];
 window.volume_i    = get_item('volume_i', 5);
 
 window.init_audio = _ => {

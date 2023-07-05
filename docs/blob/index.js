@@ -286,7 +286,7 @@ const stop_e = _ => {
 const g_blue   = img("g_blue");
 const g_yellow = g_blue.clone_yellow();
 const g_border = img("g_border");
-const g_tone   = new c_tone(0, 0, 1); 
+const g_tone   = new c_tone(0, 0, .7); 
 const g_f      = p_f * Math.pow(2 * (1 - PHI), 5);
 const g_dur    = p_dur * 6;
 let   g        = 0;

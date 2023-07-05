@@ -16,10 +16,10 @@ let save_draw      = null;
 let save_click     = null;
 
 for (let i = 0; i < window.volumes.length; ++i) {
-	greens .push(xbutton("small_green" , 20 + i * 100, 260));
-	reds   .push(xbutton("small_red"   , 20 + i * 100, 260));
-	blues  .push(xbutton("small_blue"  , 20 + i * 100, 260));
-	yellows.push(xbutton("small_yellow", 20 + i * 100, 260));
+	greens .push(xbutton("small_green" , 10 + i * 72, 660 - i * 72));
+	reds   .push(xbutton("small_red"   , 10 + i * 72, 660 - i * 72));
+	blues  .push(xbutton("small_blue"  , 10 + i * 72, 660 - i * 72));
+	yellows.push(xbutton("small_yellow", 10 + i * 72, 660 - i * 72));
 }
 
 const click_page = _ => {
