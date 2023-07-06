@@ -2,6 +2,7 @@ import start_composer from "../index.js"            ;
 import c_img          from "../../global/img.js"    ;
 import c_tone         from "../../global/tone.js"   ;
 import xbutton        from "../../global/xbutton.js";
+import volume         from "../../global/volume.js" ;
 
 const back_button   = xbutton("upper_left_blue");
 const audio_blue    = xbutton("upper_right_blue");
@@ -172,7 +173,7 @@ const click_page = _ => {
 		}
 		start_composer();
 	}
-	else if (click_audio() || click_record() || click_grid()) on_resize(); 
+	else if (click_audio() || click_record() || click_grid() || volume.click()) on_resize(); 
 	start_external_audio = null;
 };
 
@@ -181,6 +182,7 @@ const draw_page = _ => {
 	draw_grid();
 	draw_audio();
 	draw_record();
+	volume.draw_blue();
 	draw(back_button);
 };
 
