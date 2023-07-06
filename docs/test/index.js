@@ -172,6 +172,9 @@ const click_door = _ => {
 	} else return false;
 };
 
+const tone = new c_tone(90, 3, 1);
+let tone_i = 0;
+
 const start_audio = _ => {
 	tone_i = 1;
 	tone.start();
