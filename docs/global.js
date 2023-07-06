@@ -36,10 +36,6 @@ window.addEventListener('unhandledrejection', e => {
 
 window.log = m => console.log(m);
 
-window.exclusive_or = (a, b) => {
-	return a && !b || !a && b;
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
 // local storage
@@ -75,9 +71,6 @@ window.audio       = null;
 let main_gain      = null;
 window.gain        = null;
 
-window.volumes     = [ .005, .01, .02, .04, .08, .16, .32, .5, .7, 1 ];
-window.volume_i    = get_item('volume_i', 5);
-
 window.init_audio = _ => {
 	if (audio === null) {
 		audio = new (window.AudioContext || window.webkitAudioContext)();
@@ -90,7 +83,7 @@ window.init_audio = _ => {
 		main_gain.gain.value = 1;
 		main_gain.connect(audio.destination);
 		gain = audio.createGain();
-		gain.gain.value = volumes[volume_i];
+		gain.gain.value = get_item('volume');
 		gain.connect(main_gain);
 	}
 };
@@ -247,6 +240,10 @@ window.bg_white  = new c_bg(rgb_white );
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 window.PHI = 1.61803398875;
+
+window.exclusive_or = (a, b) => {
+	return a && !b || !a && b;
+};
 
 window.clamp = (n, a, b) => Math.max(Math.min(n, Math.max(a, b)), Math.min(a, b));
 

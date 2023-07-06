@@ -67,6 +67,8 @@ clone("lower_right_yellow");
 
 img("large_green", 220, 260, 150);
 clone("large_red");
+clone("large_blue");
+clone("large_yellow");
 
 img("medium_green", 160, 240, 80);
 clone("medium_red");
