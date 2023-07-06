@@ -256,5 +256,5 @@ window.scale = (octave_tones, base_frequency, half_notes_away_from_base) => {
 };
 
 window.run   = (path, ...arg) => import(path).then(o => o.default(...arg));
-window.draw  = a => Array.isArray(a) ? a.forEach(o => o.draw()) : a.draw();
-window.click = a => Array.isArray(a) ? a.some(o => o.click()) : a.click();
+window.draw  = (a, x = 0, y = 0) => Array.isArray(a) ? a.forEach(o => o.draw(x, y)) : a.draw(x, y);
+window.click = (a, x = 0, y = 0) => Array.isArray(a) ? a.some(o => o.click(x, y)) : a.click(x, y);

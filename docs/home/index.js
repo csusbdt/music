@@ -132,7 +132,8 @@ const yellow_blue_system = {
 			setTimeout(_ => {
 				yellow_blue_system.big_i = 0;
 				if (yellow_blue_system.inner_i === 0 && yellow_blue_system.outer_i === 0) {
-					run("./compose/index.js");
+					//run("./compose/index.js");
+					run("./test/index.js");
 				} else if (yellow_blue_system.inner_i === 1 && yellow_blue_system.outer_i === 1) {
 					run("./inst/index.js");
 				} else if (yellow_blue_system.inner_i === 1 && yellow_blue_system.outer_i === 0) {
