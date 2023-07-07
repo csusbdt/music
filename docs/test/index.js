@@ -185,15 +185,19 @@ const click_ship = _ => {
 				s_man_in_valley.set_off();
 				s_man_in_ship.set_on();
 				beam = beam_off;
+				s_beam_taking.set_off();
 			} else if (beam === beam_putting) {
 				man = man_in_valley;
 				s_man_in_ship.set_off();
 				s_man_in_valley.set_on();
 				beam = beam_off;
+				s_beam_putting.set_off();
 			} else if (man === man_in_ship) {
 				beam = beam_putting;
+				s_beam_putting.set_on();
 			} else if (man === man_in_valley) {
 				beam = beam_taking;
+				s_beam_taking.set_on();
 			} else {
 				ship = ship_over_house;
 			}
@@ -206,13 +210,16 @@ const click_ship = _ => {
 				s_man_outside_house.set_off();
 				s_man_in_ship.set_on();
 				beam = beam_off;
+				s_beam_taking.set_off();
 			} else if (beam === beam_putting) {
 				man = man_outside_house;
 				s_man_in_ship.set_off();
 				s_man_outside_house.set_on();
 				beam = beam_off;
+				s_beam_putting.set_off();
 			} else if (man === man_outside_house) {
 				beam = beam_taking;
+				s_beam_taking.set_on();
 			} else {
 				ship = ship_over_valley;
 			}
@@ -365,7 +372,10 @@ const s_man_outside_house = new c_seq(dur * 2, Array(p1_max).fill(0).map((_, i) 
 // 	p4(blob_f_bf, 0), p4(blob_f_bf, 3), p4(blob_f_bf, 3), p4(blob_f_bf, 1), p4(blob_f_bf, 2) 
 // ]);
 
-const s_list = [s_man_in_valley, s_man_in_ship, s_man_in_house, s_man_outside_house];
+const s_list = [
+	s_man_in_valley, s_man_in_ship, s_man_in_house, s_man_outside_house,
+	s_beam_taking, s_beam_putting 
+];
 s_man_in_valley.on = true;
 	
 const start_audio = _ => {
