@@ -89,7 +89,9 @@ c_seq.prototype.next = function() {
 };
 
 c_seq.prototype.start = function() {
-	if (this.on && this.id === null) {
+	if (window.stop_audio === null) {
+		start_audio();
+	} else if (this.on && this.id === null) {
 		this.i = this.fs.length - 1;
 		this.tone.start();
 		this.next();
@@ -200,6 +202,8 @@ const click_ship = _ => {
 				s_beam_taking.set_on();
 			} else {
 				ship = ship_over_house;
+				s_ship_over_valley.set_off();
+				s_ship_over_house.set_on();
 			}
 			return true;
 		} else return false;
@@ -222,6 +226,8 @@ const click_ship = _ => {
 				s_beam_taking.set_on();
 			} else {
 				ship = ship_over_valley;
+				s_ship_over_house.set_off();
+				s_ship_over_valley.set_on();
 			}
 			return true;
 		} else return false;
@@ -320,6 +326,8 @@ const click_house = _ => {
 	if (ship === ship_over_valley && beam === beam_off) {
 		if (house_blue.click()) {
 			ship = ship_over_house;
+			s_ship_over_valley.set_off();
+			s_ship_over_house.set_on();
 			return true;
 		} else return false;
 	} else return false;
@@ -374,20 +382,22 @@ const s_man_outside_house = new c_seq(dur * 2, Array(p1_max).fill(0).map((_, i) 
 
 const s_list = [
 	s_man_in_valley, s_man_in_ship, s_man_in_house, s_man_outside_house,
+	s_ship_over_valley, s_ship_over_house,
 	s_beam_taking, s_beam_putting 
 ];
 s_man_in_valley.on = true;
+s_ship_over_valley.on = true;
 	
 const start_audio = _ => {
-	start(s_list);
 	window.start_audio = null;
 	window.stop_audio  = stop_audio;
+	start(s_list);
 };
 
 const stop_audio = _ => {
-	stop(s_list);
 	window.start_audio = start_audio;
 	window.stop_audio  = null;
+	stop(s_list);
 };
 
 const draw_audio = _ => {
