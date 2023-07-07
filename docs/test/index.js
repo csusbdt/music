@@ -166,7 +166,7 @@ const draw_beam  = _ => {
 const ship_over_valley = 0;
 const ship_over_house  = 1;
 let ship = ship_over_valley;
-const draw_ship  = _ => { 
+const draw_ship = _ => { 
 	if (ship === ship_over_valley) {
 		if (man === man_in_ship) draw(ship_yellow); 
 		else draw(ship_blue); 
@@ -182,9 +182,13 @@ const click_ship = _ => {
 		if (click(ship_blue)) {
 			if (beam === beam_taking) {
 				man = man_in_ship;
+				s_man_in_valley.set_off();
+				s_man_in_ship.set_on();
 				beam = beam_off;
 			} else if (beam === beam_putting) {
 				man = man_in_valley;
+				s_man_in_ship.set_off();
+				s_man_in_valley.set_on();
 				beam = beam_off;
 			} else if (man === man_in_ship) {
 				beam = beam_putting;
@@ -199,9 +203,13 @@ const click_ship = _ => {
 		if (click(ship_blue, man_outside_house_x, man_outside_house_y)) {
 			if (beam === beam_taking) {
 				man = man_in_ship;
+				s_man_outside_house.set_off();
+				s_man_in_ship.set_on();
 				beam = beam_off;
 			} else if (beam === beam_putting) {
 				man = man_outside_house;
+				s_man_in_ship.set_off();
+				s_man_outside_house.set_on();
 				beam = beam_off;
 			} else if (man === man_outside_house) {
 				beam = beam_taking;
@@ -233,12 +241,15 @@ const click_man = _ => {
 	if (man === man_in_valley && beam === beam_off) {
 		if (click(man_yellow)) {
 			man = man_in_house;
-			blob_f.set_on();
+			s_man_in_valley.set_off();
+			s_man_in_house.set_on();
 			return true;
 		} else return false;
 	} else if (man === man_outside_house && beam === beam_off) {
 		if (click(man_yellow, man_outside_house_x, man_outside_house_y)) {
 			man = man_in_valley;
+			s_man_outside_house.set_off();
+			s_man_in_valley.set_on();
 			return true;
 		} else return false;
 	} else return false;
@@ -268,18 +279,10 @@ const click_sun = _ => {
 	if (sun_yellow.click()) {
 		if (sun === sun_off) {
 			sun = sun_on;
-			blob_p.set_off();
-			//night.on = false;
-			//night.stop();
-			//day.on = true;
 			if (window.stop_audio !== null) day.start();
 		} else {
 			sun = sun_off;
-			blob_p.set_on();
-			//night.on = true;
 			if (window.stop_audio !== null) night.start();
-			//day.on = false;
-			//day.stop();
 		}
 		return true;
 	} else return false;
@@ -295,7 +298,21 @@ const click_door = _ => {
 	if (man === man_in_house) {	
 		if (door_red.click()) {
 			man = man_outside_house;
-			blob_f.set_off();
+			s_man_in_house.set_off();
+			s_man_outside_house.set_on();
+			return true;
+		} else return false;
+	} else return false;
+};
+
+const draw_house  = _ => { 
+	draw(house_blue);
+	draw(house_border);
+};
+const click_house = _ => {
+	if (ship === ship_over_valley && beam === beam_off) {
+		if (house_blue.click()) {
+			ship = ship_over_house;
 			return true;
 		} else return false;
 	} else return false;
@@ -307,48 +324,58 @@ const click_door = _ => {
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-// 2, 1.62, 1.38, 1.24, 1.15, 1.09, 1.06, 1.03, 1.02, 1.01, 1.01, 1.01, 0 at i = 12
+// 2, 1.62, 1.38, 1.24, 1.15, 1.09, 1.06, 1.03, 1.02, 1.01, 1.01, 1.01, 1 at i = 12
 const p1 = (f, i) => f * (1 + Math.pow(PHI, -i));
+const p1_max = 12;
 
-// 2, 1.85, 1.72, 1.61, 1.52, 1.44, 1.38, 1.32, 1.27, 1.23, 1.20, 1.17, 1.14, ..., 0 at i = 34
+// 2, 1.85, 1.72, 1.61, 1.52, 1.44, 1.38, 1.32, 1.27, 1.23, 1.20, 1.17, 1.14, ..., 1 at i = 34
 const p2 = (f, i) => f * (1 + Math.pow(1 - 54/360, i));
+const p2_max = 34;
 
-// 2.61, 1.81, 1.40, 1.20, 1.10, 1.05, 1.03, 1.01, 1.01, 0 at i = 10
+// 2.61, 1.81, 1.40, 1.20, 1.10, 1.05, 1.03, 1.01, 1.01, 1 at i = 10
 const p3 = (f, i) => f * (1 + PHI * Math.pow(2, -i));
+const p3_max = 10;
 
-// approx: 1.62, 1.31, 1.15, 1.08, 1.04, 1.02, 1.01, 0 at i = 9
+// 1.62, 1.31, 1.15, 1.08, 1.04, 1.02, 1.01, 1 at i = 9
 const p4 = (f, i) => f * (PHI - 1 + Math.pow(2, i)) / Math.pow(2, i);
+const p4_max = 9;
 
-const dur   = 1000;
-const bf    = 90;
-const bin   = bf * Math.pow(PHI, -7);
-//const bin   = bf * 54 / 360 * 54 / 360;
-//const bin = 3;
+const dur = 1000;
+const bf  = 90;
+const bin = bf * Math.pow(PHI, -7);
 
-const night = new c_seq(dur, [ p1(bf, 0), p1(bf, 3), p1(bf, 1), p1(bf, 1) ]);
-const day   = new c_seq(dur, [ p1(bf, 6), p1(bf, 2), p1(bf, 0), p1(bf, 0) ]);
-//day.on = true;
-
-const blob_p = new c_seq(dur, [ 
-	p4(bf, 0), p4(bf, 3), p4(bf, 3), p4(bf, 1), p4(bf, 2) 
-]);
-
-
-const blob_f_bf = bf * Math.pow(2 * (PHI - 1), 3);
-const blob_f = new c_seq(dur * 3, [ 
-	p4(blob_f_bf, 0), p4(blob_f_bf, 3), p4(blob_f_bf, 3), p4(blob_f_bf, 1), p4(blob_f_bf, 2) 
-]);
+const s_sun_off           = new c_seq(dur, Array(p1_max).fill(0).map((_, i) => p1(bf, i)));
+const s_sun_on            = new c_seq(dur, Array(p1_max).fill(0).map((_, i) => p1(bf * PHI, i)));
+const s_beam_taking       = new c_seq(dur / 4, [ bf * PHI, bf * PHI * PHI ]);
+const s_beam_putting      = new c_seq(dur / 2, [ p1(bf * PHI, 7), p1(bf * PHI, 9) ]);
+const s_ship_over_valley  = new c_seq(dur, Array(p2_max).fill(0).map((_, i) => p2(bf, i)));
+const s_ship_over_house   = new c_seq(dur, Array(p3_max).fill(0).map((_, i) => p3(bf, i)));
+const s_man_in_valley     = new c_seq(dur * 2, Array(p2_max).fill(0).map((_, i) => p2(bf, i)));
+const s_man_in_ship       = new c_seq(dur * 3, Array(p3_max).fill(0).map((_, i) => p3(bf, i)));
+const s_man_in_house      = new c_seq(dur * 2, Array(p4_max).fill(0).map((_, i) => p4(bf * PHI, i)));
+const s_man_outside_house = new c_seq(dur * 2, Array(p1_max).fill(0).map((_, i) => p1(bf * PHI, i)));
 
 
+//const blob_p = new c_seq(dur, [ 
+// 	p4(bf, 0), p4(bf, 3), p4(bf, 3), p4(bf, 1), p4(bf, 2) 
+// ]);
 
+// const blob_f_bf = bf * Math.pow(2 * (PHI - 1), 3);
+// const blob_f = new c_seq(dur * 3, [ 
+// 	p4(blob_f_bf, 0), p4(blob_f_bf, 3), p4(blob_f_bf, 3), p4(blob_f_bf, 1), p4(blob_f_bf, 2) 
+// ]);
+
+const s_list = [s_man_in_valley, s_man_in_ship, s_man_in_house, s_man_outside_house];
+s_man_in_valley.on = true;
+	
 const start_audio = _ => {
-	start(night, day, blob_f, blob_p);
+	start(s_list);
 	window.start_audio = null;
 	window.stop_audio  = stop_audio;
 };
 
 const stop_audio = _ => {
-	stop(night, day, blob_f, blob_p);
+	stop(s_list);
 	window.start_audio = start_audio;
 	window.stop_audio  = null;
 };
@@ -377,8 +404,8 @@ const click_page = _ => {
 		run("./home/index.js");
 		return;
 	}
-	click_audio() || volume.click() || click_ship() || 
-	click_man()   || click_sun()    || click_door();
+	click_audio() || volume.click() || click_ship() 
+	click_man()   || click_sun()    || click_door() || click_house();
 	start_external_audio = null;
 	on_resize();
 };
@@ -387,8 +414,7 @@ const draw_page = _ => {
 	draw(bg_red);
 	draw(ground_green);
 	draw(ground_border);
-	draw(house_blue);
-	draw(house_border);
+	draw_house();
 	draw_sun();
 	draw_window();
 	draw_ship();
@@ -407,7 +433,6 @@ export default _ => {
 	} else {
 		start_external_audio = null;
 	}
-	//if (window.stop_audio === null) start_audio();
 	set_item('page', "./test/index.js");
 	on_resize = draw_page;
 	on_click = click_page;

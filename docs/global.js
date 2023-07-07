@@ -259,5 +259,5 @@ window.freq = (octave_tones, base_frequency, step_away_from_base) => {
 window.run   = (path, ...arg) => import(path).then(o => o.default(...arg));
 window.draw  = (a, x = 0, y = 0) => Array.isArray(a) ? a.forEach(o => o.draw(x, y)) : a.draw(x, y);
 window.click = (a, x = 0, y = 0) => Array.isArray(a) ? a.some(o => o.click(x, y)) : a.click(x, y);
-window.start = (...a) => Array.isArray(a) ? a.forEach(o => o.start()) : a.start();
-window.stop  = (...a) => Array.isArray(a) ? a.forEach(o => o.stop()) : a.stop();
+window.start = (a) => Array.isArray(a) ? a.forEach(o => o.start()) : a.start();
+window.stop  = (a) => Array.isArray(a) ? a.forEach(o => o.stop())  : a.stop();
