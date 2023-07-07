@@ -150,8 +150,16 @@ const click_sun = _ => {
 	if (sun_yellow.click()) {
 		if (sun === sun_off) {
 			sun = sun_on;
+			night.on = false;
+			night.stop();
+			day.on = true;
+			if (window.stop_audio !== null) day.start();
 		} else {
 			sun = sun_off;
+			night.on = true;
+			if (window.stop_audio !== null) night.start();
+			day.on = false;
+			day.stop();
 		}
 		return true;
 	} else return false;
@@ -172,19 +180,152 @@ const click_door = _ => {
 	} else return false;
 };
 
-const tone = new c_tone(90, 3, 1);
-let tone_i = 0;
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// sound pallets
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+// 2, 1.62, 1.38, 1.24, 1.15, 1.09, 1.06, 1.03, 1.02, 1.01, 1.01, 1.01, 0 at i = 12
+const p1 = (f, i) => f * (1 + Math.pow(PHI, -i));
+
+// 2, 1.85, 1.72, 1.61, 1.52, 1.44, 1.38, 1.32, 1.27, 1.23, 1.20, 1.17, 1.14, ..., 0 at i = 34
+const p2 = (f, i) => f * (1 + Math.pow(1 - 54/360, i));
+
+// 2.61, 1.81, 1.40, 1.20, 1.10, 1.05, 1.03, 1.01, 1.01, 0 at i = 10
+const p3 = (f, i) => f * (1 + PHI * Math.pow(2, -i));
+
+// approx: 1.62, 1.31, 1.15, 1.07, 1.04, 1.02, 1.01, 0 at i = 9
+const p4 = (f, i) => f * (1 + (PHI - 1) * Math.pow(2, -i));
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// c_beat_group
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+function c_beat_group(dur, members = []) {
+	this.dur     = dur;
+	this.members = Array.from(members);
+	this.joiners = [];
+	this.id      = null;
+}
+
+c_beat_group.prototype.add = function(m) {
+	if (this.members.length === 0) {
+		this.members.push(m);
+		this.start();
+	} else if (this.members.indexOf(m) === -1 && this.joiners.indexOf(m) === -1) {
+		this.joiners.push(m);
+	}
+};
+
+c_beat_group.prototype.remove = function(m) {
+	let i = this.members.indexOf(m);
+	if (i !== -1) {
+		m.stop();
+		this.members.splice(i, 1);
+	}
+	i = this.joiners.indexOf(m);
+	if (i !== -1) this.joiners.splice(i, 1);
+	if (this.members.length === 0) this.stop();
+};
+
+c_beat_group.prototype.next = function() {
+	while (this.joiners.length > 0) {
+		const m = this.joiners.pop();
+		m.start();
+		this.members.push(m);
+	}
+	this.id = setTimeout(c_beat_group.prototype.next.bind(this), this.dur);
+};
+
+c_beat_group.prototype.start = function() {
+	if (this.id === null) {
+		while (this.joiners.length > 0) {
+			this.members.push(this.joiners.pop());
+		}
+		this.members.forEach(m => m.start());
+		this.id = setTimeout(c_beat_group.prototype.next.bind(this), this.dur);
+	}
+};
+
+c_beat_group.prototype.stop = function() {
+	if (this.id !== null) {
+		clearTimeout(this.id);
+		this.id = null;
+		this.members.forEach(m => m.stop());
+		while (this.joiners.length > 0) {
+			this.members.push(this.joiners.pop());
+		}
+	}
+};
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// c_seq
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+function c_seq(dur, fs, vs = null) {
+	this.dur  = dur;
+	this.fs   = fs;
+	this.vs   = vs === null ? Array(fs.length).fill(1) : vs;
+	this.i    = fs.length - 1;
+	this.id   = null;
+	this.on   = false;
+	this.tone = new c_tone(0, bin, 1);
+}
+
+c_seq.prototype.next = function() {
+	if (++this.i === this.fs.length) this.i = 0;
+	this.tone.set_fv(this.fs[this.i], this.vs[this.i]);
+	this.id = setTimeout(c_seq.prototype.next.bind(this), this.dur);
+};
+
+c_seq.prototype.start = function() {
+	if (this.on && this.id === null) {
+		this.i = this.fs.length - 1;
+		this.tone.start();
+		this.next();
+	}
+};
+
+c_seq.prototype.stop = function() {
+	if (this.id !== null) {
+		clearTimeout(this.id);
+		this.id = null;
+		this.tone.stop();
+	}
+};
+
+c_seq.prototype.restart = function() {
+	this.stop();
+	this.start();
+};
+
+const dur   = 1000;
+const bf    = 90;
+//const bin   = bf * Math.pow(PHI, -7);
+const bin   = bf * 54 / 360 * 54 / 360;
+//const bin = 3;
+
+const night = new c_seq(dur, [ p1(bf, 0), p1(bf, 3), p1(bf, 1), p1(bf, 1) ]);
+const day   = new c_seq(dur, [ p1(bf, 6), p1(bf, 2), p1(bf, 0), p1(bf, 0) ]);
+day.on = true;
+
+
 
 const start_audio = _ => {
-	tone_i = 1;
-	tone.start();
+	if (day.on) day.start();
+	if (night.on) night.start();
 	window.start_audio = null;
 	window.stop_audio  = stop_audio;
 };
 
 const stop_audio = _ => {
-	tone_i = 0;
-	tone.stop();
+	day.stop();
+	night.stop();
 	window.start_audio = start_audio;
 	window.stop_audio  = null;
 };
@@ -206,16 +347,17 @@ let start_external_audio = null;
 
 const click_page = _ => {
 	if (click(back_button)) {
-		if (window.stop_audio === null) {
-			if (start_external_audio !== null) start_external_audio();
+		if (start_external_audio !== null) {
+			if (window.stop_audio !== null) window.stop_audio();
+			start_external_audio();
 		}
 		run("./home/index.js");
+		return;
 	}
-	else if (
-		click_audio() || volume.click() || click_ship() || 
-		click_man() || click_sun() || click_door()
-	) on_resize(); 
+	click_audio() || volume.click() || click_ship() || 
+	click_man()   || click_sun()    || click_door();
 	start_external_audio = null;
+	on_resize();
 };
 
 const draw_page = _ => {
@@ -242,6 +384,7 @@ export default _ => {
 	} else {
 		start_external_audio = null;
 	}
+	//if (window.stop_audio === null) start_audio();
 	set_item('page', "./test/index.js");
 	on_resize = draw_page;
 	on_click = click_page;

@@ -45,6 +45,7 @@ c_tone.prototype.stop = function() {
 };
 
 c_tone.prototype.set_f = function(f) {
+	if (f === this.f) return this;
 	this.f = f;
 	if (this.g !== null) {
 		this.o_left.frequency.setTargetAtTime(this.f, audio.currentTime, .05);
@@ -54,6 +55,7 @@ c_tone.prototype.set_f = function(f) {
 };
 
 c_tone.prototype.set_b = function(b) {
+	if (b === this.b) return this;
 	this.b = b;
 	if (this.g !== null) {
 		this.o_right.frequency.setTargetAtTime(this.f + this.b, audio.currentTime, .05);
@@ -62,10 +64,17 @@ c_tone.prototype.set_b = function(b) {
 };
 
 c_tone.prototype.set_v = function(v) { 
+	if (v === this.v) return this;
 	this.v = v;
 	if (this.g !== null) {
 		this.g.gain.setTargetAtTime(v, audio.currentTime, .05);
 	}
+	return this;
+};
+
+c_tone.prototype.set_fv = function(f, v) {
+	this.set_f(f);
+	this.set_v(v);
 	return this;
 };
 

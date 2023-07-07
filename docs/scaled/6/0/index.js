@@ -63,24 +63,24 @@ const stop_audio = _ => {
 
 let saved_audio_start = null;
 
-const ot = 6;
+const ots = 6;
 const f  = 100;
 const b  = 0;
 const d  = 1000;
 let x    = 100;
 const dx = 100;
 
-const tone = half_steps => new c_tone(ot, scale(ot, f, half_steps), b);
+const tone = steps => new c_tone(ots, freq(ot, f, steps), b);
 const phi  = new c_tone(PHI, b);
 
 units.push(new c_unit([
-	new c_tone(scale(6, 100, 0), 3),
+	new c_tone(freq(6, 100, 0), 3),
 	phi
 ], d * 3, x +=  0, 400));
 
 units.push(new c_unit([
-	new c_tone(scale(6, 100, 2), 3),
-	new c_tone(scale(6, 100, 4), 3)
+	new c_tone(freq(6, 100, 2), 3),
+	new c_tone(freq(6, 100, 4), 3)
 ], d, x += dx, 400));
 
 const click_page = _ => {
