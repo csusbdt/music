@@ -1,11 +1,37 @@
-import c_img   from "../global/img.js"    ;
-import c_tone  from "../global/tone.js"   ;
-import xbutton from "../global/xbutton.js";
-import volume  from "../global/volume.js" ;
+import c_img      from "../global/img.js"     ;
+import c_tone     from "../global/tone.js"    ;
+import c_tone_seq from "../global/tone_seq.js";
+import xbutton    from "../global/xbutton.js" ;
+import volume     from "../global/volume.js"  ;
 
-const back_button   = xbutton("upper_left_blue");
-const audio_blue    = xbutton("upper_right_blue");
+const back_button   = xbutton("upper_left_blue"   );
+const audio_blue    = xbutton("upper_right_blue"  );
 const audio_yellow  = xbutton("upper_right_yellow");
+
+const dur = 1000;
+const bf  = 90;
+const bin = bf * Math.pow(PHI, -7);
+
+const s_center = new c_tone_seq(dur, [ 
+	sp1(bf, 0), sp1(bf, 3), sp1(bf, 3), sp1(bf, 1), sp1(bf, 2) 
+]);
+
+const s_f_bf = bf * Math.pow(2 * (PHI - 1), 3);
+const s_f = new c_tone_seq(dur * 3, [
+	sp1(s_f_bf, 0), sp1(s_f_bf, 3), sp1(s_f_bf, 3), sp1(s_f_bf, 1), sp1(s_f_bf, 2) 
+]);
+
+const s_e_bf = bf * Math.pow(2 * (1 - PHI), 2);
+const s_e = new c_tone_seq(dur * 9, [
+	sp1(s_e_bf, 0), sp1(s_e_bf, 3), sp1(s_e_bf, 3), sp1(s_e_bf, 1), sp1(s_e_bf, 2) 
+]);
+
+const s_g_bf = bf * Math.pow(2 * (1 - PHI), 5);
+const s_g = new c_tone_seq(dur * 6, [
+	s_g_bf, s_g_bf * (PHI - 1), s_g_bf * (PHI + 1) / 2, s_g_bf * PHI 
+]);
+
+
 
 const img = n => new c_img("./blob/images/" + n + ".png");
 
@@ -51,17 +77,17 @@ const click_b  = _ => {
 	if (b_blue.click()) {
 		if (++b === 2) { 
 			b = 0; 
-			p_tone.set_b(0); 
-			f_tone.set_b(0); 
-			e_tone.set_b(0); 
-			g_tone.set_b(0); 
+			s_center.set_b(0);
+			s_f.set_b(0); 
+			s_e.set_b(0); 
+			s_g.set_b(0); 
 			h_tone.set_b(0); 
 		} else {
-			p_tone.set_b(3); 
-			f_tone.set_b(3);
-			e_tone.set_b(3);
-			g_tone.set_b(3);
-			h_tone.set_b(3);
+			s_center.set_b(bin);
+			s_f.set_b(bin);
+			s_e.set_b(bin);
+			s_g.set_b(bin);
+			h_tone.set_b(bin);
 		}
 		return true;
 	}
@@ -101,10 +127,7 @@ const p_yellow = p_blue.clone_yellow();
 const p_border = img("a_border");
 const p_dur    = 1000;
 const p_f      = 90;
-const p_tone   = new c_tone(p_f * PHI, 0, 1);
 let   p        = 0;
-let   p_i      = null;
-let   p_id     = null;
 const draw_p   = _ => { 
 	if (p === 0) draw(p_blue);
 	else draw(p_yellow);
@@ -114,47 +137,19 @@ const click_p  = _ => {
 	if (p_blue.click()) {
 		if (++p === 2) {
 			p = 0;
-			stop_p();
+			s_center.set_off();
 		} else if (window.stop_audio === null) {
 			start_audio();
 		} else {
-			if (f === 1) { stop_f(); start_f(); }
-			if (e === 1) { stop_e(); start_e(); }
-			if (g === 1) { stop_g(); start_g(); }
+			if (f === 1) { s_f.stop(); s_f.start(); }
+			if (e === 1) { s_e.stop(); s_e.start(); }
+			if (g === 1) { s_g.stop(); s_g.start(); }
 			if (h === 1) { stop_h(); start_h(); }
-			start_p();
+			s_center.set_on();
 		}
 		return true;
 	}
 	return false;
-};
-const next_p = _ => {
-	if (++p_i === 5) {
-		p_i = 0;
-		p_tone.set_f(p_f * (PHI + 0));
-	} else if (p_i === 1) {
-		p_tone.set_f(p_f * (PHI + 7) / 8);
-	} else if (p_i === 2) {
-		p_tone.set_f(p_f * (PHI + 7) / 8);
-	} else if (p_i === 3) {
-		p_tone.set_f(p_f * (PHI + 1) / 2);
-	} else if (p_i === 4) {
-		p_tone.set_f(p_f * (PHI + 3) / 4);
-	}
-	p_id = setTimeout(next_p, p_dur);
-};
-const start_p = _ => {
-	p_i = 4;
-	p_tone.start();
-	next_p();
-};
-const stop_p = _ => {
-	if (p_id !== null) {
-		clearTimeout(p_id);
-		p_i = 0;
-		p_id = null;
-		p_tone.stop();
-	}
 };
 
 // overlay 1
@@ -162,12 +157,7 @@ const stop_p = _ => {
 const f_blue   = img("f_blue");
 const f_yellow = f_blue.clone_yellow();
 const f_border = img("f_border");
-const f_tone   = new c_tone(0, 0, .7); 
-const f_dur    = p_dur * 3;
-const f_f      = p_f * Math.pow(2 * (PHI - 1), 3); 
 let   f        = 0;
-let   f_i      = null;
-let   f_id     = null;
 const draw_f   = _ => { 
 	if (f === 0) draw(f_blue);
 	else draw(f_yellow);
@@ -177,46 +167,19 @@ const click_f  = _ => {
 	if (f_blue.click()) {
 		if (++f === 2) { 
 			f = 0; 
-			stop_f(); 
+			s_f.set_off(); 
 		} else if (window.stop_audio === null) {
 			start_audio();
 		} else {
-			if (p === 1) { stop_p(); start_p(); }
-			if (e === 1) { stop_e(); start_e(); }
-			if (g === 1) { stop_g(); start_g(); }
+			if (p === 1) { s_center.stop(); s_center.start(); }
+			if (e === 1) { s_e.stop(); s_e.start(); }
+			if (g === 1) { s_g.stop(); s_g.start(); }
 			if (h === 1) { stop_h(); start_h(); }
-			start_f();
+			s_f.set_on(); 
 		}
 		return true;
 	}
 	return false;
-};
-const next_f = _ => {
-	if (++f_i === 5) {
-		f_i = 0;
-		f_tone.set_f(f_f * (PHI + 0));
-	} else if (f_i === 1) {
-		f_tone.set_f(f_f * (PHI + 7) / 8);
-	} else if (f_i === 2) {
-		f_tone.set_f(f_f * (PHI + 7) / 8);
-	} else if (f_i === 3) {
-		f_tone.set_f(f_f * (PHI + 1) / 2);
-	} else if (f_i === 4) {
-		f_tone.set_f(f_f * (PHI + 3) / 4);
-	}
-	f_id = setTimeout(next_f, f_dur);
-};
-const start_f = _ => {
-	f_i = 4;
-	f_tone.start();
-	next_f();
-};
-const stop_f = _ => {
-	if (f_id !== null) {
-		clearTimeout(f_id);
-		f_id = null;
-		f_tone.stop();
-	}
 };
 
 // overlay 2
@@ -224,12 +187,7 @@ const stop_f = _ => {
 const e_blue   = img("e_blue");
 const e_yellow = e_blue.clone_yellow();
 const e_border = img("e_border");
-const e_tone   = new c_tone(0, 0, .7); 
-const e_f      = p_f * Math.pow(2 * (1 - PHI), 2);
-const e_dur    = p_dur * 9;
 let   e        = 0;
-let   e_i      = null;
-let   e_id     = null;
 const draw_e   = _ => { 
 	if (e === 0) draw(e_blue);
 	else draw(e_yellow);
@@ -238,47 +196,20 @@ const draw_e   = _ => {
 const click_e  = _ => {
 	if (e_blue.click()) {
 		if (++e === 2) { 
-			e = 0; 
-			stop_e(); 
+			e = 0;
+			s_e.set_off();
 		} else if (window.stop_audio === null) {
 			start_audio();
 		} else {
-			if (p === 1) { stop_p(); start_p(); }
-			if (f === 1) { stop_f(); start_f(); }
-			if (g === 1) { stop_g(); start_g(); }
+			if (p === 1) { s_center.stop(); s_center.start(); }
+			if (f === 1) { s_f.stop(); s_f.start(); }
+			if (g === 1) { s_g.stop(); s_g.start(); }
 			if (h === 1) { stop_h(); start_h(); }
-			start_e();
+			s_e.set_on();
 		}
 		return true;
 	}
 	return false;
-};
-const next_e = _ => {
-	if (++e_i === 5) {
-		e_i = 0;
-		e_tone.set_f(e_f * (PHI + 0));
-	} else if (e_i === 1) {
-		e_tone.set_f(e_f * (PHI + 7) / 8);
-	} else if (e_i === 2) {
-		e_tone.set_f(e_f * (PHI + 7) / 8);
-	} else if (e_i === 3) {
-		e_tone.set_f(e_f * (PHI + 1) / 2);
-	} else if (e_i === 4) {
-		e_tone.set_f(e_f * (PHI + 3) / 4);
-	}
-	e_id = setTimeout(next_e, e_dur);
-};
-const start_e = _ => {
-	e_i = 4;
-	e_tone.start();
-	next_e();
-};
-const stop_e = _ => {
-	if (e_id !== null) {
-		clearTimeout(e_id);
-		e_id = null;
-		e_tone.stop();
-	}
 };
 
 // overlay 3
@@ -286,12 +217,12 @@ const stop_e = _ => {
 const g_blue   = img("g_blue");
 const g_yellow = g_blue.clone_yellow();
 const g_border = img("g_border");
-const g_tone   = new c_tone(0, 0, .7); 
-const g_f      = p_f * Math.pow(2 * (1 - PHI), 5);
-const g_dur    = p_dur * 6;
+//const g_tone   = new c_tone(0, 0, .7); 
+//const g_f      = p_f * Math.pow(2 * (1 - PHI), 5);
+//const g_dur    = p_dur * 6;
 let   g        = 0;
-let   g_i      = null;
-let   g_id     = null;
+//let   g_i      = null;
+//let   g_id     = null;
 const draw_g   = _ => { 
 	if (g === 0) draw(g_blue);
 	else draw(g_yellow);
@@ -301,45 +232,45 @@ const click_g  = _ => {
 	if (g_blue.click()) {
 		if (++g === 2) { 
 			g = 0; 
-			stop_g(); 
+			s_g.set_off(); 
 		} else if (window.stop_audio === null) {
 			start_audio();
 		} else {
-			if (p === 1) { stop_p(); start_p(); }
-			if (f === 1) { stop_f(); start_f(); }
-			if (e === 1) { stop_e(); start_e(); }
+			if (p === 1) { s_center.stop(); s_center.start(); }
+			if (f === 1) { s_f.stop(); s_f.start(); }
+			if (e === 1) { s_e.stop(); s_e.start(); }
 			if (h === 1) { stop_h(); start_h(); }
-			start_g();
+			s_g.set_on(); 
 		}
 		return true;
 	}
 	return false;
 };
-const next_g = _ => {
-	if (++g_i === 4) {
-		g_i = 0;
-		g_tone.set_f(g_f); 
-	} else if (g_i === 1) {
-		g_tone.set_f(g_f * (PHI - 1)); 
-	} else if (g_i === 2) {
-		g_tone.set_f(g_f * (PHI + 1) / 2); 
-	} else if (g_i === 3) {
-		g_tone.set_f(g_f * PHI); 
-	}
-	g_id = setTimeout(next_g, g_dur);
-};
-const start_g = _ => {
-	g_i = 3;
-	g_tone.start();
-	next_g();
-};
-const stop_g = _ => {
-	if (g_id !== null) {
-		clearTimeout(g_id);
-		g_id = null;
-		g_tone.stop();
-	}
-};
+// const next_g = _ => {
+// 	if (++g_i === 4) {
+// 		g_i = 0;
+// 		g_tone.set_f(g_f); 
+// 	} else if (g_i === 1) {
+// 		g_tone.set_f(g_f * (PHI - 1)); 
+// 	} else if (g_i === 2) {
+// 		g_tone.set_f(g_f * (PHI + 1) / 2); 
+// 	} else if (g_i === 3) {
+// 		g_tone.set_f(g_f * PHI); 
+// 	}
+// 	g_id = setTimeout(next_g, g_dur);
+// };
+// const start_g = _ => {
+// 	g_i = 3;
+// 	g_tone.start();
+// 	next_g();
+// };
+// const stop_g = _ => {
+// 	if (g_id !== null) {
+// 		clearTimeout(g_id);
+// 		g_id = null;
+// 		g_tone.stop();
+// 	}
+// };
 
 // overlay 4
 
@@ -365,10 +296,10 @@ const click_h  = _ => {
 		} else if (window.stop_audio === null) {
 			start_audio();
 		} else {
-			if (p === 1) { stop_p(); start_p(); }
-			if (f === 1) { stop_f(); start_f(); }
-			if (e === 1) { stop_e(); start_e(); }
-			if (g === 1) { stop_g(); start_g(); }
+			if (p === 1) { s_center.stop(); s_center.start(); }
+			if (f === 1) { s_f.stop(); s_f.start(); }
+			if (e === 1) { s_e.stop(); s_e.start(); }
+			if (g === 1) { s_g.stop(); s_g.start(); }
 			start_h();
 		}
 		return true;
@@ -404,30 +335,29 @@ const stop_h = _ => {
 };
 
 const start_audio = _ => {
-	assert(window.stop_audio === null);
-	if (a === 1) start_a();
-	if (b === 1) start_b();
-	if (p === 1) start_p();
-	if (d === 1) start_d();
-	if (e === 1) start_e();
-	if (f === 1) start_f();
-	if (g === 1) start_g();
-	if (h === 1) start_h();
 	window.start_audio = null;
 	window.stop_audio  = stop_audio;
+	if (a === 1) start_a();
+	if (b === 1) start_b();
+	if (p === 1) s_center.start();
+	if (f === 1) s_f.start();
+	if (d === 1) start_d();
+	if (e === 1) s_e.start();
+	if (g === 1) s_g.start();
+	if (h === 1) start_h();
 };
 
 const stop_audio = _ => {
-	stop_a();
-	stop_b();
-	stop_p();
-	stop_d();
-	stop_e();
-	stop_f();
-	stop_g();
-	stop_h();
 	window.start_audio = start_audio;
 	window.stop_audio  = null;
+	stop_a();
+	stop_b();
+	s_center.stop();
+	s_f.stop();
+	stop_d();
+	s_e.stop();
+	s_g.stop();
+	stop_h();
 };
 
 const draw_audio = _ => {
@@ -447,10 +377,12 @@ let start_external_audio = null;
 
 const click_page = _ => {
 	if (click(back_button)) {
-		if (window.stop_audio === null) {
-			if (start_external_audio !== null) start_external_audio();
+		if (start_external_audio !== null) {
+			if (window.stop_audio !== null) window.stop_audio();
+			start_external_audio();
 		}
 		run("./home/index.js");
+		return;	
 	}
 	else if (
 		click_audio() || click_a() || click_b() || click_p() || click_d() ||

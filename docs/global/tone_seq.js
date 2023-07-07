@@ -12,6 +12,11 @@ function c_tone_seq(dur, fs, b = 0, vs = null) {
 	this.tone = new c_tone(0, b, vs === null ? 1 : vs[0]);
 }
 
+c_tone_seq.prototype.set_b = function(b) {
+    this.b = b;
+    this.tone.set_b(b);
+};
+
 c_tone_seq.prototype.next = function() {
 	if (++this.i === this.fs.length) this.i = 0;
 	this.tone.set_fv(this.fs[this.i], this.vs[this.i]);
