@@ -292,10 +292,12 @@ const click_sun = _ => {
 	if (sun_yellow.click()) {
 		if (sun === sun_off) {
 			sun = sun_on;
-			if (window.stop_audio !== null) day.start();
+			s_sun_off.set_off();
+			s_sun_on.set_on();
 		} else {
 			sun = sun_off;
-			if (window.stop_audio !== null) night.start();
+			s_sun_on.set_off();
+			s_sun_off.set_on();
 		}
 		return true;
 	} else return false;
@@ -382,11 +384,11 @@ const s_man_outside_house = new c_seq(dur * 2, Array(p1_max).fill(0).map((_, i) 
 
 const s_list = [
 	s_man_in_valley, s_man_in_ship, s_man_in_house, s_man_outside_house,
-	s_ship_over_valley, s_ship_over_house,
-	s_beam_taking, s_beam_putting 
+	s_ship_over_valley, s_ship_over_house, s_sun_on, s_sun_off, s_beam_taking, s_beam_putting 
 ];
 s_man_in_valley.on = true;
 s_ship_over_valley.on = true;
+s_sun_on.on = true;
 	
 const start_audio = _ => {
 	window.start_audio = null;
