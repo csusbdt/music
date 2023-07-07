@@ -261,3 +261,25 @@ window.draw  = (a, x = 0, y = 0) => Array.isArray(a) ? a.forEach(o => o.draw(x, 
 window.click = (a, x = 0, y = 0) => Array.isArray(a) ? a.some(o => o.click(x, y)) : a.click(x, y);
 window.start = (a) => Array.isArray(a) ? a.forEach(o => o.start()) : a.start();
 window.stop  = (a) => Array.isArray(a) ? a.forEach(o => o.stop())  : a.stop();
+
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// sound pallets
+//
+//////////////////////////////////////////////////////////////////////////////////////
+
+// 2, 1.62, 1.38, 1.24, 1.15, 1.09, 1.06, 1.03, 1.02, 1.01, 1.01, 1.01, 1 at i = 12
+window.sp1 = (f, i) => f * (1 + Math.pow(PHI, -i));
+window.sp1_max = 12;
+
+// 2, 1.85, 1.72, 1.61, 1.52, 1.44, 1.38, 1.32, 1.27, 1.23, 1.20, 1.17, 1.14, ..., 1 at i = 34
+window.sp2 = (f, i) => f * (1 + Math.pow(1 - 54/360, i));
+window.sp2_max = 34;
+
+// 2.61, 1.81, 1.40, 1.20, 1.10, 1.05, 1.03, 1.01, 1.01, 1 at i = 10
+window.sp3 = (f, i) => f * (1 + PHI * Math.pow(2, -i));
+window.sp3_max = 10;
+
+// 1.62, 1.31, 1.15, 1.08, 1.04, 1.02, 1.01, 1 at i = 9
+window.sp4 = (f, i) => f * (PHI - 1 + Math.pow(2, i)) / Math.pow(2, i);
+window.sp4_max = 9;
