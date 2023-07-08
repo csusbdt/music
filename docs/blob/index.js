@@ -130,8 +130,8 @@ const center_controller = new c_tone_seq_controller(
 const o1_blue   = img("f_blue");
 const o1_yellow = o1_blue.clone_yellow();
 const o1_border = img("f_border");
-const o1_f      = bf * Math.pow(2 * (PHI - 1), 3);
-const o1_seq    = new c_tone_seq(dur, [ 
+const o1_f      = bf * Math.pow(2 * (PHI - 1), 3);  
+const o1_seq    = new c_tone_seq(dur * 3, [ 
 	sp1(o1_f, 0), sp1(o1_f, 3), sp1(o1_f, 3), sp1(o1_f, 1), sp1(o1_f, 2) 
 ]);
 const o1_controller = new c_tone_seq_controller(
@@ -141,7 +141,7 @@ const o1_controller = new c_tone_seq_controller(
 const o2_blue   = img("e_blue");
 const o2_yellow = o2_blue.clone_yellow();
 const o2_border = img("e_border");
-const o2_f      = bf * Math.pow(2 * (1 - PHI), 2);
+const o2_f      = bf * Math.pow(2 * (PHI - 1), 2);
 const o2_seq    = new c_tone_seq(dur * 9, [ 
 	sp1(o2_f, 0), sp1(o2_f, 3), sp1(o2_f, 3), sp1(o2_f, 1), sp1(o2_f, 2) 
 ]);
@@ -163,8 +163,8 @@ const o3_controller = new c_tone_seq_controller(
 const o4_blue   = img("d_blue");
 const o4_yellow = o4_blue.clone_yellow();
 const o4_border = img("d_border");
-const o4_f      = bf * Math.pow(2 * (1 - PHI), 3);
-const o4_seq    = new c_tone_seq(dur * 12, [ 
+const o4_f      = sp1(bf * PHI, 3); 
+const o4_seq    = new c_tone_seq(dur * 9, [ 
 	sp1(o4_f, 0), sp1(o4_f, 3), sp1(o4_f, 3), sp1(o4_f, 1), sp1(o4_f, 2)
 ]);
 const o4_controller = new c_tone_seq_controller(
@@ -174,15 +174,13 @@ const o4_controller = new c_tone_seq_controller(
 const o5_blue   = img("h_blue");
 const o5_yellow = o5_blue.clone_yellow();
 const o5_border = img("h_border");
-const o5_f      = bf;
-const o5_seq    = new c_tone_seq(dur * 10, [ 
-	sp4(o5_f, 0), sp4(o5_f, 3), sp4(o5_f, 3), sp4(o5_f, 1), sp4(o5_f, 2)
+const o5_f      = bf * 2;
+const o5_seq    = new c_tone_seq(dur * 9, [ 
+	sp1(o5_f, 0), sp1(o5_f, 3), sp1(o5_f, 1), sp1(o5_f, 2), sp1(o5_f, 4)
 ]);
 const o5_controller = new c_tone_seq_controller(
 	o5_blue, o5_yellow, o5_border, o5_seq, start_group
 );
-
-
 
 const start_audio = _ => {
 	window.start_audio = null;
