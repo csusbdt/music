@@ -10,10 +10,11 @@ const audio_yellow  = xbutton("upper_right_yellow");
 
 const dur = 1000;
 const bf  = 90;
-const bin = bf * Math.pow(PHI, -7);
 
+
+const s_center_f = bf;
 const s_center = new c_tone_seq(dur, [ 
-	sp1(bf, 0), sp1(bf, 3), sp1(bf, 3), sp1(bf, 1), sp1(bf, 2) 
+	sp1(s_center_f, 0), sp1(s_center_f, 3), sp1(s_center_f, 3), sp1(s_center_f, 1), sp1(s_center_f, 2) 
 ]);
 
 const s_f_bf = bf * Math.pow(2 * (PHI - 1), 3);
@@ -41,15 +42,14 @@ const s_k = new c_tone_seq(dur * 10, [
 	sp2(s_k_bf, 0), sp2(s_k_bf, 3), sp2(s_k_bf, 3), sp2(s_k_bf, 1), sp2(s_k_bf, 2) 
 ]);
 
-
 const img = n => new c_img("./blob/images/" + n + ".png");
 
-// waver
+// beat group toggle TODO
 
 const a_blue   = img("b_blue");
 const a_yellow = a_blue.clone_yellow();
 const a_border = img("b_border");
-const a_tone   = new c_tone(3, 0, 1);
+const a_tone   = new c_tone(bf, 0, 1);
 let   a        = 0;
 const draw_a   = _ => { 
 	if (a === 0) draw(a_blue);
@@ -73,41 +73,45 @@ const stop_a  = _ => a_tone.stop();
 
 // binaural
 
-const b_blue   = img("c_blue");
-const b_yellow = b_blue.clone_yellow();
-const b_border = img("c_border");
-let   b        = 0;
-const draw_b   = _ => { 
-	if (b === 0) draw(b_blue);
-	else draw(b_yellow);
-	draw(b_border);
-};
-const click_b  = _ => {
-	if (b_blue.click()) {
-		if (++b === 2) { 
-			b = 0; 
-			s_center.set_b(0);
-			s_f.set_b(0); 
-			s_e.set_b(0); 
-			s_g.set_b(0); 
-			s_h.set_b(0); 
-			s_k.set_b(0); 
-		} else {
-			s_center.set_b(bin);
-			s_f.set_b(bin);
-			s_e.set_b(bin);
-			s_g.set_b(bin);
-			s_h.set_b(bin);
-			s_k.set_b(bin);
-		}
-		return true;
-	}
-	return false;
-};
-const start_b = _ => {};
-const stop_b  = _ => {};
+const binaural_blue   = img("c_blue");
+const binaural_yellow = binaural_blue.clone_yellow();
+const binaural_border = img("c_border");
 
-// 1/2 
+const binaural = {
+	on: false,
+	b: bf * Math.pow(PHI, -7),
+	draw: function() {
+		if (this.on) draw(binaural_yellow); else draw(binaural_blue);
+		draw(binaural_border);
+	},
+	click: function() {
+		if (binaural_blue.click()) {
+			if (this.on) {
+				this.on = false;
+				s_center.set_b(0);
+				s_f.set_b(0); 
+				s_e.set_b(0); 
+				s_g.set_b(0); 
+				s_h.set_b(0); 
+				s_k.set_b(0); 
+			} else {
+				this.on = true;
+				s_center.set_b(this.b);
+				s_f.set_b(this.b);
+				s_e.set_b(this.b);
+				s_g.set_b(this.b);
+				s_h.set_b(this.b);
+				s_k.set_b(this.b);
+			}
+			return true;
+		}
+		return false;		
+	},
+	start: function() {},
+	stop: function() {}
+};
+
+// k
 
 const k_blue   = img("h_blue");
 const k_yellow = k_blue.clone_yellow();
@@ -123,8 +127,6 @@ const click_k  = _ => {
 		if (++k === 2) {
 			k = 0;
 			s_k.set_off();
-		// } else if (window.stop_audio === null) {
-		// 	start_audio();
 		} else {
 			if (b === 1) { s_center.stop(); s_center.start(); }
 			if (f === 1) { s_f.stop(); s_f.start(); }
@@ -154,8 +156,6 @@ const click_p  = _ => {
 		if (++p === 2) {
 			p = 0;
 			s_center.set_off();
-		// } else if (window.stop_audio === null) {
-		// 	start_audio();
 		} else {
 			if (f === 1) { s_f.stop(); s_f.start(); }
 			if (e === 1) { s_e.stop(); s_e.start(); }
@@ -185,8 +185,6 @@ const click_f  = _ => {
 		if (++f === 2) { 
 			f = 0; 
 			s_f.set_off(); 
-		// } else if (window.stop_audio === null) {
-		// 	start_audio();
 		} else {
 			if (p === 1) { s_center.stop(); s_center.start(); }
 			if (e === 1) { s_e.stop(); s_e.start(); }
@@ -216,8 +214,6 @@ const click_e  = _ => {
 		if (++e === 2) { 
 			e = 0;
 			s_e.set_off();
-		// } else if (window.stop_audio === null) {
-		// 	start_audio();
 		} else {
 			if (p === 1) { s_center.stop(); s_center.start(); }
 			if (f === 1) { s_f.stop(); s_f.start(); }
@@ -247,8 +243,6 @@ const click_g  = _ => {
 		if (++g === 2) { 
 			g = 0; 
 			s_g.set_off(); 
-		// } else if (window.stop_audio === null) {
-		// 	start_audio();
 		} else {
 			if (p === 1) { s_center.stop(); s_center.start(); }
 			if (f === 1) { s_f.stop(); s_f.start(); }
@@ -278,8 +272,6 @@ const click_h  = _ => {
 		if (++h === 2) { 
 			h = 0; 
 			s_h.set_off();
-		// } else if (window.stop_audio === null) {
-		// 	start_audio();
 		} else {
 			if (p === 1) { s_center.stop(); s_center.start(); }
 			if (f === 1) { s_f.stop(); s_f.start(); }
@@ -298,29 +290,13 @@ const start_group = [ s_center, s_f, s_e, s_g, s_h, s_k ];
 const start_audio = _ => {
 	window.start_audio = null;
 	window.stop_audio  = stop_audio;
-	if (a === 1) start_a();
-	if (b === 1) start_b();
 	start(start_group);
-	// s_center.start();
-	// if (f === 1) s_f.start();
-	// if (e === 1) s_e.start();
-	// if (g === 1) s_g.start();
-	// if (h === 1) s_h.start();
-	// if (k === 1) s_k.start();
 };
 
 const stop_audio = _ => {
 	window.start_audio = start_audio;
 	window.stop_audio  = null;
-	stop_a();
-	stop_b();
 	stop(start_group);
-	// s_center.stop();
-	// s_f.stop();
-	// s_e.stop();
-	// s_g.stop();
-	// s_h.stop();
-	// s_k.stop();
 };
 
 const draw_audio = _ => {
@@ -341,15 +317,12 @@ let start_external_audio = null;
 const click_page = _ => {
 	if (click(back_button)) {
 		on_click = null;
-		if (start_external_audio !== null) {
-//			if (window.stop_audio !== null) window.stop_audio();
-			start_external_audio();
-		}
+		if (start_external_audio !== null) start_external_audio();
 		run("./home/index.js");
 		return;	
 	}
-	click_audio() || click_a() || click_b() || click_p() || click_k() ||
-	click_f()     || click_e() || click_g() || click_h() || volume.click();
+	click_audio() || click(binaural) || click_a() || click_p() || click_k() ||
+	click_f()     || click_e()       || click_g() || click_h() || volume.click();
 	on_resize(); 
 	start_external_audio = null;
 };
@@ -360,7 +333,7 @@ const draw_page = _ => {
 	draw(back_button);
 	volume.draw_blue();
 	draw_a();
-	draw_b();
+	draw(binaural);
 	draw_p();
 	draw_k();
 	draw_e();
@@ -374,16 +347,6 @@ export default _ => {
 		window.stop_audio();
 		start_external_audio = window.start_audio;
 	}
-	// if (window.stop_audio !== null && window.stop_audio !== stop_audio) {
-	// 	window.stop_audio();
-	// 	start_external_audio = window.start_audio;
-	// 	window.start_audio = null;
-	// 	window.stop_audio = stop_audio;
-	// } else {
-	// 	//window.start_audio = null;
-	// 	//window.stop_audio = stop_audio;
-	// 	start_external_audio = null;
-	// }
 	set_item('page', "./blob/index.js");
 	on_resize = draw_page;
 	on_click = click_page;
