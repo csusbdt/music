@@ -51,30 +51,30 @@ c_tone_seq_controller.prototype.click = function() {
 
 const start_group = [];
 
-// beat  
+// // beat  
 
-const beat_blue   = img("b_blue");
-const beat_yellow = beat_blue.clone_yellow();
-const beat_border = img("b_border");
+// const beat_blue   = img("b_blue");
+// const beat_yellow = beat_blue.clone_yellow();
+// const beat_border = img("b_border");
 
-const beat = {
-	on: false,
-	draw: function() {
-		if (this.on) draw(beat_yellow); else draw(beat_blue);
-		draw(beat_border);
-	},
-	click: function() {
-		if (beat_blue.click()) {
-			if (this.on) {
-				this.on = false;
-			} else {
-				this.on = true;
-			}
-			return true;
-		}
-		return false;		
-	}
-};
+// const beat = {
+// 	on: false,
+// 	draw: function() {
+// 		if (this.on) draw(beat_yellow); else draw(beat_blue);
+// 		draw(beat_border);
+// 	},
+// 	click: function() {
+// 		if (beat_blue.click()) {
+// 			if (this.on) {
+// 				this.on = false;
+// 			} else {
+// 				this.on = true;
+// 			}
+// 			return true;
+// 		}
+// 		return false;		
+// 	}
+// };
 
 // binaural
 
@@ -125,6 +125,17 @@ const center_seq    = new c_tone_seq(dur, [
 ]);
 const center_controller = new c_tone_seq_controller(
 	center_blue, center_yellow, center_border, center_seq, start_group
+);
+
+const alt_blue   = img("b_blue");
+const alt_yellow = alt_blue.clone_yellow();
+const alt_border = img("b_border");
+const alt_f      = bf * 2;
+const alt_seq    = new c_tone_seq(dur * 2, [ 
+	alt_f, sp1(alt_f * PHI, 3), alt_f, sp1(alt_f, 0)
+], 0, .6);
+const alt_controller = new c_tone_seq_controller(
+	alt_blue, alt_yellow, alt_border, alt_seq, start_group
 );
 
 const o1_blue   = img("f_blue");
@@ -216,7 +227,7 @@ const click_page = _ => {
 		run("./home/index.js");
 		return;	
 	}
-	click_audio() || volume.click() || click(binaural) || click(beat) || 
+	click_audio() || volume.click() || click(binaural) || click(alt_controller) || 
 	click(center_controller) || click(o1_controller) || click(o2_controller) ||
 	click(o3_controller) || click(o4_controller) || click(o5_controller);		
 	on_resize(); 
@@ -228,9 +239,9 @@ const draw_page = _ => {
 	volume.draw_blue();
 	draw_audio();
 	draw(back_button);
-	draw(beat);
 	draw(binaural);
 	draw(center_controller);
+	draw(alt_controller);
 	draw(o1_controller);
 	draw(o2_controller);
 	draw(o3_controller);
@@ -248,235 +259,3 @@ export default _ => {
 	on_click = click_page;
 	on_resize();
 };
-
-
-
-
-// const a_blue   = img("b_blue");
-// const a_yellow = a_blue.clone_yellow();
-// const a_border = img("b_border");
-// const a_tone   = new c_tone(bf, 0, 1);
-// let   a        = 0;
-// const draw_a   = _ => { 
-// 	if (a === 0) draw(a_blue);
-// 	else draw(a_yellow);
-// 	draw(a_border);
-// };
-// const click_a  = _ => {
-// 	if (a_blue.click()) {
-// 		if (++a === 2) { 
-// 			a = 0; 
-// 			a_tone.stop(); 
-// 		} else if (window.stop_audio !== null) {
-// 			a_tone.start();
-// 		}
-// 		return true;
-// 	}
-// 	return false;
-// };
-// const start_a = _ => a === 1 && a_tone.start();
-// const stop_a  = _ => a_tone.stop();
-
-
-
-// const s_f_bf = bf * Math.pow(2 * (PHI - 1), 3);
-// const s_f = new c_tone_seq(dur * 3, [
-// 	sp1(s_f_bf, 0), sp1(s_f_bf, 3), sp1(s_f_bf, 3), sp1(s_f_bf, 1), sp1(s_f_bf, 2) 
-// ]);
-
-// const s_e_bf = bf * Math.pow(2 * (1 - PHI), 2);
-// const s_e = new c_tone_seq(dur * 9, [
-// 	sp1(s_e_bf, 0), sp1(s_e_bf, 3), sp1(s_e_bf, 3), sp1(s_e_bf, 1), sp1(s_e_bf, 2) 
-// ]);
-
-// const s_g_bf = bf * Math.pow(2 * (1 - PHI), 5);
-// const s_g = new c_tone_seq(dur * 6, [
-// 	s_g_bf, s_g_bf * (PHI - 1), s_g_bf * (PHI + 1) / 2, s_g_bf * PHI 
-// ]);
-
-// const s_h_bf = bf * Math.pow(2 * (1 - PHI), 3);
-// const s_h = new c_tone_seq(dur * 12, [
-// 	sp1(s_h_bf, 0), sp1(s_h_bf, 3), sp1(s_h_bf, 3), sp1(s_h_bf, 1), sp1(s_h_bf, 2) 
-// ]);
-
-// const s_k_bf = bf;
-// const s_k = new c_tone_seq(dur * 10, [
-// 	sp2(s_k_bf, 0), sp2(s_k_bf, 3), sp2(s_k_bf, 3), sp2(s_k_bf, 1), sp2(s_k_bf, 2) 
-// ]);
-
-
-// // base sequence
-
-// const p_blue   = img("a_blue");
-// const p_yellow = p_blue.clone_yellow();
-// const p_border = img("a_border");
-// let   p        = 0;
-// const draw_p   = _ => { 
-// 	if (p === 0) draw(p_blue);
-// 	else draw(p_yellow);
-// 	draw(p_border);
-// };
-// const click_p  = _ => {
-// 	if (p_blue.click()) {
-// 		if (++p === 2) {
-// 			p = 0;
-// 			s_center.set_off();
-// 		} else {
-// 			if (f === 1) { s_f.stop(); s_f.start(); }
-// 			if (e === 1) { s_e.stop(); s_e.start(); }
-// 			if (g === 1) { s_g.stop(); s_g.start(); }
-// 			if (h === 1) { s_h.stop(); s_h.start(); }
-// 			if (k === 1) { s_k.stop(); s_k.start(); }
-// 			s_center.set_on();
-// 		}
-// 		return true;
-// 	}
-// 	return false;
-// };
-
-// overlay 1
-
-// const f_blue   = img("f_blue");
-// const f_yellow = f_blue.clone_yellow();
-// const f_border = img("f_border");
-// let   f        = 0;
-// const draw_f   = _ => { 
-// 	if (f === 0) draw(f_blue);
-// 	else draw(f_yellow);
-// 	draw(f_border);
-// };
-// const click_f  = _ => {
-// 	if (f_blue.click()) {
-// 		if (++f === 2) { 
-// 			f = 0; 
-// 			s_f.set_off(); 
-// 		} else {
-// 			if (p === 1) { s_center.stop(); s_center.start(); }
-// 			if (e === 1) { s_e.stop(); s_e.start(); }
-// 			if (g === 1) { s_g.stop(); s_g.start(); }
-// 			if (h === 1) { s_h.stop(); s_h.start(); }
-// 			if (k === 1) { s_k.stop(); s_k.start(); }
-// 			s_f.set_on(); 
-// 		}
-// 		return true;
-// 	}
-// 	return false;
-// };
-
-// overlay 2
-
-// const e_blue   = img("e_blue");
-// const e_yellow = e_blue.clone_yellow();
-// const e_border = img("e_border");
-// let   e        = 0;
-// const draw_e   = _ => { 
-// 	if (e === 0) draw(e_blue);
-// 	else draw(e_yellow);
-// 	draw(e_border);
-// };
-// const click_e  = _ => {
-// 	if (e_blue.click()) {
-// 		if (++e === 2) { 
-// 			e = 0;
-// 			s_e.set_off();
-// 		} else {
-// 			if (p === 1) { s_center.stop(); s_center.start(); }
-// 			if (f === 1) { s_f.stop(); s_f.start(); }
-// 			if (g === 1) { s_g.stop(); s_g.start(); }
-// 			if (h === 1) { s_h.stop(); s_h.start(); }
-// 			if (k === 1) { s_k.stop(); s_k.start(); }
-// 			s_e.set_on();
-// 		}
-// 		return true;
-// 	}
-// 	return false;
-// };
-
-// overlay 3
-
-// const g_blue   = img("g_blue");
-// const g_yellow = g_blue.clone_yellow();
-// const g_border = img("g_border");
-// let   g        = 0;
-// const draw_g   = _ => { 
-// 	if (g === 0) draw(g_blue);
-// 	else draw(g_yellow);
-// 	draw(g_border);
-// };
-// const click_g  = _ => {
-// 	if (g_blue.click()) {
-// 		if (++g === 2) { 
-// 			g = 0; 
-// 			s_g.set_off(); 
-// 		} else {
-// 			if (p === 1) { s_center.stop(); s_center.start(); }
-// 			if (f === 1) { s_f.stop(); s_f.start(); }
-// 			if (e === 1) { s_e.stop(); s_e.start(); }
-// 			if (h === 1) { s_h.stop(); s_h.start(); }
-// 			if (k === 1) { s_k.stop(); s_k.start(); }
-// 			s_g.set_on(); 
-// 		}
-// 		return true;
-// 	}
-// 	return false;
-// };
-
-// overlay 4
-
-// const h_blue   = img("d_blue");
-// const h_yellow = h_blue.clone_yellow();
-// const h_border = img("d_border");
-// let   h        = 0;
-// const draw_h   = _ => { 
-// 	if (h === 0) draw(h_blue);
-// 	else draw(h_yellow);
-// 	draw(h_border);
-// };
-// const click_h  = _ => {
-// 	if (h_blue.click()) {
-// 		if (++h === 2) { 
-// 			h = 0; 
-// 			s_h.set_off();
-// 		} else {
-// 			if (p === 1) { s_center.stop(); s_center.start(); }
-// 			if (f === 1) { s_f.stop(); s_f.start(); }
-// 			if (e === 1) { s_e.stop(); s_e.start(); }
-// 			if (g === 1) { s_g.stop(); s_g.start(); }
-// 			if (k === 1) { s_k.stop(); s_k.start(); }
-// 			s_h.set_on();
-// 		}
-// 		return true;
-// 	}
-// 	return false;
-// };
-
-// k = overlay 5
-
-// const k_blue   = img("h_blue");
-// const k_yellow = k_blue.clone_yellow();
-// const k_border = img("h_border");
-// let   k        = 0;
-// const draw_k   = _ => { 
-// 	if (k === 0) draw(k_blue);
-// 	else draw(k_yellow);
-// 	draw(k_border);
-// };
-// const click_k  = _ => {
-// 	if (k_blue.click()) {
-// 		if (++k === 2) {
-// 			k = 0;
-// 			s_k.set_off();
-// 		} else {
-// 			s_center.start();
-// 			if (f === 1) { s_f.stop(); s_f.start(); }
-// 			if (e === 1) { s_e.stop(); s_e.start(); }
-// 			if (g === 1) { s_g.stop(); s_g.start(); }
-// 			if (h === 1) { s_h.stop(); s_h.start(); }
-// 			s_k.set_on();
-// 		}
-// 		return true;
-// 	}
-// 	return false;
-// };
-
-//const start_group = [ s_center, s_f, s_e, s_g, s_h, s_k ];
