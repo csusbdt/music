@@ -31,14 +31,10 @@ const s_g = new c_tone_seq(dur * 6, [
 	s_g_bf, s_g_bf * (PHI - 1), s_g_bf * (PHI + 1) / 2, s_g_bf * PHI 
 ]);
 
-
-
 const s_h_bf = bf * Math.pow(2 * (1 - PHI), 3);
 const s_h = new c_tone_seq(dur * 12, [
 	sp1(s_h_bf, 0), sp1(s_h_bf, 3), sp1(s_h_bf, 3), sp1(s_h_bf, 1), sp1(s_h_bf, 2) 
 ]);
-
-
 
 
 
@@ -256,12 +252,7 @@ const click_g  = _ => {
 const h_blue   = img("d_blue");
 const h_yellow = h_blue.clone_yellow();
 const h_border = img("d_border");
-//const h_tone   = new c_tone(0, 0, .5); 
-//const h_f      = p_f * Math.pow(2 * (1 - PHI), 3);
-//const h_dur    = p_dur * 12;
 let   h        = 0;
-//let   h_i      = null;
-//let   h_id     = null;
 const draw_h   = _ => { 
 	if (h === 0) draw(h_blue);
 	else draw(h_yellow);
@@ -285,33 +276,6 @@ const click_h  = _ => {
 	}
 	return false;
 };
-// const next_h = _ => {
-// 	if (++h_i === 5) {
-// 		h_i = 0;
-// 		h_tone.set_f(h_f * (PHI + 0));
-// 	} else if (h_i === 1) {
-// 		h_tone.set_f(h_f * (PHI + 7) / 8);
-// 	} else if (h_i === 2) {
-// 		h_tone.set_f(h_f * (PHI + 7) / 8);
-// 	} else if (h_i === 3) {
-// 		h_tone.set_f(h_f * (PHI + 1) / 2);
-// 	} else if (h_i === 4) {
-// 		h_tone.set_f(h_f * (PHI + 3) / 4);
-// 	}
-// 	h_id = setTimeout(next_h, h_dur);
-// };
-// const start_h = _ => {
-// 	h_i = 4;
-// 	h_tone.start();
-// 	next_h();
-// };
-// const stop_h = _ => {
-// 	if (h_id !== null) {
-// 		clearTimeout(h_id);
-// 		h_id = null;
-// 		h_tone.stop();
-// 	}
-// };
 
 const start_audio = _ => {
 	window.start_audio = null;
