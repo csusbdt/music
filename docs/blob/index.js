@@ -51,31 +51,6 @@ c_tone_seq_controller.prototype.click = function() {
 
 const start_group = [];
 
-// // beat  
-
-// const beat_blue   = img("b_blue");
-// const beat_yellow = beat_blue.clone_yellow();
-// const beat_border = img("b_border");
-
-// const beat = {
-// 	on: false,
-// 	draw: function() {
-// 		if (this.on) draw(beat_yellow); else draw(beat_blue);
-// 		draw(beat_border);
-// 	},
-// 	click: function() {
-// 		if (beat_blue.click()) {
-// 			if (this.on) {
-// 				this.on = false;
-// 			} else {
-// 				this.on = true;
-// 			}
-// 			return true;
-// 		}
-// 		return false;		
-// 	}
-// };
-
 // binaural
 
 const binaural_blue   = img("c_blue");
@@ -94,6 +69,7 @@ const binaural = {
 			if (this.on) {
 				this.on = false;
 				center_seq.set_b(0);
+				alt_seq.set_b(0); 
 				o1_seq.set_b(0); 
 				o2_seq.set_b(0); 
 				o3_seq.set_b(0); 
@@ -102,6 +78,7 @@ const binaural = {
 			} else {
 				this.on = true;
 				center_seq.set_b(this.b);
+				alt_seq.set_b(this.b);
 				o1_seq.set_b(this.b); 
 				o2_seq.set_b(this.b); 
 				o3_seq.set_b(this.b);
