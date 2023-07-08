@@ -89,7 +89,7 @@ window.init_audio = _ => {
 };
 
 window.stop_audio  = null; 
-window.start_audio = null; 
+window.start_audio = _ => {}; 
 
 ///////////////////////////////////////////////////////////////////////////////
 //

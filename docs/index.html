@@ -9,12 +9,11 @@
     
     <script type="module">
         import "./global.js";
-        import set_song from "./songs/index.js";
-        const song_i = get_item('song_i', 0);
-        set_song(song_i);
-        import(get_item('page', "./home/index.js")).then(o => { 
-            o.default(); 
-        });
+        import(get_item('page', "./home/index.js")).then(o => o.default()); 
+
+        //        import set_song from "./songs/index.js";
+//        const song_i = get_item('song_i', 0);
+//        set_song(song_i);
     </script>
 </head>    
 <body><canvas onclick="init_audio();" id="canvas" width="1000" height="1000"></canvas></body>

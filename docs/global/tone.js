@@ -14,7 +14,7 @@ c_tone.prototype.clone = function() {
 c_tone.prototype.is_playing = function() { return this.g !== null; }
 
 c_tone.prototype.start = function() {
-	if (this.g === null) {
+	if (window.stop_audio !== null && this.g === null) {
     	this.g = audio.createGain();
     	this.g.connect(gain);
     	this.g.gain.value = 0;

@@ -36,6 +36,10 @@ const s_h = new c_tone_seq(dur * 12, [
 	sp1(s_h_bf, 0), sp1(s_h_bf, 3), sp1(s_h_bf, 3), sp1(s_h_bf, 1), sp1(s_h_bf, 2) 
 ]);
 
+const s_k_bf = bf;
+const s_k = new c_tone_seq(dur * 10, [
+	sp2(s_k_bf, 0), sp2(s_k_bf, 3), sp2(s_k_bf, 3), sp2(s_k_bf, 1), sp2(s_k_bf, 2) 
+]);
 
 
 const img = n => new c_img("./blob/images/" + n + ".png");
@@ -87,12 +91,14 @@ const click_b  = _ => {
 			s_e.set_b(0); 
 			s_g.set_b(0); 
 			s_h.set_b(0); 
+			s_k.set_b(0); 
 		} else {
 			s_center.set_b(bin);
 			s_f.set_b(bin);
 			s_e.set_b(bin);
 			s_g.set_b(bin);
 			s_h.set_b(bin);
+			s_k.set_b(bin);
 		}
 		return true;
 	}
@@ -103,35 +109,40 @@ const stop_b  = _ => {};
 
 // 1/2 
 
-const d_blue   = img("h_blue");
-const d_yellow = d_blue.clone_yellow();
-const d_border = img("h_border");
-const d_tone   = new c_tone(1/2, 0, 1);
-let   d        = 0;
-const draw_d   = _ => { 
-	if (d === 0) draw(d_blue);
-	else draw(d_yellow);
-	draw(d_border);
+const k_blue   = img("h_blue");
+const k_yellow = k_blue.clone_yellow();
+const k_border = img("h_border");
+let   k        = 0;
+const draw_k   = _ => { 
+	if (k === 0) draw(k_blue);
+	else draw(k_yellow);
+	draw(k_border);
 };
-const click_d  = _ => {
-	if (d_blue.click()) {
-		if (window.stop_audio === null) start_audio();
-		if (++d === 2) { d = 0; d_tone.stop(); }
-		else d_tone.start();
+const click_k  = _ => {
+	if (k_blue.click()) {
+		if (++k === 2) {
+			k = 0;
+			s_k.set_off();
+		// } else if (window.stop_audio === null) {
+		// 	start_audio();
+		} else {
+			if (b === 1) { s_center.stop(); s_center.start(); }
+			if (f === 1) { s_f.stop(); s_f.start(); }
+			if (e === 1) { s_e.stop(); s_e.start(); }
+			if (g === 1) { s_g.stop(); s_g.start(); }
+			if (h === 1) { s_h.stop(); s_h.start(); }
+			s_k.set_on();
+		}
 		return true;
 	}
 	return false;
 };
-const start_d = _ => d === 1 && d_tone.start();
-const stop_d  = _ => d_tone.stop();
 
 // base sequence
 
 const p_blue   = img("a_blue");
 const p_yellow = p_blue.clone_yellow();
 const p_border = img("a_border");
-const p_dur    = 1000;
-const p_f      = 90;
 let   p        = 0;
 const draw_p   = _ => { 
 	if (p === 0) draw(p_blue);
@@ -143,13 +154,14 @@ const click_p  = _ => {
 		if (++p === 2) {
 			p = 0;
 			s_center.set_off();
-		} else if (window.stop_audio === null) {
-			start_audio();
+		// } else if (window.stop_audio === null) {
+		// 	start_audio();
 		} else {
 			if (f === 1) { s_f.stop(); s_f.start(); }
 			if (e === 1) { s_e.stop(); s_e.start(); }
 			if (g === 1) { s_g.stop(); s_g.start(); }
 			if (h === 1) { s_h.stop(); s_h.start(); }
+			if (k === 1) { s_k.stop(); s_k.start(); }
 			s_center.set_on();
 		}
 		return true;
@@ -173,13 +185,14 @@ const click_f  = _ => {
 		if (++f === 2) { 
 			f = 0; 
 			s_f.set_off(); 
-		} else if (window.stop_audio === null) {
-			start_audio();
+		// } else if (window.stop_audio === null) {
+		// 	start_audio();
 		} else {
 			if (p === 1) { s_center.stop(); s_center.start(); }
 			if (e === 1) { s_e.stop(); s_e.start(); }
 			if (g === 1) { s_g.stop(); s_g.start(); }
 			if (h === 1) { s_h.stop(); s_h.start(); }
+			if (k === 1) { s_k.stop(); s_k.start(); }
 			s_f.set_on(); 
 		}
 		return true;
@@ -203,13 +216,14 @@ const click_e  = _ => {
 		if (++e === 2) { 
 			e = 0;
 			s_e.set_off();
-		} else if (window.stop_audio === null) {
-			start_audio();
+		// } else if (window.stop_audio === null) {
+		// 	start_audio();
 		} else {
 			if (p === 1) { s_center.stop(); s_center.start(); }
 			if (f === 1) { s_f.stop(); s_f.start(); }
 			if (g === 1) { s_g.stop(); s_g.start(); }
 			if (h === 1) { s_h.stop(); s_h.start(); }
+			if (k === 1) { s_k.stop(); s_k.start(); }
 			s_e.set_on();
 		}
 		return true;
@@ -233,13 +247,14 @@ const click_g  = _ => {
 		if (++g === 2) { 
 			g = 0; 
 			s_g.set_off(); 
-		} else if (window.stop_audio === null) {
-			start_audio();
+		// } else if (window.stop_audio === null) {
+		// 	start_audio();
 		} else {
 			if (p === 1) { s_center.stop(); s_center.start(); }
 			if (f === 1) { s_f.stop(); s_f.start(); }
 			if (e === 1) { s_e.stop(); s_e.start(); }
 			if (h === 1) { s_h.stop(); s_h.start(); }
+			if (k === 1) { s_k.stop(); s_k.start(); }
 			s_g.set_on(); 
 		}
 		return true;
@@ -263,13 +278,14 @@ const click_h  = _ => {
 		if (++h === 2) { 
 			h = 0; 
 			s_h.set_off();
-		} else if (window.stop_audio === null) {
-			start_audio();
+		// } else if (window.stop_audio === null) {
+		// 	start_audio();
 		} else {
 			if (p === 1) { s_center.stop(); s_center.start(); }
 			if (f === 1) { s_f.stop(); s_f.start(); }
 			if (e === 1) { s_e.stop(); s_e.start(); }
 			if (g === 1) { s_g.stop(); s_g.start(); }
+			if (k === 1) { s_k.stop(); s_k.start(); }
 			s_h.set_on();
 		}
 		return true;
@@ -277,17 +293,20 @@ const click_h  = _ => {
 	return false;
 };
 
+const start_group = [ s_center, s_f, s_e, s_g, s_h, s_k ];
+
 const start_audio = _ => {
 	window.start_audio = null;
 	window.stop_audio  = stop_audio;
 	if (a === 1) start_a();
 	if (b === 1) start_b();
-	if (p === 1) s_center.start();
-	if (f === 1) s_f.start();
-	if (d === 1) start_d();
-	if (e === 1) s_e.start();
-	if (g === 1) s_g.start();
-	if (h === 1) s_h.start();
+	start(start_group);
+	// s_center.start();
+	// if (f === 1) s_f.start();
+	// if (e === 1) s_e.start();
+	// if (g === 1) s_g.start();
+	// if (h === 1) s_h.start();
+	// if (k === 1) s_k.start();
 };
 
 const stop_audio = _ => {
@@ -295,12 +314,13 @@ const stop_audio = _ => {
 	window.stop_audio  = null;
 	stop_a();
 	stop_b();
-	s_center.stop();
-	s_f.stop();
-	stop_d();
-	s_e.stop();
-	s_g.stop();
-	s_h.stop();
+	stop(start_group);
+	// s_center.stop();
+	// s_f.stop();
+	// s_e.stop();
+	// s_g.stop();
+	// s_h.stop();
+	// s_k.stop();
 };
 
 const draw_audio = _ => {
@@ -320,17 +340,17 @@ let start_external_audio = null;
 
 const click_page = _ => {
 	if (click(back_button)) {
+		on_click = null;
 		if (start_external_audio !== null) {
-			if (window.stop_audio !== null) window.stop_audio();
+//			if (window.stop_audio !== null) window.stop_audio();
 			start_external_audio();
 		}
 		run("./home/index.js");
 		return;	
 	}
-	else if (
-		click_audio() || click_a() || click_b() || click_p() || click_d() ||
-		click_f()     || click_e() || click_g() || click_h() || volume.click()
-	) on_resize(); 
+	click_audio() || click_a() || click_b() || click_p() || click_k() ||
+	click_f()     || click_e() || click_g() || click_h() || volume.click();
+	on_resize(); 
 	start_external_audio = null;
 };
 
@@ -342,20 +362,28 @@ const draw_page = _ => {
 	draw_a();
 	draw_b();
 	draw_p();
-	draw_d();
+	draw_k();
 	draw_e();
 	draw_f();
 	draw_g();
 	draw_h();
-};
+}; 
 
 export default _ => {
 	if (window.stop_audio !== null && window.stop_audio !== stop_audio) {
 		window.stop_audio();
 		start_external_audio = window.start_audio;
-	} else {
-		start_external_audio = null;
 	}
+	// if (window.stop_audio !== null && window.stop_audio !== stop_audio) {
+	// 	window.stop_audio();
+	// 	start_external_audio = window.start_audio;
+	// 	window.start_audio = null;
+	// 	window.stop_audio = stop_audio;
+	// } else {
+	// 	//window.start_audio = null;
+	// 	//window.stop_audio = stop_audio;
+	// 	start_external_audio = null;
+	// }
 	set_item('page', "./blob/index.js");
 	on_resize = draw_page;
 	on_click = click_page;

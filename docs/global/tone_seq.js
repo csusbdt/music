@@ -24,13 +24,22 @@ c_tone_seq.prototype.next = function() {
 };
 
 c_tone_seq.prototype.start = function() {
-	if (window.stop_audio === null) {
-		start_audio();
-	} else if (this.on && this.id === null) {
-		this.i = this.fs.length - 1;
-		this.tone.start();
-		this.next();
-	}
+    if (this.on && this.id === null) {
+    	// if (window.stop_audio === null) {
+    	// 	start_audio();
+     //    } else {
+        	this.tone.start();
+        	this.next();
+//        }
+    }
+//		this.i = this.fs.length - 1;
+	// if (window.stop_audio === null) {
+	// 	start_audio();
+	// } else if (this.on && this.id === null) {
+	// 	this.i = this.fs.length - 1;
+	// 	this.tone.start();
+	// 	this.next();
+	// }
 };
 
 c_tone_seq.prototype.stop = function() {

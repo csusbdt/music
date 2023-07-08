@@ -258,16 +258,6 @@ const s_man_in_ship       = new c_tone_seq(dur * 3, Array(sp3_max).fill(0).map((
 const s_man_in_house      = new c_tone_seq(dur * 2, Array(sp4_max).fill(0).map((_, i) => sp4(bf * PHI, i)));
 const s_man_outside_house = new c_tone_seq(dur * 2, Array(sp1_max).fill(0).map((_, i) => sp1(bf * PHI, i)));
 
-
-//const blob_p = new c_seq(dur, [ 
-// 	p4(bf, 0), p4(bf, 3), p4(bf, 3), p4(bf, 1), p4(bf, 2) 
-// ]);
-
-// const blob_f_bf = bf * Math.pow(2 * (PHI - 1), 3);
-// const blob_f = new c_seq(dur * 3, [ 
-// 	p4(blob_f_bf, 0), p4(blob_f_bf, 3), p4(blob_f_bf, 3), p4(blob_f_bf, 1), p4(blob_f_bf, 2) 
-// ]);
-
 const group = new c_beat_group(dur);
 group.on = true;
 group.add(s_man_in_valley);
