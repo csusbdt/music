@@ -1,7 +1,6 @@
 import c_tone from "./tone.js";
 
 function c_tone_seq(dur, fs, b = 0, vs = null) {
-    assert(fs.length > 0);
 	this.dur  = dur;
 	this.fs   = fs;
     this.b    = b;
@@ -24,29 +23,29 @@ c_tone_seq.prototype.next = function() {
 };
 
 c_tone_seq.prototype.start = function() {
-    if (this.on && this.id === null) {
-    	// if (window.stop_audio === null) {
-    	// 	start_audio();
-     //    } else {
-        	this.tone.start();
-        	this.next();
-//        }
+    if (window.stop_audio !== null) {
+        assert(this.id === null);
+        if (this.on) {
+            this.tone.start();
+            this.next();
+        }
     }
-//		this.i = this.fs.length - 1;
-	// if (window.stop_audio === null) {
-	// 	start_audio();
-	// } else if (this.on && this.id === null) {
-	// 	this.i = this.fs.length - 1;
-	// 	this.tone.start();
-	// 	this.next();
-	// }
 };
+
+// c_tone_seq.prototype.pause = function() {
+// 	if (this.id !== null) {
+// 		clearTimeout(this.id);
+// 		this.id = null;
+// 		this.tone.stop();
+// 	}
+// };
 
 c_tone_seq.prototype.stop = function() {
 	if (this.id !== null) {
 		clearTimeout(this.id);
 		this.id = null;
 		this.tone.stop();
+        this.i = this.fs.length - 1;
 	}
 };
 

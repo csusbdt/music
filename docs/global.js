@@ -256,11 +256,13 @@ window.freq = (octave_tones, base_frequency, step_away_from_base) => {
 	return base_frequency * Math.pow(Math.pow(2, 1.0 / octave_tones), steps_away_from_base);
 };
 
-window.run   = (path, ...arg) => import(path).then(o => o.default(...arg));
-window.draw  = (a, x = 0, y = 0) => Array.isArray(a) ? a.forEach(o => o.draw(x, y)) : a.draw(x, y);
-window.click = (a, x = 0, y = 0) => Array.isArray(a) ? a.some(o => o.click(x, y)) : a.click(x, y);
-window.start = (a) => Array.isArray(a) ? a.forEach(o => o.start()) : a.start();
-window.stop  = (a) => Array.isArray(a) ? a.forEach(o => o.stop())  : a.stop();
+window.run     = (path, ...arg) => import(path).then(o => o.default(...arg));
+window.draw    = (a, x = 0, y = 0) => Array.isArray(a) ? a.forEach(o => o.draw(x, y)) : a.draw(x, y);
+window.click   = (a, x = 0, y = 0) => Array.isArray(a) ? a.some(o => o.click(x, y)) : a.click(x, y);
+window.start   = (a) => Array.isArray(a) ? a.forEach(o => o.start()) : a.start();
+window.stop    = (a) => Array.isArray(a) ? a.forEach(o => o.stop())  : a.stop();
+window.pause   = (a) => Array.isArray(a) ? a.forEach(o => o.pause()) : a.pause();
+//window.restart = (a) => Array.isArray(a) ? a.forEach(o => o.restart()) : a.restart();
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
