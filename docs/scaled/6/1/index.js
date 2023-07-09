@@ -1,6 +1,7 @@
 import start_scaled_6 from "../index.js"               ;
 import c_tone         from "../../../global/tone.js"   ;
 import xbutton        from "../../../global/xbutton.js";
+import volume         from "../../../global/volume.js" ;
 
 const back_button = xbutton("upper_left_green" );
 const audio_green = xbutton("upper_right_green");
@@ -128,12 +129,14 @@ const click_page = _ => {
 		window.stop_audio === null ? start_audio() : window.stop_audio();
 		on_resize();
 	}
+	else if (volume.click()) on_resize();
 	start_external_audio = null;
 };
 
 const draw_page = _ => {
 	bg_blue.draw();
 	draw(back_button);
+	volume.draw_green();
 	window.stop_audio === null ? draw(audio_green) : draw(audio_red);
 	units.forEach(o => o.draw());
 };

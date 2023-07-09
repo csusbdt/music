@@ -1,5 +1,6 @@
 import songs    from "./songs.js"          ;
 import xbutton  from "../global/xbutton.js";
+import volume   from "../global/volume.js" ;
 
 const draw = a => Array.isArray(a) ? a.forEach(o => o.draw()) : a.draw();
 
@@ -38,6 +39,7 @@ const stop_audio = _ => {
 
 const draw_page = _ => {
 	bg_blue.draw();
+	volume.draw_green();
 	draw(green);
 	if (window.stop_audio === stop_audio) red[song_i].draw();
 	back_button.draw();
@@ -74,6 +76,7 @@ const click_page = _ => {
 	} else if (back_button.click()) {
 		run("./home/index.js");
 	} else if (click_song_buttons()) on_resize();
+	else if (volume.click()) on_resize();
 };
 
 export default i => {

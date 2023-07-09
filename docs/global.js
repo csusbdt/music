@@ -252,8 +252,8 @@ window.scale = (octave_tones, base_frequency, half_notes_away_from_base) => {
 	return base_frequency * Math.pow(Math.pow(2, 1.0 / octave_tones), half_notes_away_from_base);
 };
 
-window.freq = (octave_tones, base_frequency, step_away_from_base) => {
-	return base_frequency * Math.pow(Math.pow(2, 1.0 / octave_tones), steps_away_from_base);
+window.freq = (octave_steps, base_f, steps) => {
+	return base_f * Math.pow(Math.pow(2, 1 / octave_steps), steps);
 };
 
 window.run     = (path, ...arg) => import(path).then(o => o.default(...arg));

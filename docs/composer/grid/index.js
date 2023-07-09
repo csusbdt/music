@@ -53,8 +53,8 @@ const draw_grid = _ => {
 };
 
 const draw_audio = _ => {
-	if (state === playback) audio_yellow.draw();
-	else audio_blue.draw();
+	if (window.stop_audio === null) audio_blue.draw();
+	else audio_yellow.draw();
 };
 
 const click_grid = _ => {
@@ -187,15 +187,15 @@ const draw_page = _ => {
 };
 
 const start_audio = _ => {
-	start_playback();
 	window.start_audio = null;
 	window.stop_audio = stop_audio;
+	if (state === playback) start_playback();
 };
 
 const stop_audio = _ => {
-	stop_playback();
 	window.start_audio = start_audio;
 	window.stop_audio = null;
+	if (state === playback) stop_playback();
 };
 
 export default _ => {
